@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./calculator_theme.css" />
+  <style>
+    body, html {
+      background-color: var(--background) !important;
+      color: var(--foreground) !important;
+      font-family: var(--font-sans) !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
+    .calculator {
+      background-color: var(--card) !important;
+      color: var(--card-foreground) !important;
+      border-radius: var(--radius) !important;
+      box-shadow: var(--shadow-lg) !important;
+      width: 320px !important;
+      padding: var(--spacing) !important;
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      grid-template-rows: minmax(80px, auto) repeat(5, 60px) !important;
+      gap: var(--spacing) !important;
+    }
+    .display {
+      grid-column: span 4 !important;
+      background-color: var(--background) !important;
+      border-radius: var(--radius) !important;
+      padding: 1rem !important;
+      font-size: 2rem !important;
+      text-align: right !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.5) !important;
+      user-select: none !important;
+    }
+    button {
+      background-color: var(--secondary) !important;
+      color: var(--secondary-foreground) !important;
+      border: none !important;
+      border-radius: var(--radius) !important;
+      font-size: 1.25rem !important;
+      font-weight: 600 !important;
+      box-shadow: var(--shadow-sm) !important;
+      cursor: pointer !important;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      user-select: none !important;
+    }
+    button:active {
+      transform: scale(0.95) !important;
+      box-shadow: var(--shadow-xs) !important;
+    }
+    button.operator {
+      background-color: var(--primary) !important;
+      color: var(--primary-foreground) !important;
+    }
+    button.equals {
+      background-color: var(--accent) !important;
+      color: var(--accent-foreground) !important;
+      grid-column: span 2 !important;
+    }
+    button.zero {
+      grid-column: span 2 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator" role="application" aria-label="Calculator">
+    <div class="display" id="display" aria-live="polite" aria-atomic="true">0</div>
+    <button type="button" class="clear" aria-label="Clear">C</button>
+    <button type="button" class="toggle-sign" aria-label="Toggle Sign">+/-</button>
+    <button type="button" class="percent" aria-label="Percent">%</button>
+    <button type="button" class="operator" aria-label="Divide">÷</button>
+    <button type="button" class="number" aria-label="7">7</button>
+    <button type="button" class="number" aria-label="8">8</button>
+    <button type="button" class="number" aria-label="9">9</button>
+    <button type="button" class="operator" aria-label="Multiply">×</button>
+    <button type="button" class="number" aria-label="4">4</button>
+    <button type="button" class="number" aria-label="5">5</button>
+    <button type="button" class="number" aria-label="6">6</button>
+    <button type="button" class="operator" aria-label="Subtract">-</button>
+    <button type="button" class="number" aria-label="1">1</button>
+    <button type="button" class="number" aria-label="2">2</button>
+    <button type="button" class="number" aria-label="3">3</button>
+    <button type="button" class="operator" aria-label="Add">+</button>
+    <button type="button" class="number zero" aria-label="0">0</button>
+    <button type="button" class="decimal" aria-label="Decimal point">.</button>
+    <button type="button" class="equals" aria-label="Equals">=</button>
+  </div>
+</body>
+</html>

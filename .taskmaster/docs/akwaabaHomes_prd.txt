@@ -1,0 +1,160 @@
+# 🏡 AkwaabaHomes - Real Estate Platform PRD
+
+**Product Name:** AkwaabaHomes
+**Version:** v2.3 (Frontend First Development)
+**Date:** January 2025
+
+## 1. Product Overview
+
+AkwaabaHomes is a real estate marketplace for Ghana where local agents, developers, and property owners list lands, houses, and apartments, and both local and diaspora buyers browse, compare, and connect safely.
+
+The platform emphasises:
+* **Trust** → fraud prevention, verified listings and agents
+* **Transparency** → mandatory geo-tagging, market price comparisons
+* **Diaspora inclusivity (buyers only)** → multi-currency display, virtual tours, family inspection scheduling
+* **Monetisation per post** → sellers pay based on tiered visibility, buyers browse for free
+
+## 2. Target Users
+
+### Primary
+* **Local Buyers & Renters** — Ghanaians searching for property
+* **Diaspora Buyers** — Ghanaians abroad or international buyers investing for family, retirement, or income
+* **Local Sellers** — property owners, estate developers, and licensed agents in Ghana
+
+### Secondary
+* Banks (diaspora mortgage products, local financing)
+* Service providers (lawyers, surveyors, movers, contractors)
+
+## 3. Key Frontend Features to Build
+
+### 3.1 Homepage
+* Hero section with search functionality
+* Featured properties carousel
+* Quick search filters (location, type, price range)
+* Trust indicators and USPs
+* Diaspora-focused messaging
+
+### 3.2 Property Listings
+* Grid/List view toggle
+* Advanced search filters
+* Map integration with clustering
+* Multi-currency display (GHS, USD, GBP, EUR)
+* Verified agent badges
+* Mandatory geo-tagging display
+
+### 3.3 Property Details Page
+* Photo galleries and virtual tours
+* Price in multiple currencies
+* Location map with neighborhood insights
+* Contact seller options (Call, WhatsApp, Schedule Inspection)
+* Property specifications
+* Verification status indicators
+
+### 3.4 Search & Discovery
+* Location-based search with map
+* Filter by property type, price, size
+* Sort by newest, price, verification status
+* Saved searches (for registered users)
+* Search alerts
+
+### 3.5 Diaspora Features
+* Multi-currency converter
+* Virtual tour viewer
+* Inspection scheduling interface
+* Neighborhood insights dashboard
+* Resource hub for buyers abroad
+
+### 3.6 Seller Dashboard (Basic UI)
+* Listing creation form with mandatory geo-tagging
+* Pricing tier selection
+* Media upload (photos/videos)
+* Listing management
+* Analytics preview
+
+### 3.7 Trust & Safety UI
+* Verification badges
+* Fraud reporting interface
+* Document verification status
+* Seller profile verification
+
+## 4. Tech Stack (Frontend)
+
+* **Framework:** Next.js 14 (App Router)
+* **Styling:** TailwindCSS + ShadCN UI
+* **Maps:** Mapbox GL JS
+* **State Management:** Zustand
+* **Forms:** React Hook Form + Zod validation
+* **Currency:** Real-time FX API integration
+* **Images:** Next/Image with optimization
+* **Icons:** Lucide React
+* **Animations:** Framer Motion
+
+## 5. Design Requirements
+
+* Mobile-first responsive design
+* Clean, modern UI following realtor.com patterns
+* Ghana-specific cultural elements
+* Multi-currency support throughout
+* Fast loading (<3s on 3G)
+* Accessibility compliant
+* Trust-building visual elements
+
+## 6. Key Pages to Build
+
+1. **Homepage** - Hero, search, featured properties
+2. **Search Results** - Listings grid/list with filters
+3. **Property Details** - Complete property page
+4. **Seller Dashboard** - Listing management
+5. **User Authentication** - Login/Register
+6. **About/Trust** - Company info and safety
+7. **Diaspora Hub** - Resources for overseas buyers
+8. **Contact** - Support and inquiries
+
+## 7. Unique Selling Points (Frontend Focus)
+
+1. **Mandatory geo-tagging** visual indicators
+2. **Multi-currency display** throughout the platform
+3. **Diaspora-focused UX** with inspection scheduling
+4. **Verified seller badges** and trust indicators
+5. **Virtual tour integration** for remote viewing
+6. **Neighborhood insights** with local data
+7. **WhatsApp integration** for Ghana communication preferences
+
+## 8. Success Metrics
+
+* Page load speed <3s
+* Mobile responsiveness score >95
+* User engagement with diaspora features
+* Conversion from browse to contact
+* Search filter usage analytics
+* Mobile vs desktop usage patterns
+
+## 9. Development Phases
+
+### Phase 1: Core Frontend (Demo Ready)
+* Homepage with search
+* Property listings page
+* Property details page
+* Basic seller dashboard
+* Responsive design implementation
+
+### Phase 2: Enhanced Features
+* User authentication
+* Advanced search and filters
+* Map integration
+* Multi-currency system
+* Virtual tours
+
+### Phase 3: Diaspora Features
+* Inspection scheduling
+* Neighborhood insights
+* Resource hub
+* Family representative features
+
+### Phase 4: Trust & Safety
+* Verification badges
+* Fraud reporting
+* Document verification UI
+* Seller profiles
+
+This PRD focuses on creating a demo-ready frontend that showcases the platform's unique value proposition while drawing inspiration from realtor.com's proven patterns.
