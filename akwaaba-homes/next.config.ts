@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
+  basePath: '/akwaaba-homes',
+  assetPrefix: '/akwaaba-homes/',
   images: {
     unoptimized: true,
     remotePatterns: [

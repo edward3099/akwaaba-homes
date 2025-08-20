@@ -137,7 +137,7 @@ export function MobileSearchBar({
             </Select>
 
             {/* Status Quick Select */}
-            <Select value={status} onValueChange={(value: string) => setStatus(value as 'all' | 'sale' | 'rent')}>
+            <Select value={status} onValueChange={(value: string) => setStatus(value as Property['status'] | 'all')}>
               <SelectTrigger className="w-auto min-w-[100px] h-10 border-0 bg-muted/50 rounded-full text-sm">
                 <SelectValue />
               </SelectTrigger>
