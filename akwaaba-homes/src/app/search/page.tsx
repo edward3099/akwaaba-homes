@@ -283,11 +283,6 @@ function SearchResults() {
         <div className="container mx-auto px-4 py-6">
           <SearchBar 
             onSearch={handleSearch}
-            defaultValues={{
-              query: filters.location || '',
-              type: filters.type?.[0],
-              currency: currency,
-            }}
           />
         </div>
       </div>

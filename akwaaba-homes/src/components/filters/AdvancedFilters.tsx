@@ -92,7 +92,7 @@ export function AdvancedFilters({
       ? currentTypes.filter(t => t !== type)
       : [...currentTypes, type];
     
-    handleFilterChange('type', newTypes.length > 0 ? newTypes : undefined);
+    handleFilterChange('type', newTypes.length > 0 ? newTypes : []);
   };
 
   const toggleAmenity = (amenity: string) => {
@@ -101,7 +101,7 @@ export function AdvancedFilters({
       ? currentAmenities.filter(a => a !== amenity)
       : [...currentAmenities, amenity];
     
-    handleFilterChange('amenities', newAmenities.length > 0 ? newAmenities : undefined);
+    handleFilterChange('amenities', newAmenities.length > 0 ? newAmenities : []);
   };
 
   return (
