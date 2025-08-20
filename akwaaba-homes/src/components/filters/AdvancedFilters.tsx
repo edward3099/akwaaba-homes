@@ -35,7 +35,7 @@ export function AdvancedFilters({
 }: AdvancedFiltersProps) {
   const [localFilters, setLocalFilters] = useState<SearchFilters>(filters);
 
-  const handleFilterChange = (key: keyof SearchFilters, value: any) => {
+  const handleFilterChange = (key: keyof SearchFilters, value: SearchFilters[keyof SearchFilters]) => {
     const newFilters = { ...localFilters, [key]: value };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
