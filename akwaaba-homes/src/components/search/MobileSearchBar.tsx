@@ -117,7 +117,7 @@ export function MobileSearchBar({
           {/* Quick Filters Row */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 smooth-scroll">
             {/* Property Type Quick Select */}
-            <Select value={propertyType} onValueChange={(value: string) => setPropertyType(value)}>
+            <Select value={propertyType} onValueChange={(value: string) => setPropertyType(value as Property['type'] | 'all')}>
               <SelectTrigger className="w-auto min-w-[100px] h-10 border-0 bg-muted/50 rounded-full text-sm">
                 <div className="flex items-center gap-2">
                   <Home className="w-4 h-4" />
@@ -137,7 +137,7 @@ export function MobileSearchBar({
             </Select>
 
             {/* Status Quick Select */}
-            <Select value={status} onValueChange={(value: string) => setStatus(value)}>
+            <Select value={status} onValueChange={(value: string) => setStatus(value as Property['status'])}>
               <SelectTrigger className="w-auto min-w-[100px] h-10 border-0 bg-muted/50 rounded-full text-sm">
                 <SelectValue />
               </SelectTrigger>

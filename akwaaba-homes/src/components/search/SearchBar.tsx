@@ -104,7 +104,7 @@ export function SearchBar({ onSearch, showAdvancedFilters = false, className = '
             <label className="block text-sm font-medium text-foreground mb-2">
               Property Type
             </label>
-            <Select value={propertyType} onValueChange={(value: string) => setPropertyType(value)}>
+            <Select value={propertyType} onValueChange={(value: string) => setPropertyType(value as Property['type'] | 'all')}>
               <SelectTrigger className="w-full h-11">
                 <div className="flex items-center gap-2">
                   <Home className="h-4 w-4 text-muted-foreground" />
