@@ -10,7 +10,7 @@ import { Property, CurrencyCode } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface SearchBarProps {
-  onSearch?: (filters: any) => void;
+  onSearch?: (filters: { query: string; type: Property['type'][] | undefined; minPrice: number; maxPrice: number; status: Property['status'] | undefined }) => void;
   showAdvancedFilters?: boolean;
   className?: string;
 }
@@ -51,9 +51,10 @@ export function SearchBar({ onSearch, showAdvancedFilters = false, className = '
   const handleSearch = () => {
     const filters = {
       query: searchQuery,
-      type: propertyType !== 'all' ? propertyType : undefined,
-      priceRange: priceRange !== 'all' ? priceRange : undefined,
-      currency,
+      type: propertyType !== 'all' ? [propertyType as Property['type']] : undefined,
+      minPrice: 0,
+      maxPrice: 10000000,
+      status: undefined,
     };
 
     if (onSearch) {
@@ -104,7 +105,7 @@ export function SearchBar({ onSearch, showAdvancedFilters = false, className = '
             <label className="block text-sm font-medium text-foreground mb-2">
               Property Type
             </label>
-            <Select value={propertyType} onValueChange={(value: any) => setPropertyType(value)}>
+            <Select value={propertyType} onValueChange={(value: string) => setPropertyType(value as Property['type'] | 'all')}>
               <SelectTrigger className="w-full h-11">
                 <div className="flex items-center gap-2">
                   <Home className="h-4 w-4 text-muted-foreground" />

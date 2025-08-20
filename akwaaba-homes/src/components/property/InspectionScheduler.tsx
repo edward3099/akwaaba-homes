@@ -235,14 +235,14 @@ export function InspectionScheduler({ property, onClose }: InspectionSchedulerPr
                     <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">Diaspora Inspection Service</p>
-                      <p>Since you're arranging inspection through someone else, please provide their contact information so the seller can coordinate directly with them.</p>
+                      <p>Since you&apos;re arranging inspection through someone else, please provide their contact information so the seller can coordinate directly with them.</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="inspectorName" className="text-sm">Inspector's Name *</Label>
+                    <Label htmlFor="inspectorName" className="text-sm">Inspector&apos;s Name *</Label>
                     <Input
                       id="inspectorName"
                       type="text"
@@ -254,7 +254,7 @@ export function InspectionScheduler({ property, onClose }: InspectionSchedulerPr
                   </div>
 
                   <div>
-                    <Label htmlFor="inspectorPhone" className="text-sm">Inspector's Phone *</Label>
+                    <Label htmlFor="inspectorPhone" className="text-sm">Inspector&apos;s Phone *</Label>
                     <Input
                       id="inspectorPhone"
                       type="tel"
@@ -268,7 +268,7 @@ export function InspectionScheduler({ property, onClose }: InspectionSchedulerPr
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="inspectorEmail" className="text-sm">Inspector's Email</Label>
+                    <Label htmlFor="inspectorEmail" className="text-sm">Inspector&apos;s Email</Label>
                     <Input
                       id="inspectorEmail"
                       type="email"

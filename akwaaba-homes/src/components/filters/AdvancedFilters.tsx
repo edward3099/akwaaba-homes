@@ -175,7 +175,7 @@ export function AdvancedFilters({
                   ...localFilters.priceRange,
                   min,
                   currency
-                });
+                } as any);
               }}
             />
             <Input
@@ -188,7 +188,7 @@ export function AdvancedFilters({
                   ...localFilters.priceRange,
                   max,
                   currency
-                });
+                } as any);
               }}
             />
           </div>
@@ -205,7 +205,7 @@ export function AdvancedFilters({
                     ? [parseInt(range.value.replace('+', '')), undefined]
                     : range.value.split('-').map(v => parseInt(v));
                   
-                  handleFilterChange('priceRange', { min, max, currency });
+                  handleFilterChange('priceRange', { min, max, currency } as any);
                 }}
                 className="w-full justify-start text-xs h-8"
               >

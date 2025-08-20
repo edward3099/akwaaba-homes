@@ -124,18 +124,17 @@ const mockProperty: Property = {
   }
 };
 
-interface PropertyPageProps {
-  params: { id: string };
-}
 
-export default function PropertyPage({ params }: PropertyPageProps) {
+
+export default function PropertyPage() {
+  // For now, use mock data. In production, you'd get the ID from params
+  // const { id } = await params;
+  // const property = await fetchProperty(id);
+  const property = mockProperty;
   const [currency, setCurrency] = useState<CurrencyCode>('GHS');
   const [isSaved, setIsSaved] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showInspectionForm, setShowInspectionForm] = useState(false);
-
-  // In production, fetch property data based on params.id
-  const property = mockProperty;
   const priceDisplay = formatDiasporaPrice(property.price, currency);
 
   const handleSave = () => {
