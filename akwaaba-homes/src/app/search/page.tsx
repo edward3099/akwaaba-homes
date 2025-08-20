@@ -253,24 +253,7 @@ function SearchResults() {
     setFilters(urlFilters);
   }, [searchParams]);
 
-  const handleSearch = (searchData: { query: string; type: Property['type'][] | undefined; minPrice: number; maxPrice: number; status: Property['status'] | undefined }) => {
-    const newFilters: SearchFilters = {
-      location: searchData.query,
-      type: searchData.type,
-      status: searchData.status,
-      priceRange: {
-        min: searchData.minPrice,
-        max: searchData.maxPrice,
-        currency: currency
-      }
-    };
-    setFilters(newFilters);
-    setCurrentPage(1);
-    // In a real app, this would make an API call
-    console.log('Searching with filters:', newFilters);
-  };
-
-  const handleAdvancedFiltersChange = (newFilters: SearchFilters) => {
+  const handleSearch = (newFilters: SearchFilters) => {
     setFilters(newFilters);
     setCurrentPage(1);
     // In a real app, this would make an API call
@@ -300,6 +283,11 @@ function SearchResults() {
         <div className="container mx-auto px-4 py-6">
           <SearchBar 
             onSearch={handleSearch}
+            defaultValues={{
+              query: filters.location || '',
+              type: filters.type?.[0],
+              currency: currency,
+            }}
           />
         </div>
       </div>
@@ -325,7 +313,7 @@ function SearchResults() {
                 </div>
                 <AdvancedFilters
                   filters={filters}
-                  onFiltersChange={handleAdvancedFiltersChange}
+                  onFiltersChange={handleSearch}
                   currency={currency}
                   onCurrencyChange={setCurrency}
                 />
@@ -383,7 +371,7 @@ function SearchResults() {
                       const newFilters = { ...filters };
                       newFilters.type = newFilters.type?.filter(t => t !== type);
                       if (newFilters.type?.length === 0) delete newFilters.type;
-                      handleAdvancedFiltersChange(newFilters);
+                      handleSearch(newFilters);
                     }} />
                   </Badge>
                 ))}
@@ -393,7 +381,7 @@ function SearchResults() {
                     <X className="w-3 h-3 cursor-pointer" onClick={() => {
                       const newFilters = { ...filters };
                       delete newFilters.location;
-                      handleAdvancedFiltersChange(newFilters);
+                      handleSearch(newFilters);
                     }} />
                   </Badge>
                 )}
@@ -416,7 +404,7 @@ function SearchResults() {
                 <AdvancedFilters
                   filters={filters}
                   onFiltersChange={(newFilters) => {
-                    handleAdvancedFiltersChange(newFilters);
+                    handleSearch(newFilters);
                     setShowFilters(false);
                   }}
                   currency={currency}

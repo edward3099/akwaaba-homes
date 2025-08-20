@@ -108,7 +108,7 @@ export function TrustIndicators() {
           </h2>
           
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We&apos;ve built Ghana&apos;s most trusted real estate platform with security, 
+            We've built Ghana's most trusted real estate platform with security, 
             verification, and transparency at the core of everything we do.
           </p>
         </div>

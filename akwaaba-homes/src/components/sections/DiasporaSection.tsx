@@ -101,7 +101,7 @@ export function DiasporaSection() {
               </h3>
               <p className="text-lg text-muted-foreground mb-6">
                 All properties display prices in multiple currencies with real-time exchange rates. 
-                No more mental calculations - see exactly what you&apos;ll pay in your local currency.
+                No more mental calculations - see exactly what you'll pay in your local currency.
               </p>
               
               <div className="space-y-3 mb-6">

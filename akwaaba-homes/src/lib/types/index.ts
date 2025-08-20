@@ -260,7 +260,7 @@ export interface ApiResponse<T> {
 }
 
 // Form Types
-export interface PropertyFormData extends Omit<Property, 'id' | 'createdAt' | 'updatedAt' | 'expiresAt' | 'images' | 'videos'> {
+export interface PropertyFormData extends Omit<Property, 'id' | 'createdAt' | 'updatedAt' | 'expiresAt'> {
   tier: ListingTier['id'];
   images: File[];
   videos?: File[];
