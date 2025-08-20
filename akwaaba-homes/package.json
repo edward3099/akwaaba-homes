@@ -2,11 +2,10 @@
   "name": "akwaaba-homes",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://edward3099.github.io/akwaaba-homes",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "build:static": "next build && next export",
+    "export": "next build",
     "start": "next start",
     "lint": "next lint"
   },
