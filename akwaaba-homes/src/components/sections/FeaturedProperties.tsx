@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/property/PropertyCard';
-import { ArrowRight, MapPin, ChevronDown } from 'lucide-react';
+import { MapPin, ChevronDown } from 'lucide-react';
 import { Property } from '@/lib/types';
 import { useState } from 'react';
 
@@ -463,6 +463,9 @@ export function FeaturedProperties() {
     setSelectedPropertyType(type);
   };
 
+  // Add state for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+
   return (
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
@@ -817,18 +820,41 @@ export function FeaturedProperties() {
           ))}
         </div>
 
-        {/* Load More / View All */}
+        {/* Pagination */}
         <div className="text-center">
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="flex items-center gap-2 mx-auto"
-          >
-            View All Properties
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="px-3 py-2"
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((page) => (
+                <Button
+                  key={page}
+                  size="sm"
+                  variant={currentPage === page ? "default" : "outline"}
+                  className="px-3 py-2 min-w-[40px]"
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+            
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="px-3 py-2"
+            >
+              Next
+            </Button>
+          </div>
           
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-sm text-muted-foreground">
             Showing {filteredProperties.length} of 5,000+ verified properties
           </p>
         </div>
