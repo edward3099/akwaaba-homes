@@ -111,7 +111,9 @@ export function PropertyCard({
 
   if (viewMode === 'list') {
     return (
-      <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 ${className}`}>
+      <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 ${className} ${
+        property.tier === 'premium' ? 'premium-card-glow' : ''
+      }`}>
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
@@ -266,7 +268,9 @@ export function PropertyCard({
 
   // Grid View
   return (
-    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden ${className}`}>
+    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden ${className} ${
+      property.tier === 'premium' ? 'premium-card-glow' : ''
+    }`}>
       <CardContent className="p-0">
         {/* Image Section */}
         <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">

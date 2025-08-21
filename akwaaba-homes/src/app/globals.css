@@ -373,6 +373,22 @@
   .property-status-short-let {
     @apply bg-[oklch(var(--property-short-let))] text-white;
   }
+
+  /* Premium card glow effect */
+  .premium-card-glow {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #9333ea, #a855f7, #c084fc, #d8b4fe) border-box;
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3), 
+                0 0 40px rgba(147, 51, 234, 0.1),
+                0 0 60px rgba(147, 51, 234, 0.05);
+  }
+
+  .premium-card-glow:hover {
+    box-shadow: 0 0 25px rgba(147, 51, 234, 0.4), 
+                0 0 50px rgba(147, 51, 234, 0.15),
+                0 0 75px rgba(147, 51, 234, 0.08);
+  }
   
   .verification-badge {
     @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium
