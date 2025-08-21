@@ -85,7 +85,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-20 lg:pb-6">
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content Column */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
@@ -420,6 +420,36 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
           onClose={() => setShowInspectionForm(false)}
         />
       )}
+
+      {/* Sticky Bottom Menu */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50 lg:hidden">
+        <div className="flex gap-2 p-3">
+          <Button 
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            size="lg"
+            onClick={() => {
+              // Open WhatsApp with pre-filled message
+              const message = `Hi, I'm interested in ${property.title} at ${property.location.address}, ${property.location.city}. Can you provide more details?`;
+              const whatsappUrl = `https://wa.me/${property.seller.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+              window.open(whatsappUrl, '_blank');
+            }}
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            WhatsApp
+          </Button>
+          <Button 
+            className="flex-1 bg-primary hover:bg-primary/90 text-white"
+            size="lg"
+            onClick={() => {
+              // Open phone dialer
+              window.open(`tel:${property.seller.phone}`, '_self');
+            }}
+          >
+            <Phone className="w-4 h-4 mr-2" />
+            Call Now
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
