@@ -101,7 +101,7 @@ export function PropertyCard({
       case 'premium':
         return { text: 'Premium', className: 'bg-purple-600 text-white' };
       case 'standard':
-        return { text: 'Featured', className: 'bg-amber-600 text-white' };
+        return null; // Remove Featured badge for standard tier
       default:
         return null;
     }
