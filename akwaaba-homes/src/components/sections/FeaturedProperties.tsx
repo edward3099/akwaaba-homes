@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/property/PropertyCard';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, TrendingUp, MapPin, Filter, Search } from 'lucide-react';
+import { ArrowRight, MapPin, ChevronDown } from 'lucide-react';
 import { Property } from '@/lib/types';
 
 // Mock data - in production this would come from an API
@@ -250,102 +248,325 @@ const mockProperties: Property[] = [
 ];
 
 export function FeaturedProperties() {
-  const [selectedRegion, setSelectedRegion] = useState<string>('all');
-
-  const regions = [
-    { value: 'all', label: 'All Regions' },
-    { value: 'greater-accra', label: 'Greater Accra' },
-    { value: 'ashanti', label: 'Ashanti' },
-    { value: 'western', label: 'Western' },
-    { value: 'central', label: 'Central' },
-    { value: 'eastern', label: 'Eastern' },
-    { value: 'volta', label: 'Volta' },
-    { value: 'northern', label: 'Northern' },
-    { value: 'upper-east', label: 'Upper East' },
-    { value: 'upper-west', label: 'Upper West' },
-    { value: 'bono', label: 'Bono' },
-    { value: 'ahafo', label: 'Ahafo' },
-    { value: 'savannah', label: 'Savannah' },
-    { value: 'north-east', label: 'North East' },
-  ];
-
-  const filteredProperties = selectedRegion === 'all' 
-    ? mockProperties 
-    : mockProperties.filter(p => p.location.region.toLowerCase().replace(' ', '-') === selectedRegion);
+  // Remove old region filtering logic since we now have a full search form
+  
+  const filteredProperties = mockProperties; // Show all properties by default
 
   return (
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
 
 
-        {/* Region Filter - Form-Based Design */}
+        {/* Full Search Form */}
         <div className="mb-8">
           <div className="bg-white rounded-xl shadow-xl p-4 sm:p-6 border border-border/50">
             {/* Header */}
             <div className="text-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Find Your New Property</h2>
-              <p className="text-muted-foreground text-sm sm:text-base">Select your preferred region to discover properties</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Find your new property</h2>
             </div>
 
-            {/* Region Selection Form */}
+            {/* Search Form */}
             <form className="space-y-6">
-              {/* Region Selection */}
+              {/* Property Type Tabs */}
               <div className="form-group">
-                <label className="block text-sm font-medium text-foreground mb-3">
-                  <MapPin className="w-4 h-4 inline mr-2 text-primary" />
-                  Choose Your Region
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {regions.map((region) => (
-                    <div key={region.value} className="flex-shrink-0">
-                      <input
-                        type="radio"
-                        id={`region-${region.value}`}
-                        name="region"
-                        value={region.value}
-                        checked={selectedRegion === region.value}
-                        onChange={(e) => setSelectedRegion(e.target.value)}
-                        className="sr-only"
-                      />
-                      <label
-                        htmlFor={`region-${region.value}`}
-                        className={`
-                          block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200
-                          ${selectedRegion === region.value
-                            ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25'
-                            : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50 hover:text-foreground'
-                          }
-                        `}
-                      >
-                        {region.label}
-                      </label>
-                    </div>
-                  ))}
+                <ul className="flex justify-center space-x-1" id="">
+                  <li id="li-cid-for-sale" className="flex-1">
+                    <input 
+                      type="radio" 
+                      name="cid" 
+                      id="cid-for-sale" 
+                      value="2" 
+                      defaultChecked 
+                      className="sr-only"
+                    />
+                    <label 
+                      htmlFor="cid-for-sale" 
+                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-primary text-primary-foreground border-primary"
+                    >
+                      Buy
+                    </label>
+                  </li>
+                  <li id="li-cid-for-rent" className="flex-1">
+                    <input 
+                      type="radio" 
+                      name="cid" 
+                      id="cid-for-rent" 
+                      value="1" 
+                      className="sr-only"
+                    />
+                    <label 
+                      htmlFor="cid-for-rent" 
+                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                    >
+                      Rent
+                    </label>
+                  </li>
+                  <li id="li-cid-short-let" className="flex-1">
+                    <input 
+                      type="radio" 
+                      name="cid" 
+                      id="cid-short-let" 
+                      value="4" 
+                      className="sr-only"
+                    />
+                    <label 
+                      htmlFor="cid-short-let" 
+                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                    >
+                      Short Let
+                    </label>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Location Input */}
+              <div className="form-group">
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input 
+                    id="propertyLocation" 
+                    name="propertyLocation" 
+                    placeholder="Enter a region, district or subdistrict" 
+                    type="text" 
+                    className="w-full h-12 pl-10 pr-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                    autoComplete="off"
+                  />
+                </div>
+                <em className="text-sm text-red-500 hidden" id="no-location-found">Location not found</em>
+                <input type="hidden" name="sid" id="sid" />
+                <input type="hidden" name="lid" id="lid" />
+                <input type="hidden" name="slid" id="slid" />
+                <input type="hidden" name="n" id="n" />
+                <input type="hidden" name="selectedLoc" id="selectedLoc" />
+              </div>
+
+              {/* Filter Panel */}
+              <div className="filter-panel">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-foreground mb-2">Type</label>
+                    <select name="tid" id="tid" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="0">All Types</option>
+                      <option value="1">Apartment</option>
+                      <option value="2">House</option>
+                      <option value="5">Land</option>
+                      <option value="3">Commercial Property</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-foreground mb-2">Bedrooms</label>
+                    <select name="bedrooms" id="bedrooms" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="0">Any</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6+</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-foreground mb-2">Min price</label>
+                    <select name="minprice" id="minprice" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="0">No Min</option>
+                      <option value="250">GH₵ 250</option>
+                      <option value="300">GH₵ 300</option>
+                      <option value="400">GH₵ 400</option>
+                      <option value="500">GH₵ 500</option>
+                      <option value="600">GH₵ 600</option>
+                      <option value="800">GH₵ 800</option>
+                      <option value="1000">GH₵ 1,000</option>
+                      <option value="1200">GH₵ 1,200</option>
+                      <option value="1400">GH₵ 1,400</option>
+                      <option value="1600">GH₵ 1,600</option>
+                      <option value="1800">GH₵ 1,800</option>
+                      <option value="2000">GH₵ 2,000</option>
+                      <option value="2500">GH₵ 2,500</option>
+                      <option value="5000">GH₵ 5,000</option>
+                      <option value="10000">GH₵ 10,000</option>
+                      <option value="25000">GH₵ 25,000</option>
+                      <option value="50000">GH₵ 50,000</option>
+                      <option value="100000">GH₵ 100,000</option>
+                      <option value="150000">GH₵ 150,000</option>
+                      <option value="200000">GH₵ 200,000</option>
+                      <option value="250000">GH₵ 250,000</option>
+                      <option value="300000">GH₵ 300,000</option>
+                      <option value="350000">GH₵ 350,000</option>
+                      <option value="400000">GH₵ 400,000</option>
+                      <option value="500000">GH₵ 500,000</option>
+                      <option value="600000">GH₵ 600,000</option>
+                      <option value="750000">GH₵ 750,000</option>
+                      <option value="1000000">GH₵ 1 Million</option>
+                      <option value="2000000">GH₵ 2 Million</option>
+                      <option value="5000000">GH₵ 5 Million</option>
+                      <option value="10000000">GH₵ 10 Million</option>
+                      <option value="25000000">GH₵ 25 Million</option>
+                      <option value="50000000">GH₵ 50 Million</option>
+                      <option value="100000000">GH₵ 100 Million</option>
+                      <option value="125000000">GH₵ 125 Million</option>
+                      <option value="150000000">GH₵ 150 Million</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-foreground mb-2">Max price</label>
+                    <select name="maxprice" id="maxprice" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="0">No Max</option>
+                      <option value="250">GH₵ 250</option>
+                      <option value="300">GH₵ 300</option>
+                      <option value="400">GH₵ 400</option>
+                      <option value="500">GH₵ 500</option>
+                      <option value="600">GH₵ 600</option>
+                      <option value="800">GH₵ 800</option>
+                      <option value="1000">GH₵ 1,000</option>
+                      <option value="1200">GH₵ 1,200</option>
+                      <option value="1400">GH₵ 1,400</option>
+                      <option value="1600">GH₵ 1,600</option>
+                      <option value="1800">GH₵ 1,800</option>
+                      <option value="2000">GH₵ 2,000</option>
+                      <option value="2500">GH₵ 2,500</option>
+                      <option value="5000">GH₵ 5,000</option>
+                      <option value="10000">GH₵ 10,000</option>
+                      <option value="25000">GH₵ 25,000</option>
+                      <option value="50000">GH₵ 50,000</option>
+                      <option value="100000">GH₵ 100,000</option>
+                      <option value="150000">GH₵ 150,000</option>
+                      <option value="200000">GH₵ 200,000</option>
+                      <option value="250000">GH₵ 250,000</option>
+                      <option value="300000">GH₵ 300,000</option>
+                      <option value="350000">GH₵ 350,000</option>
+                      <option value="400000">GH₵ 400,000</option>
+                      <option value="500000">GH₵ 500,000</option>
+                      <option value="600000">GH₵ 600,000</option>
+                      <option value="750000">GH₵ 750,000</option>
+                      <option value="1000000">GH₵ 1 Million</option>
+                      <option value="2000000">GH₵ 2 Million</option>
+                      <option value="5000000">GH₵ 5 Million</option>
+                      <option value="10000000">GH₵ 10 Million</option>
+                      <option value="25000000">GH₵ 25 Million</option>
+                      <option value="50000000">GH₵ 50 Million</option>
+                      <option value="100000000">GH₵ 100 Million</option>
+                      <option value="125000000">GH₵ 125 Million</option>
+                      <option value="150000000">GH₵ 150 Million</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Current Selection Display */}
-              <div className="text-center pt-4 border-t border-border/50">
-                <span className="text-sm text-muted-foreground">Currently viewing:</span>
-                <span className="ml-2 text-sm font-semibold text-primary">
-                  {regions.find(r => r.value === selectedRegion)?.label}
-                </span>
-              </div>
+              {/* Advanced Search Panel */}
+              <div className="filter-panel">
+                <div className="border rounded-lg">
+                  {/* Advanced Search Collapsible */}
+                  <div className="border-b">
+                    <div className="flex items-center justify-between p-4">
+                      <div className="hidden sm:block">
+                        <h4 className="text-sm font-medium text-foreground">
+                          <button 
+                            type="button"
+                            className="flex items-center gap-2 hover:text-primary transition-colors"
+                            onClick={() => {
+                              // Toggle advanced search visibility
+                              const advancedSearch = document.getElementById('advanced-search');
+                              if (advancedSearch) {
+                                advancedSearch.classList.toggle('hidden');
+                              }
+                            }}
+                          >
+                            More search options
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </h4>
+                      </div>
+                      <div className="sm:hidden text-center">
+                        <h4 className="text-sm font-medium text-foreground">
+                          <button 
+                            type="button"
+                            className="flex items-center gap-2 hover:text-primary transition-colors"
+                            onClick={() => {
+                              // Toggle advanced search visibility
+                              const advancedSearch = document.getElementById('advanced-search');
+                              if (advancedSearch) {
+                                advancedSearch.classList.toggle('hidden');
+                              }
+                            }}
+                          >
+                            More search options
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </h4>
+                      </div>
+                      <div className="flex-1 sm:flex-none sm:ml-4">
+                        <Button 
+                          type="submit" 
+                          size="lg"
+                          className="w-full sm:w-auto px-8 py-3 text-base font-medium"
+                        >
+                          Search
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Search Button */}
-              <div className="text-center pt-2">
-                <Button 
-                  type="button"
-                  size="lg"
-                  className="px-8 py-3 text-base font-medium"
-                  onClick={() => {
-                    // Handle region-based search
-                    console.log('Searching in region:', selectedRegion);
-                  }}
-                >
-                  <Search className="w-4 h-4 mr-2" />
-                  Search Properties
-                </Button>
+                  {/* Advanced Search Content */}
+                  <div id="advanced-search" className="hidden p-4 bg-muted/30">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Furnishing</label>
+                        <select name="furnished" id="furnished" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                          <option value="0">Any</option>
+                          <option value="1">Furnished</option>
+                          <option value="2">Unfurnished</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Serviced</label>
+                        <select name="serviced" id="serviced" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                          <option value="0">Any</option>
+                          <option value="1">Serviced</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Shared</label>
+                        <select name="shared" id="shared" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                          <option value="0">Any</option>
+                          <option value="1">Shared</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Added to site</label>
+                        <select name="added" id="added" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                          <option value="0">Anytime</option>
+                          <option value="1">Last 24 hours</option>
+                          <option value="3">Last 3 days</option>
+                          <option value="7">Last 7 days</option>
+                          <option value="14">Last 14 days</option>
+                          <option value="30">Last 30 days</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Keywords</label>
+                        <input 
+                          name="keywords" 
+                          id="keywords" 
+                          className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
+                          placeholder="e.g. 'pool' or 'jacuzzi'" 
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="block text-sm font-medium text-foreground mb-2">Property Ref.</label>
+                        <input 
+                          name="ref" 
+                          id="ref" 
+                          className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
+                          placeholder="e.g. 83256" 
+                          type="number" 
+                          min="0" 
+                          autoComplete="off"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
