@@ -79,7 +79,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden tap-target touch-manipulation h-8 w-8 sm:h-9 sm:w-9 p-0"
+              className="md:hidden tap-target touch-manipulation h-auto px-3 py-2 flex items-center gap-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -87,6 +87,7 @@ export function Header() {
               ) : (
                 <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
+              <span className="text-sm font-medium">MENU</span>
             </Button>
           </div>
         </div>
