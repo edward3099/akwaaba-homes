@@ -466,6 +466,23 @@ export function FeaturedProperties() {
   // Add state for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < 5) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
   return (
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
@@ -828,6 +845,7 @@ export function FeaturedProperties() {
               variant="outline" 
               className="px-3 py-2"
               disabled={currentPage === 1}
+              onClick={handlePreviousPage}
             >
               Previous
             </Button>
@@ -839,6 +857,7 @@ export function FeaturedProperties() {
                   size="sm"
                   variant={currentPage === page ? "default" : "outline"}
                   className="px-3 py-2 min-w-[40px]"
+                  onClick={() => handlePageChange(page)}
                 >
                   {page}
                 </Button>
@@ -849,6 +868,7 @@ export function FeaturedProperties() {
               size="sm" 
               variant="outline" 
               className="px-3 py-2"
+              onClick={handleNextPage}
             >
               Next
             </Button>
