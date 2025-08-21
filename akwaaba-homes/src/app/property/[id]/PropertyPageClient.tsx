@@ -4,34 +4,27 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Heart, 
   Share2, 
   Phone, 
   Mail, 
   MessageCircle, 
-  Car, 
   MapPin, 
   Calendar, 
   Bed, 
   Bath, 
   Square, 
-  Wifi,
-  Zap,
-  Droplets,
-  Trees,
-  Camera,
-  Video,
   Eye,
-  Home,
-  AlertTriangle,
-  Users,
   CheckCircle,
   Clock,
-  Shield
+  Shield,
+  ChevronLeft,
+  ArrowLeft,
+  ArrowRight,
+  Building,
+  Star,
+  FileText
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
@@ -42,11 +35,12 @@ interface PropertyPageClientProps {
   propertyId: string;
 }
 
-export default function PropertyPageClient({ property, propertyId }: PropertyPageClientProps) {
-  const [currency, setCurrency] = useState<CurrencyCode>('GHS');
+export default function PropertyPageClient({ property }: PropertyPageClientProps) {
+  const [currency] = useState<CurrencyCode>('GHS');
   const [isSaved, setIsSaved] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
   const [showInspectionForm, setShowInspectionForm] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('details');
 
   const priceDisplay = formatDiasporaPrice(property.price, currency);
 
@@ -54,294 +48,372 @@ export default function PropertyPageClient({ property, propertyId }: PropertyPag
     setIsSaved(!isSaved);
   };
 
-  const amenityIcons = {
-    'Air Conditioning': Zap,
-    'Swimming Pool': Droplets,
-    'Garden': Trees,
-    'Parking': Car,
-    'WiFi': Wifi,
-    'Security': Shield
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === property.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? property.images.length - 1 : prev - 1
+    );
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Image Section */}
-      <div className="relative h-[40vh] sm:h-[50vh] md:h-[60vh]">
-        <Image
-          src={property.images[0]}
-          alt={property.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        {/* Overlay with quick actions */}
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2">
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={toggleSaved}
-            className={`backdrop-blur-sm h-8 w-8 sm:h-9 sm:w-9 ${isSaved ? 'bg-red-500 text-white' : 'bg-white/90'}`}
-          >
-            <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isSaved ? 'fill-current' : ''}`} />
-          </Button>
-          <Button variant="secondary" size="icon" className="backdrop-blur-sm bg-white/90 h-8 w-8 sm:h-9 sm:w-9">
-            <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-        </div>
-
-        {/* Virtual Tour Badge */}
-        {property.diasporaFeatures?.virtualTourAvailable && (
-          <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4">
-            <Badge variant="secondary" className="backdrop-blur-sm bg-blue-600 text-white text-xs">
-              <Video className="w-3 h-3 mr-1" />
-              Virtual Tour Available
-            </Badge>
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+            <button 
+              onClick={() => window.history.back()}
+              className="flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to property list
+            </button>
           </div>
-        )}
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {property.title}
+          </h1>
+        </div>
       </div>
 
-      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {/* Property Header */}
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                <div className="flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">{property.title}</h1>
-                  <div className="flex items-center text-muted-foreground mb-2">
-                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                    <span className="text-sm sm:text-base">{property.location.address}, {property.location.city}</span>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Property Header Info */}
+            <div className="bg-white rounded-lg p-6 border">
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                    {property.specifications.bedrooms} bedroom {property.type.toLowerCase()} for {property.status === 'for-sale' ? 'sale' : 'rent'}
+                  </h2>
+                  <div className="flex items-center text-gray-600">
+                    <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span>{property.location.address}, {property.location.city}</span>
                   </div>
                 </div>
-                <div className="text-left sm:text-right">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary">
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">
                     {priceDisplay.primary}
                   </div>
-                  <div className="text-xs sm:text-sm text-muted-foreground">
+                  <div className="text-sm text-gray-500">
                     {priceDisplay.alternatives.map(alt => alt.formatted).join(' • ')}
                   </div>
                 </div>
               </div>
 
               {/* Property Stats */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+              <div className="flex flex-wrap items-center gap-4 text-sm border-t pt-4">
                 <div className="flex items-center gap-1">
-                  <Bed className="w-4 h-4 flex-shrink-0" />
-                  <span>{property.specifications.bedrooms} beds</span>
+                  <Bed className="w-4 h-4 text-gray-600" />
+                  <span>{property.specifications.bedrooms} Bedrooms</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Bath className="w-4 h-4 flex-shrink-0" />
-                  <span>{property.specifications.bathrooms} baths</span>
+                  <Bath className="w-4 h-4 text-gray-600" />
+                  <span>{property.specifications.bathrooms} Bathrooms</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Square className="w-4 h-4 flex-shrink-0" />
+                  <Square className="w-4 h-4 text-gray-600" />
                   <span>{property.specifications.size} {property.specifications.sizeUnit}</span>
                 </div>
-                <Badge variant="outline" className="text-xs">
-                  {property.type}
-                </Badge>
-                <Badge variant={property.status === 'for-sale' ? 'default' : 'secondary'} className="text-xs">
-                  {property.status}
+                <Badge variant="outline">{property.type}</Badge>
+                <Badge variant={property.status === 'for-sale' ? 'default' : 'secondary'}>
+                  {property.status === 'for-sale' ? 'For Sale' : 'For Rent'}
                 </Badge>
               </div>
             </div>
 
-            {/* Description */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Description</h2>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  {property.description}
-                </p>
-              </CardContent>
-            </Card>
+            {/* Image Gallery */}
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <div className="relative">
+                <div className="relative h-80 sm:h-96">
+                  <Image
+                    src={property.images[currentImageIndex]}
+                    alt={`${property.title} - Image ${currentImageIndex + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  
+                  {/* Navigation Arrows */}
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  >
+                    <ArrowRight className="w-5 h-5 text-gray-700" />
+                  </button>
 
-            {/* Diaspora Services */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Diaspora Services</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Virtual Property Inspection</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Family Representative Contact</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Multi-Currency Pricing</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Legal Documentation Support</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Remote Transaction Management</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">Property Management Services</span>
-                    </div>
+                  {/* Image Counter */}
+                  <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                    {currentImageIndex + 1} of {property.images.length}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Amenities */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Amenities</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                  {property.amenities.map((amenity, index) => {
-                    const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
-                    return (
-                      <div key={index} className="flex items-center gap-2 text-xs sm:text-sm">
-                        <IconComponent className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span>{amenity}</span>
+                {/* Thumbnail Navigation */}
+                <div className="p-4 border-t">
+                  <div className="flex gap-2 overflow-x-auto">
+                    {property.images.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToImage(index)}
+                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                          index === currentImageIndex 
+                            ? 'border-primary' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`Thumbnail ${index + 1}`}
+                          width={64}
+                          height={64}
+                          className="object-cover w-full h-full"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-center text-sm text-gray-600 mt-3">
+                    Click main picture to view in fullscreen
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Actions */}
+            <div className="bg-white rounded-lg p-6 border text-center">
+              <p className="text-lg font-medium mb-4">Interested in this property?</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button className="flex-1 sm:flex-none">
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call Now
+                </Button>
+                <Button variant="outline" className="flex-1 sm:flex-none">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  WhatsApp
+                </Button>
+                <Button variant="outline" className="flex-1 sm:flex-none">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </Button>
+              </div>
+            </div>
+
+            {/* Tabs Section */}
+            <div className="bg-white rounded-lg border">
+              <div className="border-b">
+                <div className="flex">
+                  <button
+                    onClick={() => setActiveTab('details')}
+                    className={`px-6 py-4 font-medium transition-colors ${
+                      activeTab === 'details'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <FileText className="w-4 h-4 inline mr-2" />
+                    Details
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('area-guide')}
+                    className={`px-6 py-4 font-medium transition-colors ${
+                      activeTab === 'area-guide'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <MapPin className="w-4 h-4 inline mr-2" />
+                    Area Guide
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {activeTab === 'details' && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4">Property Description</h3>
+                    <p className="text-gray-700 leading-relaxed mb-6">
+                      {property.description}
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-4">Property Details</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Property Ref:</div>
+                        <div className="font-medium">{property.id}</div>
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Property Images Grid */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Property Gallery</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
-                  {property.images.slice(1, 7).map((image, index) => (
-                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                      <Image
-                        src={image}
-                        alt={`Property view ${index + 1}`}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform cursor-pointer"
-                      />
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Type:</div>
+                        <div className="font-medium">{property.type}</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Bedrooms:</div>
+                        <div className="font-medium">{property.specifications.bedrooms}</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Bathrooms:</div>
+                        <div className="font-medium">{property.specifications.bathrooms}</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Size:</div>
+                        <div className="font-medium">{property.specifications.size} {property.specifications.sizeUnit}</div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="text-sm text-gray-600">Year Built:</div>
+                        <div className="font-medium">{property.specifications.yearBuilt}</div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-                {property.images.length > 7 && (
-                  <Button variant="outline" className="w-full mt-3 sm:mt-4" size="sm">
-                    <Camera className="w-4 h-4 mr-2" />
-                    View All {property.images.length} Photos
-                  </Button>
+                  </div>
                 )}
-              </CardContent>
-            </Card>
+
+                {activeTab === 'area-guide' && (
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4">About {property.location.city}</h3>
+                    <p className="text-gray-700 leading-relaxed mb-6">
+                      {property.location.city} is a vibrant area known for its excellent amenities, 
+                      convenient transportation, and thriving community. This location offers the perfect 
+                      balance of urban convenience and residential tranquility.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Building className="w-5 h-5 text-primary" />
+                          Popular Estates
+                        </h4>
+                        <p className="text-gray-700 text-sm">
+                          The area features several prestigious estates and gated communities 
+                          offering residents amenities that are both stylish and convenient.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Star className="w-5 h-5 text-primary" />
+                          Lifestyle
+                        </h4>
+                        <p className="text-gray-700 text-sm">
+                          Residents enjoy access to shopping centers, restaurants, schools, 
+                          and recreational facilities, making it an ideal place to call home.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Social Sharing */}
+            <div className="bg-white rounded-lg p-6 border text-center">
+              <p className="text-sm text-gray-600 mb-3">Share this property</p>
+              <div className="flex justify-center gap-4">
+                <Button variant="outline" size="sm">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Facebook
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Twitter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  WhatsApp
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-6">
             {/* Contact Card */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Contact Seller</h3>
-                
-                <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                  <Button className="w-full" size="sm">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Call Now
-                  </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    WhatsApp
-                  </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Email
-                  </Button>
+            <div className="bg-white rounded-lg border p-6">
+              <h3 className="text-lg font-semibold mb-4">Marketed by</h3>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center">
+                    <Building className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="font-medium">{property.seller.name}</p>
+                  <p className="text-sm text-gray-600">{property.seller.type}</p>
                 </div>
-
-                <hr className="my-3 sm:my-4" />
-
-                {/* Family Representative */}
-                <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                  <p className="font-medium text-foreground mb-2">Family Representative in Ghana</p>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 flex-shrink-0" />
-                    <span>{property.diasporaFeatures?.familyRepresentativeContact}</span>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-gray-600" />
+                    <span className="text-gray-700">{property.location.city}, Ghana</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="w-4 h-4 text-gray-600" />
+                    <span className="text-gray-700">{property.seller.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MessageCircle className="w-4 h-4 text-gray-600" />
+                    <span className="text-gray-700">{property.seller.phone}</span>
                   </div>
                 </div>
 
                 <Button 
-                  variant="secondary" 
                   className="w-full"
-                  size="sm"
                   onClick={() => setShowInspectionForm(true)}
                 >
                   <Calendar className="w-4 h-4 mr-2" />
                   Schedule Inspection
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Quick Stats */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Property Details</h3>
-                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Property Type</span>
-                    <span className="font-medium">{property.type}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Size</span>
-                    <span className="font-medium">{property.specifications.size} {property.specifications.sizeUnit}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Year Built</span>
-                    <span className="font-medium">{property.specifications.yearBuilt}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status</span>
-                    <Badge variant={property.status === 'for-sale' ? 'default' : 'secondary'} className="text-xs">
-                      {property.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Save Property */}
+            <div className="bg-white rounded-lg border p-6 text-center">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={toggleSaved}
+              >
+                <Heart className={`w-4 h-4 mr-2 ${isSaved ? 'fill-current text-red-500' : ''}`} />
+                {isSaved ? 'Saved' : 'Save Property'}
+              </Button>
+            </div>
 
             {/* Diaspora Support */}
-            <Card className="border-blue-200 bg-blue-50/50">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
-                  <h3 className="text-base sm:text-lg font-semibold text-blue-900">Diaspora Support</h3>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-semibold text-blue-900">Diaspora Support</h3>
+              </div>
+              <div className="space-y-2 text-sm text-blue-800">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>24/7 Support Available</span>
                 </div>
-                <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-blue-800">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 flex-shrink-0" />
-                    <span>24/7 Support Available</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Eye className="w-4 h-4 flex-shrink-0" />
-                    <span>Virtual Inspection Services</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>Verified Property Listings</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  <span>Virtual Inspection Services</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Verified Property Listings</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Inspection Modal */}
       {showInspectionForm && (
-        <InspectionScheduler 
+        <InspectionScheduler
           property={property}
           onClose={() => setShowInspectionForm(false)}
         />
