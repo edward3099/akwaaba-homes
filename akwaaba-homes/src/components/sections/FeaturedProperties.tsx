@@ -258,15 +258,15 @@ export function FeaturedProperties() {
 
 
         {/* Full Search Form */}
-        <div className="mb-8">
-          <div className="bg-white rounded-xl shadow-xl p-4 sm:p-6 border border-border/50">
+        <div className="mb-6">
+          <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 border border-border/50">
             {/* Header */}
-            <div className="text-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Find your new property</h2>
+            <div className="text-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">Find your new property</h2>
             </div>
 
             {/* Search Form */}
-            <form className="space-y-6">
+            <form className="space-y-4">
               {/* Property Type Tabs */}
               <div className="form-group">
                 <ul className="flex justify-center space-x-1" id="">
@@ -281,7 +281,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-for-sale" 
-                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-primary text-primary-foreground border-primary"
+                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-primary text-primary-foreground border-primary"
                     >
                       Buy
                     </label>
@@ -296,7 +296,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-for-rent" 
-                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
                     >
                       Rent
                     </label>
@@ -311,7 +311,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-short-let" 
-                      className="block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
                     >
                       Short Let
                     </label>
@@ -328,7 +328,7 @@ export function FeaturedProperties() {
                     name="propertyLocation" 
                     placeholder="Enter a region, district or subdistrict" 
                     type="text" 
-                    className="w-full h-12 pl-10 pr-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="w-full h-10 pl-10 pr-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     autoComplete="off"
                   />
                 </div>
@@ -342,10 +342,10 @@ export function FeaturedProperties() {
 
               {/* Filter Panel */}
               <div className="filter-panel">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-2">Type</label>
-                    <select name="tid" id="tid" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label className="block text-sm font-medium text-foreground mb-1">Type</label>
+                    <select name="tid" id="tid" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                       <option value="0">All Types</option>
                       <option value="1">Apartment</option>
                       <option value="2">House</option>
@@ -354,8 +354,8 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-2">Bedrooms</label>
-                    <select name="bedrooms" id="bedrooms" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label className="block text-sm font-medium text-foreground mb-1">Bedrooms</label>
+                    <select name="bedrooms" id="bedrooms" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                       <option value="0">Any</option>
                       <option value="1">1</option>
                       <option value="2">2</option>
@@ -366,8 +366,8 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-2">Min price</label>
-                    <select name="minprice" id="minprice" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label className="block text-sm font-medium text-foreground mb-1">Min price</label>
+                    <select name="minprice" id="minprice" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                       <option value="0">No Min</option>
                       <option value="250">GH₵ 250</option>
                       <option value="300">GH₵ 300</option>
@@ -408,8 +408,8 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-2">Max price</label>
-                    <select name="maxprice" id="maxprice" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label className="block text-sm font-medium text-foreground mb-1">Max price</label>
+                    <select name="maxprice" id="maxprice" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                       <option value="0">No Max</option>
                       <option value="250">GH₵ 250</option>
                       <option value="300">GH₵ 300</option>
@@ -457,7 +457,7 @@ export function FeaturedProperties() {
                 <div className="border rounded-lg">
                   {/* Advanced Search Collapsible */}
                   <div className="border-b">
-                    <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center justify-between p-3">
                       <div className="hidden sm:block">
                         <h4 className="text-sm font-medium text-foreground">
                           <button 
@@ -494,11 +494,11 @@ export function FeaturedProperties() {
                           </button>
                         </h4>
                       </div>
-                      <div className="flex-1 sm:flex-none sm:ml-4">
+                      <div className="flex-1 sm:flex-none sm:ml-3">
                         <Button 
                           type="submit" 
-                          size="lg"
-                          className="w-full sm:w-auto px-8 py-3 text-base font-medium"
+                          size="default"
+                          className="w-full sm:w-auto px-6 py-2 text-sm font-medium"
                         >
                           Search
                         </Button>
@@ -507,33 +507,33 @@ export function FeaturedProperties() {
                   </div>
 
                   {/* Advanced Search Content */}
-                  <div id="advanced-search" className="hidden p-4 bg-muted/30">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div id="advanced-search" className="hidden p-3 bg-muted/30">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Furnishing</label>
-                        <select name="furnished" id="furnished" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label className="block text-sm font-medium text-foreground mb-1">Furnishing</label>
+                        <select name="furnished" id="furnished" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                           <option value="0">Any</option>
                           <option value="1">Furnished</option>
                           <option value="2">Unfurnished</option>
                         </select>
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Serviced</label>
-                        <select name="serviced" id="serviced" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label className="block text-sm font-medium text-foreground mb-1">Serviced</label>
+                        <select name="serviced" id="serviced" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                           <option value="0">Any</option>
                           <option value="1">Serviced</option>
                         </select>
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Shared</label>
-                        <select name="shared" id="shared" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label className="block text-sm font-medium text-foreground mb-1">Shared</label>
+                        <select name="shared" id="shared" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                           <option value="0">Any</option>
                           <option value="1">Shared</option>
                         </select>
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Added to site</label>
-                        <select name="added" id="added" className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label className="block text-sm font-medium text-foreground mb-1">Added to site</label>
+                        <select name="added" id="added" className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                           <option value="0">Anytime</option>
                           <option value="1">Last 24 hours</option>
                           <option value="3">Last 3 days</option>
@@ -543,21 +543,21 @@ export function FeaturedProperties() {
                         </select>
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Keywords</label>
+                        <label className="block text-sm font-medium text-foreground mb-1">Keywords</label>
                         <input 
                           name="keywords" 
                           id="keywords" 
-                          className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
+                          className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
                           placeholder="e.g. 'pool' or 'jacuzzi'" 
                           autoComplete="off"
                         />
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-2">Property Ref.</label>
+                        <label className="block text-sm font-medium text-foreground mb-1">Property Ref.</label>
                         <input 
                           name="ref" 
                           id="ref" 
-                          className="w-full h-10 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
+                          className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
                           placeholder="e.g. 83256" 
                           type="number" 
                           min="0" 
