@@ -153,10 +153,103 @@ const mockProperties: Property[] = [
     expiresAt: '2024-02-08',
     tier: 'basic',
   },
+  {
+    id: '6',
+    title: 'Luxury Villa in Cape Coast',
+    description: 'Stunning oceanfront villa with panoramic sea views and private beach access.',
+    price: 1200000,
+    currency: 'GHS',
+    status: 'for-sale',
+    type: 'house',
+    location: {
+      address: 'Cape Coast Castle Road',
+      city: 'Cape Coast',
+      region: 'Central',
+      country: 'Ghana',
+      coordinates: { lat: 5.1053, lng: -1.2466 },
+    },
+    specifications: {
+      bedrooms: 5,
+      bathrooms: 4,
+      size: 4500,
+      sizeUnit: 'sqft',
+      lotSize: 8000,
+      lotSizeUnit: 'sqft',
+      yearBuilt: 2021,
+      parkingSpaces: 3,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['Ocean View', 'Private Beach', 'Swimming Pool', 'Garden'],
+    amenities: ['24/7 Security', 'Backup Generator', 'Borehole Water', 'Solar Panels'],
+    seller: {
+      id: 'seller6',
+      name: 'Cape Coast Estates',
+      type: 'developer',
+      phone: '+233244789012',
+      whatsapp: '+233244789012',
+      isVerified: true,
+      company: 'Cape Coast Estates Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-05',
+    updatedAt: '2024-01-05',
+    expiresAt: '2024-02-05',
+    tier: 'premium',
+  },
+  {
+    id: '7',
+    title: 'Commercial Space in Takoradi',
+    description: 'Prime commercial property in the heart of Takoradi business district.',
+    price: 850000,
+    currency: 'GHS',
+    status: 'for-sale',
+    type: 'commercial',
+    location: {
+      address: 'Harbor Road',
+      city: 'Takoradi',
+      region: 'Western',
+      country: 'Ghana',
+      coordinates: { lat: 4.9011, lng: -1.7833 },
+    },
+    specifications: {
+      size: 2500,
+      sizeUnit: 'sqft',
+      yearBuilt: 2020,
+      parkingSpaces: 5,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['High Traffic Area', 'Modern Design', 'Parking'],
+    amenities: ['24/7 Security', 'Backup Generator', 'Loading Bay'],
+    seller: {
+      id: 'seller7',
+      name: 'Western Properties',
+      type: 'developer',
+      phone: '+233244789013',
+      whatsapp: '+233244789013',
+      isVerified: true,
+      company: 'Western Properties Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-03',
+    updatedAt: '2024-01-03',
+    expiresAt: '2024-02-03',
+    tier: 'standard',
+  },
 ];
 
 export function FeaturedProperties() {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
 
   const regions = [
@@ -165,6 +258,15 @@ export function FeaturedProperties() {
     { value: 'ashanti', label: 'Ashanti' },
     { value: 'western', label: 'Western' },
     { value: 'central', label: 'Central' },
+    { value: 'eastern', label: 'Eastern' },
+    { value: 'volta', label: 'Volta' },
+    { value: 'northern', label: 'Northern' },
+    { value: 'upper-east', label: 'Upper East' },
+    { value: 'upper-west', label: 'Upper West' },
+    { value: 'bono', label: 'Bono' },
+    { value: 'ahafo', label: 'Ahafo' },
+    { value: 'savannah', label: 'Savannah' },
+    { value: 'north-east', label: 'North East' },
   ];
 
   const filteredProperties = selectedRegion === 'all' 
@@ -172,56 +274,62 @@ export function FeaturedProperties() {
     : mockProperties.filter(p => p.location.region.toLowerCase().replace(' ', '-') === selectedRegion);
 
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-6 bg-muted/30">
+      <div className="container mx-auto px-3">
 
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Region:</span>
-            </div>
-            <div className="flex gap-2">
+        {/* Region Filter - Horizontal Sliding Menu */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <MapPin className="w-5 h-5 text-primary" />
+            <span className="text-lg font-semibold text-foreground">Choose Your Region</span>
+          </div>
+          
+          {/* Horizontal Scrolling Region Menu */}
+          <div className="relative">
+            <div className="flex gap-3 overflow-x-auto pb-4 region-scroll scroll-smooth">
               {regions.map((region) => (
-                <Button
+                <div
                   key={region.value}
-                  variant={selectedRegion === region.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedRegion(region.value)}
-                  className="text-sm"
+                  className="flex-shrink-0"
                 >
-                  {region.label}
-                </Button>
+                  <button
+                    onClick={() => setSelectedRegion(region.value)}
+                    className={`
+                      relative px-6 py-3 rounded-2xl font-medium text-sm transition-all duration-300
+                      ${selectedRegion === region.value
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105'
+                        : 'bg-white text-muted-foreground hover:text-foreground hover:bg-accent/50 border border-border/50 hover:border-primary/30 hover:shadow-md'
+                      }
+                    `}
+                  >
+                    {region.label}
+                    {selectedRegion === region.value && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary rounded-full" />
+                    )}
+                  </button>
+                </div>
               ))}
             </div>
+            
+            {/* Gradient Fade Indicators */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted/30 to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-            >
-              Grid
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-            >
-              List
-            </Button>
+          
+          {/* Selected Region Display */}
+          <div className="mt-3 text-center">
+            <span className="text-sm text-muted-foreground">
+              Currently viewing: 
+            </span>
+            <span className="ml-2 text-sm font-semibold text-primary">
+              {regions.find(r => r.value === selectedRegion)?.label}
+            </span>
           </div>
         </div>
 
-        {/* Properties Grid/List */}
-        <div className={`grid gap-6 mb-12 ${
-          viewMode === 'grid' 
-            ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-            : 'grid-cols-1'
-        }`}>
+        {/* Properties Grid */}
+        <div className="grid gap-2 sm:gap-3 mb-12 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           {filteredProperties.map((property, index) => (
             <div 
               key={property.id}
@@ -230,7 +338,7 @@ export function FeaturedProperties() {
             >
               <PropertyCard 
                 property={property} 
-                viewMode={viewMode}
+                viewMode="grid"
                 onSave={(id) => console.log('Saved property:', id)}
                 onContact={(property) => console.log('Contact for property:', property.title)}
               />

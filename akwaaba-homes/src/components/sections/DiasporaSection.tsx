@@ -90,16 +90,16 @@ export function DiasporaSection() {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5">
-      <div className="container mx-auto px-4">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      <div className="container mx-auto px-3 sm:px-4">
         {/* Currency Feature Highlight */}
-        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-xl mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
                 See Prices in Your Currency
               </h3>
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-4 sm:mb-6">
                 All properties display prices in multiple currencies with real-time exchange rates. 
                 No more mental calculations - see exactly what you&apos;ll pay in your local currency.
               </p>
@@ -156,12 +156,12 @@ export function DiasporaSection() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-primary to-accent rounded-3xl p-8 md:p-12 text-center text-white">
-          <Plane className="w-16 h-16 mx-auto mb-6 opacity-80" />
-          <h3 className="text-2xl md:text-3xl font-bold mb-4">
+        <div className="bg-gradient-to-r from-primary to-accent rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white">
+          <Plane className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 opacity-80" />
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
             Ready to Invest in Ghana Real Estate?
           </h3>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto">
             Join thousands of diaspora Ghanaians who have successfully purchased 
             properties back home through our platform.
           </p>

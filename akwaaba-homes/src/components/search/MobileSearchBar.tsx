@@ -91,8 +91,8 @@ export function MobileSearchBar({
   return (
     <div className={`w-full ${className}`}>
       {/* Compact Search Bar */}
-      <Card className="p-4 shadow-lg border-0 bg-white/95 backdrop-blur-md">
-        <div className="space-y-4">
+      <Card className="p-3 sm:p-4 shadow-lg border-0 bg-white/95 backdrop-blur-md">
+        <div className="space-y-3 sm:space-y-4">
           {/* Primary Search Input */}
           <div className="relative">
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">

@@ -85,15 +85,15 @@ export function InspectionScheduler({ property, onClose }: InspectionSchedulerPr
   const isDiasporaInspection = formData.inspectorType !== 'self';
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 sm:pb-4">
           <div>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5" />
+            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
               Schedule Property Inspection
             </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Arrange a viewing for this property
             </p>
           </div>

@@ -18,21 +18,21 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-              <Home className="h-5 w-5 text-white" />
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+              <Home className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base md:text-lg font-bold gradient-text whitespace-nowrap">AkwaabaHomes</span>
+              <span className="text-sm sm:text-base md:text-lg font-bold gradient-text whitespace-nowrap">AkwaabaHomes</span>
               <span className="text-xs text-muted-foreground hidden sm:block">Ghana Real Estate</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -46,16 +46,16 @@ export function Header() {
           </nav>
 
           {/* Trust Indicators & Actions */}
-          <div className="flex items-center space-x-2 md:space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
             {/* Verification Badge */}
-            <Badge variant="secondary" className="hidden xl:flex items-center gap-1">
+            <Badge variant="secondary" className="hidden xl:flex items-center gap-1 text-xs">
               <div className="w-2 h-2 bg-verified rounded-full"></div>
               Verified Platform
             </Badge>
 
             {/* Contact */}
-            <div className="hidden xl:flex items-center space-x-2 text-sm text-muted-foreground">
-              <Phone className="h-4 w-4" />
+            <div className="hidden xl:flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground">
+              <Phone className="h-4 w-4 flex-shrink-0" />
               <span>+233 XX XXX XXXX</span>
             </div>
 
@@ -65,7 +65,7 @@ export function Header() {
             </div>
 
             {/* CTA Button */}
-            <Button size="sm" className="btn-ghana hidden sm:flex">
+            <Button size="sm" className="btn-ghana hidden sm:flex text-xs sm:text-sm">
               List Property
             </Button>
 
@@ -73,13 +73,13 @@ export function Header() {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden tap-target touch-manipulation"
+              className="md:hidden tap-target touch-manipulation h-8 w-8 sm:h-9 sm:w-9 p-0"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <Menu className="h-5 w-5" />
+                <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </Button>
           </div>
@@ -88,12 +88,12 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden border-t bg-background animate-slide-up">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-3 pt-3 pb-4 space-y-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                  className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}

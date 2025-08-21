@@ -105,12 +105,12 @@ export function AdvancedFilters({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Currency Selection */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <DollarSign className="w-4 h-4" />
+        <CardHeader className="pb-2 sm:pb-3">
+          <CardTitle className="text-xs sm:text-sm flex items-center gap-2">
+            <DollarSign className="w-4 h-4 flex-shrink-0" />
             Currency
           </CardTitle>
         </CardHeader>

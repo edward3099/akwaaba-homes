@@ -44,7 +44,7 @@ export function HeroSection() {
   }, [phrases.length, isPaused]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[80vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
       
@@ -65,21 +65,21 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 z-10">
-        <div className="text-center max-w-5xl mx-auto">
+      <div className="container mx-auto px-3 sm:px-4 z-10">
+        <div className="text-center max-w-4xl sm:max-w-5xl mx-auto">
           {/* Trust Badge */}
-          <Badge variant="secondary" className="mb-4 md:mb-6 px-3 md:px-4 py-2 text-xs md:text-sm">
-            <CheckCircle className="w-3 md:w-4 h-3 md:h-4 mr-1 md:mr-2 text-verified" />
+          <Badge variant="secondary" className="mb-3 sm:mb-4 md:mb-6 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs md:text-sm">
+            <CheckCircle className="w-3 md:w-4 h-3 md:h-4 mr-1 md:mr-2 text-verified flex-shrink-0" />
             Ghana&apos;s Most Trusted Real Estate Platform
           </Badge>
 
           {/* Main Headline */}
           <div 
-            className="mb-4 md:mb-6 px-2"
+            className="mb-3 sm:mb-4 md:mb-6 px-2"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-bold leading-tight text-center">
               <span 
                 className={`gradient-text inline-block transition-all duration-700 ease-in-out transform ${
                   isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'

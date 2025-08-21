@@ -79,22 +79,22 @@ export function SearchBar({ onSearch, showAdvancedFilters = false, className = '
   return (
     <div className={`w-full max-w-6xl mx-auto ${className}`}>
       {/* Main Search Bar */}
-      <div className="bg-white rounded-2xl shadow-xl p-4 md:p-6 border border-border/50">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-end">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border border-border/50">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4 items-end">
           {/* Location Search */}
           <div className="md:col-span-4">
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-foreground mb-2">
               Location
             </label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
               <Input
                 type="text"
                 placeholder="City, Region, or Neighborhood"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="pl-10 search-input h-11 no-zoom"
+                className="pl-10 search-input h-10 sm:h-11 no-zoom text-xs sm:text-sm"
               />
             </div>
           </div>

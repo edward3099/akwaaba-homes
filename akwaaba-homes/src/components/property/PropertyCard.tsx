@@ -145,16 +145,16 @@ export function PropertyCard({
                 variant="ghost"
                 size="sm"
                 onClick={handleSave}
-                className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                className="absolute top-1 sm:top-2 right-1 sm:right-2 bg-white/80 hover:bg-white h-6 w-6 sm:h-8 sm:w-8 p-0"
               >
-                <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
               </Button>
 
               {/* Verification Badge */}
               {property.verification.isVerified && (
-                <div className="absolute bottom-2 right-2">
-                  <Badge className="verification-badge">
-                    <Shield className="w-3 h-3 mr-1" />
+                <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2">
+                  <Badge className="verification-badge text-xs px-1.5 py-0.5 sm:px-2 sm:py-1">
+                    <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                     Verified
                   </Badge>
                 </div>
@@ -245,10 +245,10 @@ export function PropertyCard({
 
   // Grid View
   return (
-    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group ${className}`}>
+    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden ${className}`}>
       <CardContent className="p-0">
         {/* Image Section */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
           <Image
             src={property.images[currentImageIndex] || '/placeholder-property.jpg'}
             alt={property.title}
@@ -258,12 +258,12 @@ export function PropertyCard({
           
           {/* Image Navigation */}
           {property.images.length > 1 && (
-            <div className="absolute bottom-2 left-2 flex space-x-1">
+            <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 flex space-x-1">
               {property.images.slice(0, 4).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
                     index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                   }`}
                 />
@@ -272,13 +272,13 @@ export function PropertyCard({
           )}
 
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            <Badge className={statusBadge.className}>
+          <div className="absolute top-1 sm:top-2 left-1 sm:left-2 flex flex-col gap-1">
+            <Badge className={`${statusBadge.className} text-xs px-1.5 py-0.5 sm:px-2 sm:py-1`}>
               {statusBadge.text}
             </Badge>
             {tierBadge && (
-              <Badge className={tierBadge.className}>
-                <Star className="w-3 h-3 mr-1" />
+              <Badge className={`${tierBadge.className} text-xs px-1.5 py-0.5 sm:px-2 sm:py-1`}>
+                <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                 {tierBadge.text}
               </Badge>
             )}
@@ -305,68 +305,85 @@ export function PropertyCard({
         </div>
 
         {/* Content Section */}
-        <div className="p-4">
+        <div className="p-2 sm:p-3 md:p-4 flex flex-col h-48 sm:h-52 md:h-56">
           {/* Price */}
-          <div className="mb-2">
-            <div className="text-xl font-bold text-primary">
+          <div className="mb-1 sm:mb-2">
+            <div className="text-lg sm:text-xl font-bold text-primary">
               {priceDisplay.primary}
             </div>
             {priceDisplay.alternatives.length > 0 && (
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 {priceDisplay.alternatives[0].formatted}
               </div>
             )}
           </div>
 
           {/* Title & Location */}
-          <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors mb-1">
-            <Link href={`/property/${property.id}`}>
-              {property.title}
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors mb-1 overflow-hidden min-h-[2.5rem] sm:min-h-[2rem] md:min-h-[1.5rem]">
+            <Link href={`/property/${property.id}`} className="block text-foreground hover:text-primary">
+              <span className="block overflow-hidden leading-tight" style={{ 
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}>
+                {property.title}
+              </span>
             </Link>
           </h3>
-          <div className="flex items-center text-sm text-muted-foreground mb-3">
-            <MapPin className="h-4 w-4 mr-1" />
-            {property.location.address}, {property.location.city}
+          <div className="flex items-center text-xs sm:text-sm text-muted-foreground mb-2">
+            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+              {property.location.address}, {property.location.city}
+            </span>
           </div>
 
           {/* Property Details */}
-          <div className="flex items-center space-x-3 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground mb-3">
             {property.specifications.bedrooms && (
               <div className="flex items-center">
-                <Bed className="h-4 w-4 mr-1" />
+                <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
                 {property.specifications.bedrooms}
               </div>
             )}
             {property.specifications.bathrooms && (
               <div className="flex items-center">
-                <Bath className="h-4 w-4 mr-1" />
+                <Bath className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
                 {property.specifications.bathrooms}
               </div>
             )}
             <div className="flex items-center">
-              <Square className="h-4 w-4 mr-1" />
-              {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+              <Square className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+              </span>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={handleContact} className="flex-1">
-              <Phone className="h-4 w-4 mr-1" />
-              Call
+          <div className="flex space-x-1 sm:space-x-2">
+            <Button variant="outline" size="sm" onClick={handleContact} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
+              <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Call</span>
+              <span className="sm:hidden">Call</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleWhatsApp} className="flex-1">
-              <MessageCircle className="h-4 w-4 mr-1" />
-              WhatsApp
+            <Button variant="outline" size="sm" onClick={handleWhatsApp} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
+              <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">WhatsApp</span>
+              <span className="sm:hidden">WA</span>
             </Button>
           </div>
 
           {/* Seller Info */}
-          <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
-            Listed by <span className="font-medium">{property.seller.name}</span>
-            {property.seller.isVerified && (
-              <Verified className="inline w-3 h-3 ml-1 text-verified" />
-            )}
+          <div className="mt-auto pt-2 border-t text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <span className="flex-shrink-0">Listed by</span>
+              <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
+                {property.seller.name}
+              </span>
+              {property.seller.isVerified && (
+                <Verified className="inline w-3 h-3 ml-1 text-verified flex-shrink-0" />
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
