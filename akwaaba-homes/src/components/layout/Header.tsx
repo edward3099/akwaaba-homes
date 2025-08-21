@@ -63,13 +63,7 @@ export function Header() {
               <span>+233 XX XXX XXXX</span>
             </div>
 
-            {/* Sell Link */}
-            <Link
-              href="/seller"
-              className="hidden lg:flex text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Sell
-            </Link>
+
 
             {/* Currency Toggle - placeholder for now */}
             <div className="hidden lg:flex items-center space-x-1 px-2 py-1 bg-muted rounded-lg text-xs">
@@ -122,13 +116,25 @@ export function Header() {
                 >
                   Airbnb
                 </Link>
-                <Link
-                  href="/seller"
-                  className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sell
-                </Link>
+                <div className="pt-4 border-t">
+                  <div className="px-3 py-2">
+                    <span className="text-sm font-medium text-foreground">Options</span>
+                  </div>
+                  <Link
+                    href="/about"
+                    className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    href="/seller"
+                    className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sell
+                  </Link>
+                </div>
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between px-3 py-2">
                     <span className="text-sm text-muted-foreground">Currency:</span>
