@@ -467,19 +467,6 @@ export function FeaturedProperties() {
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
 
-        {/* Dynamic Section Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            {selectedPropertyType === 'for-sale' && 'Properties for Sale'}
-            {selectedPropertyType === 'for-rent' && 'Properties for Rent'}
-            {selectedPropertyType === 'short-let' && 'Short Let Properties'}
-          </h2>
-          <p className="text-muted-foreground">
-            {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} available
-          </p>
-        </div>
-
-
         {/* Full Search Form */}
         <div className="mb-6">
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 border border-border/50">
