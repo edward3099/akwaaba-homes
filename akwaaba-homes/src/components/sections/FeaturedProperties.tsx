@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, TrendingUp, MapPin, Filter } from 'lucide-react';
+import { ArrowRight, TrendingUp, MapPin, Filter, Search } from 'lucide-react';
 import { Property } from '@/lib/types';
 
 // Mock data - in production this would come from an API
@@ -278,53 +278,76 @@ export function FeaturedProperties() {
       <div className="container mx-auto px-3">
 
 
-        {/* Region Filter - Horizontal Sliding Menu */}
+        {/* Region Filter - Form-Based Design */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <MapPin className="w-5 h-5 text-primary" />
-            <span className="text-lg font-semibold text-foreground">Choose Your Region</span>
-          </div>
-          
-          {/* Horizontal Scrolling Region Menu */}
-          <div className="relative">
-            <div className="flex gap-3 overflow-x-auto pb-4 region-scroll scroll-smooth">
-              {regions.map((region) => (
-                <div
-                  key={region.value}
-                  className="flex-shrink-0"
-                >
-                  <button
-                    onClick={() => setSelectedRegion(region.value)}
-                    className={`
-                      relative px-6 py-3 rounded-2xl font-medium text-sm transition-all duration-300
-                      ${selectedRegion === region.value
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105'
-                        : 'bg-white text-muted-foreground hover:text-foreground hover:bg-accent/50 border border-border/50 hover:border-primary/30 hover:shadow-md'
-                      }
-                    `}
-                  >
-                    {region.label}
-                    {selectedRegion === region.value && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary rounded-full" />
-                    )}
-                  </button>
-                </div>
-              ))}
+          <div className="bg-white rounded-xl shadow-xl p-4 sm:p-6 border border-border/50">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Find Your New Property</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">Select your preferred region to discover properties</p>
             </div>
-            
-            {/* Gradient Fade Indicators */}
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted/30 to-transparent pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
-          </div>
-          
-          {/* Selected Region Display */}
-          <div className="mt-3 text-center">
-            <span className="text-sm text-muted-foreground">
-              Currently viewing: 
-            </span>
-            <span className="ml-2 text-sm font-semibold text-primary">
-              {regions.find(r => r.value === selectedRegion)?.label}
-            </span>
+
+            {/* Region Selection Form */}
+            <form className="space-y-6">
+              {/* Region Selection */}
+              <div className="form-group">
+                <label className="block text-sm font-medium text-foreground mb-3">
+                  <MapPin className="w-4 h-4 inline mr-2 text-primary" />
+                  Choose Your Region
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {regions.map((region) => (
+                    <div key={region.value} className="flex-shrink-0">
+                      <input
+                        type="radio"
+                        id={`region-${region.value}`}
+                        name="region"
+                        value={region.value}
+                        checked={selectedRegion === region.value}
+                        onChange={(e) => setSelectedRegion(e.target.value)}
+                        className="sr-only"
+                      />
+                      <label
+                        htmlFor={`region-${region.value}`}
+                        className={`
+                          block w-full px-4 py-3 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200
+                          ${selectedRegion === region.value
+                            ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25'
+                            : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50 hover:text-foreground'
+                          }
+                        `}
+                      >
+                        {region.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Current Selection Display */}
+              <div className="text-center pt-4 border-t border-border/50">
+                <span className="text-sm text-muted-foreground">Currently viewing:</span>
+                <span className="ml-2 text-sm font-semibold text-primary">
+                  {regions.find(r => r.value === selectedRegion)?.label}
+                </span>
+              </div>
+
+              {/* Search Button */}
+              <div className="text-center pt-2">
+                <Button 
+                  type="button"
+                  size="lg"
+                  className="px-8 py-3 text-base font-medium"
+                  onClick={() => {
+                    // Handle region-based search
+                    console.log('Searching in region:', selectedRegion);
+                  }}
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Search Properties
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
 
