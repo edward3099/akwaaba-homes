@@ -68,6 +68,8 @@ export function PropertyCard({
         return { text: 'For Sale', className: 'property-status-sale' };
       case 'for-rent':
         return { text: 'For Rent', className: 'property-status-rent' };
+      case 'short-let':
+        return { text: 'Short Let', className: 'property-status-short-let' };
       case 'sold':
         return { text: 'Sold', className: 'bg-muted text-muted-foreground' };
       case 'rented':
@@ -78,6 +80,20 @@ export function PropertyCard({
   };
 
   const statusBadge = getStatusBadge();
+
+  // Get pricing context based on property status
+  const getPricingContext = () => {
+    switch (property.status) {
+      case 'for-rent':
+        return 'per year';
+      case 'short-let':
+        return 'per night';
+      default:
+        return null;
+    }
+  };
+
+  const pricingContext = getPricingContext();
 
   // Get tier badge
   const getTierBadge = () => {
@@ -179,6 +195,11 @@ export function PropertyCard({
                 <div className="text-right">
                   <div className="text-2xl font-bold text-primary">
                     {priceDisplay.primary}
+                    {pricingContext && (
+                      <span className="text-sm font-normal text-muted-foreground ml-1">
+                        {pricingContext}
+                      </span>
+                    )}
                   </div>
                   {priceDisplay.alternatives.length > 0 && (
                     <div className="text-sm text-muted-foreground">
@@ -310,6 +331,11 @@ export function PropertyCard({
           <div className="mb-1 sm:mb-2">
             <div className="text-lg sm:text-xl font-bold text-primary">
               {priceDisplay.primary}
+              {pricingContext && (
+                <span className="text-sm font-normal text-muted-foreground ml-1">
+                  {pricingContext}
+                </span>
+              )}
             </div>
             {priceDisplay.alternatives.length > 0 && (
               <div className="text-xs sm:text-sm text-muted-foreground">

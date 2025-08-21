@@ -138,6 +138,7 @@
   --property-sold: oklch(0.556 0 0);
   --property-featured: oklch(0.792 0.150 49);
   --property-premium: oklch(0.627 0.150 270);
+  --property-short-let: oklch(0.627 0.150 221);
   
   /* Trust colors */
   --verified: oklch(0.627 0.150 142);
@@ -367,6 +368,10 @@
   
   .property-status-rent {
     @apply bg-[oklch(var(--property-rent))] text-white;
+  }
+  
+  .property-status-short-let {
+    @apply bg-[oklch(var(--property-short-let))] text-white;
   }
   
   .verification-badge {
