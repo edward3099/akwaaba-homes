@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { ArrowRight, MapPin, ChevronDown } from 'lucide-react';
 import { Property } from '@/lib/types';
+import { useState } from 'react';
 
 // Mock data - in production this would come from an API
 const mockProperties: Property[] = [
@@ -248,9 +249,17 @@ const mockProperties: Property[] = [
 ];
 
 export function FeaturedProperties() {
+  // Add state for property type selection
+  const [selectedPropertyType, setSelectedPropertyType] = useState<string>('for-sale');
+  
   // Remove old region filtering logic since we now have a full search form
   
   const filteredProperties = mockProperties; // Show all properties by default
+
+  // Handle property type selection
+  const handlePropertyTypeChange = (type: string) => {
+    setSelectedPropertyType(type);
+  };
 
   return (
     <section className="py-6 bg-muted/30">
@@ -275,13 +284,18 @@ export function FeaturedProperties() {
                       type="radio" 
                       name="cid" 
                       id="cid-for-sale" 
-                      value="2" 
-                      defaultChecked 
+                      value="for-sale" 
+                      checked={selectedPropertyType === 'for-sale'}
+                      onChange={(e) => handlePropertyTypeChange(e.target.value)}
                       className="sr-only"
                     />
                     <label 
                       htmlFor="cid-for-sale" 
-                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-primary text-primary-foreground border-primary"
+                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                        selectedPropertyType === 'for-sale'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
+                      }`}
                     >
                       Buy
                     </label>
@@ -291,12 +305,18 @@ export function FeaturedProperties() {
                       type="radio" 
                       name="cid" 
                       id="cid-for-rent" 
-                      value="1" 
+                      value="for-rent" 
+                      checked={selectedPropertyType === 'for-rent'}
+                      onChange={(e) => handlePropertyTypeChange(e.target.value)}
                       className="sr-only"
                     />
                     <label 
                       htmlFor="cid-for-rent" 
-                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                        selectedPropertyType === 'for-rent'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
+                      }`}
                     >
                       Rent
                     </label>
@@ -306,12 +326,18 @@ export function FeaturedProperties() {
                       type="radio" 
                       name="cid" 
                       id="cid-short-let" 
-                      value="4" 
+                      value="short-let" 
+                      checked={selectedPropertyType === 'short-let'}
+                      onChange={(e) => handlePropertyTypeChange(e.target.value)}
                       className="sr-only"
                     />
                     <label 
                       htmlFor="cid-short-let" 
-                      className="block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50"
+                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                        selectedPropertyType === 'short-let'
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
+                      }`}
                     >
                       Short Let
                     </label>
