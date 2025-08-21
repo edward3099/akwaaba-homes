@@ -4,17 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Menu, X, Home, MapPin, Phone } from 'lucide-react';
+import { Menu, X, Home, Phone } from 'lucide-react';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const navigation = [
-    { name: 'Buy', href: '/search?status=for-sale' },
-    { name: 'Rent', href: '/search?status=for-rent' },
-    { name: 'Sell', href: '/seller' },
-    { name: 'About', href: '/about' },
-  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -31,19 +24,30 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {navigation.map((item) => (
+                      {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               <Link
-                key={item.name}
-                href={item.href}
+                href="/search?status=for-sale"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
               >
-                {item.name}
+                Buy
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
               </Link>
-            ))}
-          </nav>
+              <Link
+                href="/search?status=for-rent"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
+              >
+                Rent
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+              </Link>
+              <Link
+                href="/airbnb"
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
+              >
+                Airbnb
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+              </Link>
+            </nav>
 
           {/* Trust Indicators & Actions */}
           <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
@@ -58,6 +62,14 @@ export function Header() {
               <Phone className="h-4 w-4 flex-shrink-0" />
               <span>+233 XX XXX XXXX</span>
             </div>
+
+            {/* Sell Link */}
+            <Link
+              href="/seller"
+              className="hidden lg:flex text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Sell
+            </Link>
 
             {/* Currency Toggle - placeholder for now */}
             <div className="hidden lg:flex items-center space-x-1 px-2 py-1 bg-muted rounded-lg text-xs">
@@ -85,36 +97,54 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t bg-background animate-slide-up">
-            <div className="px-3 pt-3 pb-4 space-y-2">
-              {navigation.map((item) => (
+                  {/* Mobile Navigation */}
+          {isMenuOpen && (
+            <div className="md:hidden border-t bg-background animate-slide-up">
+              <div className="px-3 pt-3 pb-4 space-y-2">
                 <Link
-                  key={item.name}
-                  href={item.href}
+                  href="/search?status=for-sale"
                   className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.name}
+                  Buy
                 </Link>
-              ))}
-              <div className="pt-4 border-t">
-                <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-sm text-muted-foreground">Currency:</span>
-                  <div className="flex items-center space-x-1 px-2 py-1 bg-muted rounded text-sm">
-                    ₵ GHS
+                <Link
+                  href="/search?status=for-rent"
+                  className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Rent
+                </Link>
+                <Link
+                  href="/airbnb"
+                  className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Airbnb
+                </Link>
+                <Link
+                  href="/seller"
+                  className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sell
+                </Link>
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between px-3 py-2">
+                    <span className="text-sm text-muted-foreground">Currency:</span>
+                    <div className="flex items-center space-x-1 px-2 py-1 bg-muted rounded text-sm">
+                      ₵ GHS
+                    </div>
                   </div>
-                </div>
-                <div className="px-3 py-2">
-                  <Button className="w-full btn-ghana">
-                    List Your Property
-                  </Button>
+                  <div className="px-3 py-2">
+                    <Button className="w-full btn-ghana">
+                      List Your Property
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </header>
   );
