@@ -246,15 +246,217 @@ const mockProperties: Property[] = [
     expiresAt: '2024-02-03',
     tier: 'standard',
   },
+  {
+    id: '8',
+    title: '2-Bedroom Apartment for Rent in Osu',
+    description: 'Modern apartment in the heart of Osu, close to restaurants, shops, and nightlife.',
+    price: 2500,
+    currency: 'GHS',
+    status: 'for-rent',
+    type: 'apartment',
+    location: {
+      address: 'Osu Oxford Street',
+      city: 'Accra',
+      region: 'Greater Accra',
+      country: 'Ghana',
+      coordinates: { lat: 5.5600, lng: -0.1869 },
+    },
+    specifications: {
+      bedrooms: 2,
+      bathrooms: 1,
+      size: 1200,
+      sizeUnit: 'sqft',
+      yearBuilt: 2021,
+      parkingSpaces: 1,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['Balcony', 'Modern Kitchen', 'Air Conditioning'],
+    amenities: ['24/7 Security', 'Elevator', 'Gym'],
+    seller: {
+      id: 'seller8',
+      name: 'Osu Properties',
+      type: 'agent',
+      phone: '+233244789014',
+      whatsapp: '+233244789014',
+      isVerified: true,
+      company: 'Osu Properties Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-20',
+    updatedAt: '2024-01-20',
+    expiresAt: '2024-02-20',
+    tier: 'standard',
+  },
+  {
+    id: '9',
+    title: '3-Bedroom House for Rent in East Legon',
+    description: 'Spacious family home with garden and parking, perfect for families.',
+    price: 3500,
+    currency: 'GHS',
+    status: 'for-rent',
+    type: 'house',
+    location: {
+      address: 'East Legon',
+      city: 'Accra',
+      region: 'Greater Accra',
+      country: 'Ghana',
+      coordinates: { lat: 5.6037, lng: -0.1870 },
+    },
+    specifications: {
+      bedrooms: 3,
+      bathrooms: 2,
+      size: 2000,
+      sizeUnit: 'sqft',
+      lotSize: 3000,
+      lotSizeUnit: 'sqft',
+      yearBuilt: 2020,
+      parkingSpaces: 2,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['Garden', 'Parking', 'Security', 'Modern Kitchen'],
+    amenities: ['24/7 Security', 'Backup Generator', 'Water Tank'],
+    seller: {
+      id: 'seller9',
+      name: 'East Legon Rentals',
+      type: 'agent',
+      phone: '+233244789015',
+      whatsapp: '+233244789015',
+      isVerified: true,
+      company: 'East Legon Rentals Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-18',
+    updatedAt: '2024-01-18',
+    expiresAt: '2024-02-18',
+    tier: 'premium',
+  },
+  {
+    id: '10',
+    title: 'Luxury Villa for Short Let in Labadi',
+    description: 'Exclusive villa perfect for short stays, close to Labadi Beach.',
+    price: 800,
+    currency: 'GHS',
+    status: 'short-let',
+    type: 'house',
+    location: {
+      address: 'Labadi Beach Road',
+      city: 'Accra',
+      region: 'Greater Accra',
+      country: 'Ghana',
+      coordinates: { lat: 5.5500, lng: -0.1667 },
+    },
+    specifications: {
+      bedrooms: 4,
+      bathrooms: 3,
+      size: 3000,
+      sizeUnit: 'sqft',
+      lotSize: 4000,
+      lotSizeUnit: 'sqft',
+      yearBuilt: 2022,
+      parkingSpaces: 3,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['Beach Access', 'Swimming Pool', 'Garden', 'Ocean View'],
+    amenities: ['24/7 Security', 'Housekeeping', 'Concierge', 'WiFi'],
+    seller: {
+      id: 'seller10',
+      name: 'Labadi Luxury Stays',
+      type: 'agent',
+      phone: '+233244789016',
+      whatsapp: '+233244789016',
+      isVerified: true,
+      company: 'Labadi Luxury Stays Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-22',
+    updatedAt: '2024-01-22',
+    expiresAt: '2024-02-22',
+    tier: 'premium',
+  },
+  {
+    id: '11',
+    title: 'Modern Apartment for Short Let in Cantonments',
+    description: 'Contemporary apartment perfect for business travelers and tourists.',
+    price: 450,
+    currency: 'GHS',
+    status: 'short-let',
+    type: 'apartment',
+    location: {
+      address: 'Cantonments',
+      city: 'Accra',
+      region: 'Greater Accra',
+      country: 'Ghana',
+      coordinates: { lat: 5.5600, lng: -0.1869 },
+    },
+    specifications: {
+      bedrooms: 2,
+      bathrooms: 1,
+      size: 1500,
+      sizeUnit: 'sqft',
+      yearBuilt: 2023,
+      parkingSpaces: 1,
+    },
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    ],
+    features: ['Modern Design', 'Fully Furnished', 'Air Conditioning', 'Balcony'],
+    amenities: ['24/7 Security', 'WiFi', 'Housekeeping', 'Gym Access'],
+    seller: {
+      id: 'seller11',
+      name: 'Cantonments Stays',
+      type: 'agent',
+      phone: '+233244789017',
+      whatsapp: '+233244789017',
+      isVerified: true,
+      company: 'Cantonments Stays Ltd',
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+    },
+    createdAt: '2024-01-25',
+    updatedAt: '2024-01-25',
+    expiresAt: '2024-02-25',
+    tier: 'standard',
+  },
 ];
 
 export function FeaturedProperties() {
   // Add state for property type selection
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>('for-sale');
   
-  // Remove old region filtering logic since we now have a full search form
-  
-  const filteredProperties = mockProperties; // Show all properties by default
+  // Filter properties based on selected property type
+  const filteredProperties = mockProperties.filter(property => {
+    switch (selectedPropertyType) {
+      case 'for-sale':
+        return property.status === 'for-sale';
+      case 'for-rent':
+        return property.status === 'for-rent';
+      case 'short-let':
+        return property.status === 'short-let';
+      default:
+        return true; // Show all properties if no specific type is selected
+    }
+  });
 
   // Handle property type selection
   const handlePropertyTypeChange = (type: string) => {
@@ -264,6 +466,18 @@ export function FeaturedProperties() {
   return (
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
+
+        {/* Dynamic Section Header */}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+            {selectedPropertyType === 'for-sale' && 'Properties for Sale'}
+            {selectedPropertyType === 'for-rent' && 'Properties for Rent'}
+            {selectedPropertyType === 'short-let' && 'Short Let Properties'}
+          </h2>
+          <p className="text-muted-foreground">
+            {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} available
+          </p>
+        </div>
 
 
         {/* Full Search Form */}

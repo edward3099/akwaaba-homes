@@ -6,7 +6,7 @@ export interface Property {
   description: string;
   price: number; // Always in GHS
   currency: 'GHS';
-  status: 'for-sale' | 'for-rent' | 'sold' | 'rented';
+  status: 'for-sale' | 'for-rent' | 'short-let' | 'sold' | 'rented';
   type: 'house' | 'apartment' | 'land' | 'commercial' | 'townhouse' | 'condo';
   
   // Location & Geo-tagging (mandatory)
