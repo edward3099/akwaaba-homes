@@ -97,7 +97,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
           <div className="xl:col-span-2 space-y-3">
             {/* Agent Profile Header */}
             <div className="bg-white rounded-lg border overflow-hidden">
-              <div className="relative h-24 sm:h-32">
+              <div className="relative h-32 sm:h-40">
                 <Image 
                   src={agent.coverImage} 
                   alt={`${agent.name} cover image`} 
@@ -107,48 +107,48 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20"></div>
                 
                 {/* Agent Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
-                  <div className="flex items-center gap-2">
+                <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
+                  <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-full p-1 shadow-lg">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1.5 shadow-lg">
                         <Image 
                           src={agent.avatar} 
                           alt={agent.name} 
-                          width={48} 
-                          height={48} 
+                          width={64} 
+                          height={64} 
                           className="w-full h-full rounded-full object-cover"
                         />
                       </div>
-                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
-                        <CheckCircle className="w-1.5 h-1.5" />
+                      <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white rounded-full p-1">
+                        <CheckCircle className="w-2 h-2" />
                       </div>
                     </div>
                     
                     <div className="flex-1 text-white">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h2 className="text-sm sm:text-lg font-bold">{agent.name}</h2>
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-white/20 text-white border-white/30">agent</Badge>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-lg sm:text-xl font-bold">{agent.name}</h2>
+                        <Badge variant="secondary" className="text-sm px-3 py-1 bg-white/20 text-white border-white/30">agent</Badge>
                       </div>
-                      <p className="text-white/90 text-sm mb-1">{agent.company}</p>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
+                      <p className="text-white/90 text-base mb-2">{agent.company}</p>
+                      <div className="flex items-center gap-3 text-base">
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
                           {agent.experience}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
+                        <span className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
                           {agent.contactInfo.address}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-6 px-2 text-xs border-white/30">
-                        <Heart className="w-3 h-3 mr-1" />
+                    <div className="flex gap-3">
+                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-8 px-3 text-sm border-white/30">
+                        <Heart className="w-4 h-4 mr-2" />
                         Save
                       </Button>
-                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-6 px-2 text-xs border-white/30">
-                        <Share2 className="w-3 h-3 mr-1" />
+                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-8 px-3 text-sm border-white/30">
+                        <Share2 className="w-4 h-4 mr-2" />
                         Share
                       </Button>
                     </div>
