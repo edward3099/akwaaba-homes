@@ -696,8 +696,8 @@ export function FeaturedProperties() {
                       <option value="150000000">GH₵ 150 Million</option>
                     </select>
                   </div>
-                </div>
-              </div>
+            </div>
+          </div>
 
               {/* Advanced Search Panel */}
               <div className="filter-panel">
@@ -742,13 +742,13 @@ export function FeaturedProperties() {
                         </h4>
                       </div>
                       <div className="flex-1 sm:flex-none sm:ml-3">
-                        <Button 
+            <Button
                           type="submit" 
                           size="default"
                           className="w-full sm:w-auto px-6 py-2 text-sm font-medium"
                         >
                           Search
-                        </Button>
+            </Button>
                       </div>
                     </div>
                   </div>
@@ -864,14 +864,14 @@ export function FeaturedProperties() {
               ))}
             </div>
             
-            <Button 
+          <Button 
               size="sm" 
-              variant="outline" 
+            variant="outline" 
               className="px-3 py-2"
               onClick={handleNextPage}
-            >
+          >
               Next
-            </Button>
+          </Button>
           </div>
           
           <p className="text-sm text-muted-foreground">

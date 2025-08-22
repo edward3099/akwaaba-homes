@@ -24,7 +24,9 @@ import {
   ArrowRight,
   Building,
   Star,
-  FileText
+  FileText,
+  Map,
+  Flag
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
@@ -68,7 +70,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
     <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
             <button 
               onClick={() => window.history.back()}
@@ -85,10 +87,10 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-20 lg:pb-6">
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="container mx-auto px-4 py-4 sm:py-6 pb-20 xl:pb-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 xl:gap-8">
           {/* Main Content Column */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="xl:col-span-2 space-y-4 sm:space-y-6">
             {/* Property Header Info */}
             <div className="bg-white rounded-lg p-4 sm:p-6 border">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -238,6 +240,28 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                     <MapPin className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
                     Area Guide
                   </button>
+                  <button
+                    onClick={() => setActiveTab('map')}
+                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                      activeTab === 'map'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <Map className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                    View on Map
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('report')}
+                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                      activeTab === 'report'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <Flag className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                    Report
+                  </button>
                 </div>
               </div>
 
@@ -312,6 +336,83 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                     </div>
                   </div>
                 )}
+
+                {activeTab === 'map' && (
+                  <div className="h-full">
+                    <div className="bg-gray-100 p-4 sm:p-6 rounded-lg">
+                      <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Location on Map</h3>
+                      <div className="space-y-4">
+                        <div className="bg-white p-4 rounded-lg">
+                          <h4 className="font-semibold mb-2 text-sm sm:text-base">Property Location</h4>
+                          <div className="flex items-start gap-2 text-sm text-gray-700">
+                            <MapPin className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                            <div>
+                              <p className="font-medium">{property.location.address}</p>
+                              <p>{property.location.city}, {property.location.region}</p>
+                              <p className="text-gray-600">{property.location.country}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {property.location.coordinates ? (
+                          <div className="bg-white p-4 rounded-lg">
+                            <h4 className="font-semibold mb-2 text-sm sm:text-base">View on Map</h4>
+                            <p className="text-gray-700 text-sm mb-3">
+                              Click the button below to view this property's exact location on Google Maps.
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              className="text-sm" 
+                              onClick={() => {
+                                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${property.location.coordinates.lat},${property.location.coordinates.lng}`;
+                                window.open(googleMapsUrl, '_blank');
+                              }}
+                            >
+                              <Map className="w-4 h-4 mr-2" />
+                              View on Google Maps
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="bg-white p-4 rounded-lg">
+                            <h4 className="font-semibold mb-2 text-sm sm:text-base">Location Search</h4>
+                            <p className="text-gray-700 text-sm mb-3">
+                              Search for this property's location on Google Maps using the address.
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              className="text-sm" 
+                              onClick={() => {
+                                const searchQuery = `${property.location.address}, ${property.location.city}, ${property.location.region}, ${property.location.country}`;
+                                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+                                window.open(googleMapsUrl, '_blank');
+                              }}
+                            >
+                              <Map className="w-4 h-4 mr-2" />
+                              Search on Google Maps
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'report' && (
+                  <div className="bg-gray-50 p-4 sm:p-6 rounded-lg">
+                    <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Report Property</h3>
+                    <p className="text-gray-700 text-sm sm:text-base mb-4">
+                      If you believe this property listing is inappropriate or violates our terms of service, please let us know.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full text-sm sm:text-base" 
+                      size="sm"
+                    >
+                      <Flag className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      Report Property
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -335,10 +436,10 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-4 sm:space-y-6">
+          {/* Sidebar - Now properly responsive with better spacing */}
+          <div className="xl:col-span-1 space-y-4 sm:space-y-6 xl:space-y-6">
             {/* Contact Card */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6">
+            <div className="bg-white rounded-lg border p-4 sm:p-6 xl:p-6">
               <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Marketed by</h3>
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
@@ -351,15 +452,15 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                 
                 <div className="space-y-2 sm:space-y-3">
                   <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 flex-shrink-0" />
                     <span className="text-gray-700">{property.location.city}, Ghana</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 flex-shrink-0" />
                     <span className="text-gray-700">{property.seller.phone}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                    <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600 flex-shrink-0" />
                     <span className="text-gray-700">{property.seller.phone}</span>
                   </div>
                 </div>
@@ -376,7 +477,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             </div>
 
             {/* Save Property */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6 text-center">
+            <div className="bg-white rounded-lg border p-4 sm:p-6 xl:p-6 text-center">
               <Button
                 variant="outline"
                 className="w-full text-sm sm:text-base"
@@ -389,22 +490,22 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             </div>
 
             {/* Diaspora Support */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 xl:p-6">
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
                 <h3 className="text-base sm:text-lg font-semibold text-blue-900">Diaspora Support</h3>
               </div>
               <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-blue-800">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span>24/7 Support Available</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span>Virtual Inspection Services</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span>Verified Property Listings</span>
                 </div>
               </div>
@@ -422,7 +523,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
       )}
 
       {/* Sticky Bottom Menu */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50 lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50 xl:hidden">
         <div className="flex gap-2 p-3">
           <Button 
             className="flex-1 bg-green-600 hover:bg-green-700 text-white"
