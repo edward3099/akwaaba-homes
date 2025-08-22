@@ -63,7 +63,7 @@ interface AgentPageClientProps {
 export default function AgentPageClient({ agent, properties }: AgentPageClientProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [activeTab, setActiveTab] = useState<'about' | 'properties'>('about');
+  const [activeTab, setActiveTab] = useState<'about' | 'properties'>('properties');
   const [currency] = useState<'GHS'>('GHS');
 
   const toggleSaved = () => {
