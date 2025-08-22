@@ -191,20 +191,6 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
               </CardHeader>
 
               <CardContent className="space-y-3 px-4">
-                {/* Experience and Rating */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <Clock className="w-3 h-3" />
-                    <span>{agent.experience}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {renderStars(agent.stats.clientSatisfaction)}
-                    <span className="text-xs text-gray-600 ml-1">
-                      {agent.stats.clientSatisfaction}
-                    </span>
-                  </div>
-                </div>
-
                 {/* Specializations */}
                 <div>
                   <h4 className="text-xs font-medium text-gray-700 mb-1">Specializations</h4>
