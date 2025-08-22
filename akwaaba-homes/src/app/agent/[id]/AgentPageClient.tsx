@@ -93,43 +93,43 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
       <div className="container mx-auto px-4 py-4 sm:py-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-8">
           {/* Main Content Column */}
-          <div className="xl:col-span-2 space-y-4">
+          <div className="xl:col-span-2 space-y-3">
             {/* Agent Profile Header (Cover Image, Avatar, Info) */}
             <div className="bg-white rounded-lg border overflow-hidden">
-              <div className="relative h-32 sm:h-40">
+              <div className="relative h-24 sm:h-32">
                 <Image src={agent.coverImage} alt={`${agent.name} cover image`} fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
-              <div className="relative px-4 sm:px-6 pb-4 -mt-12">
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+              <div className="relative px-3 sm:px-4 pb-3 -mt-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2">
                   <div className="relative">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-1 shadow-lg">
-                      <Image src={agent.avatar} alt={agent.name} width={80} height={80} className="w-full h-full rounded-full object-cover" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1 shadow-lg">
+                      <Image src={agent.avatar} alt={agent.name} width={64} height={64} className="w-full h-full rounded-full object-cover" />
                     </div>
                     {agent.isVerified && (
                       <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1">
-                        <CheckCircle className="w-3 h-3" />
+                        <CheckCircle className="w-2.5 h-2.5" />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 text-white sm:text-gray-900">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                      <h2 className="text-xl sm:text-2xl font-bold">{agent.name}</h2>
-                      <Badge variant="secondary" className="w-fit">{agent.type}</Badge>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                      <h2 className="text-lg sm:text-xl font-bold">{agent.name}</h2>
+                      <Badge variant="secondary" className="w-fit text-xs">{agent.type}</Badge>
                     </div>
-                    <p className="text-white/90 sm:text-gray-600 text-base sm:text-lg mb-2">{agent.company}</p>
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{agent.experience} experience</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{agent.contactInfo.address}</span>
+                    <p className="text-white/90 sm:text-gray-600 text-sm sm:text-base mb-1">{agent.company}</p>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{agent.experience} experience</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{agent.contactInfo.address}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white">
-                      <Heart className={`w-4 h-4 mr-2 ${isSaved ? 'fill-current text-red-500' : ''}`} />
+                  <div className="flex gap-1">
+                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white h-7 px-2 text-xs">
+                      <Heart className={`w-3 h-3 mr-1 ${isSaved ? 'fill-current text-red-500' : ''}`} />
                       {isSaved ? 'Saved' : 'Save'}
                     </Button>
-                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white">
-                      <Share2 className="w-4 h-4 mr-2" />
+                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-7 px-2 text-xs">
+                      <Share2 className="w-3 h-3 mr-1" />
                       Share
                     </Button>
                   </div>
@@ -315,7 +315,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
           </div>
 
           {/* Sidebar */}
-          <div className="xl:col-span-1 space-y-4">
+          <div className="xl:col-span-1 space-y-3">
             {/* Contact Card */}
             <div className="bg-white rounded-lg border p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold mb-4">Contact Information</h3>
