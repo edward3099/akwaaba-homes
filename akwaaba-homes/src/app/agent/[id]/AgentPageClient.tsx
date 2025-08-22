@@ -93,80 +93,42 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
       <div className="container mx-auto px-4 py-4 sm:py-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-8">
           {/* Main Content Column */}
-          <div className="xl:col-span-2 space-y-6">
-            {/* Agent Profile Header */}
+          <div className="xl:col-span-2 space-y-4">
+            {/* Agent Profile Header (Cover Image, Avatar, Info) */}
             <div className="bg-white rounded-lg border overflow-hidden">
-              {/* Cover Image */}
-              <div className="relative h-48 sm:h-64">
-                <Image
-                  src={agent.coverImage}
-                  alt={`${agent.name} cover image`}
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative h-32 sm:h-40">
+                <Image src={agent.coverImage} alt={`${agent.name} cover image`} fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
-
-              {/* Agent Info Overlay */}
-              <div className="relative px-4 sm:px-6 pb-6 -mt-16">
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-                  {/* Avatar */}
+              <div className="relative px-4 sm:px-6 pb-4 -mt-12">
+                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
                   <div className="relative">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full p-1 shadow-lg">
-                      <Image
-                        src={agent.avatar}
-                        alt={agent.name}
-                        width={128}
-                        height={128}
-                        className="w-full h-full rounded-full object-cover"
-                      />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-1 shadow-lg">
+                      <Image src={agent.avatar} alt={agent.name} width={80} height={80} className="w-full h-full rounded-full object-cover" />
                     </div>
                     {agent.isVerified && (
                       <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1">
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-3 h-3" />
                       </div>
                     )}
                   </div>
-
-                  {/* Agent Details */}
                   <div className="flex-1 text-white sm:text-gray-900">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-                      <h2 className="text-2xl sm:text-3xl font-bold">{agent.name}</h2>
-                      <Badge variant="secondary" className="w-fit">
-                        {agent.type}
-                      </Badge>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                      <h2 className="text-xl sm:text-2xl font-bold">{agent.name}</h2>
+                      <Badge variant="secondary" className="w-fit">{agent.type}</Badge>
                     </div>
-                    <p className="text-white/90 sm:text-gray-600 text-lg sm:text-xl mb-2">
-                      {agent.company}
-                    </p>
-                    <div className="flex items-center gap-4 text-sm sm:text-base">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {agent.experience} experience
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {agent.contactInfo.address}
-                      </span>
+                    <p className="text-white/90 sm:text-gray-600 text-base sm:text-lg mb-2">{agent.company}</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{agent.experience} experience</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{agent.contactInfo.address}</span>
                     </div>
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 sm:gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={toggleSaved}
-                      className="bg-white/90 hover:bg-white"
-                    >
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white">
                       <Heart className={`w-4 h-4 mr-2 ${isSaved ? 'fill-current text-red-500' : ''}`} />
                       {isSaved ? 'Saved' : 'Save'}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-white/90 hover:bg-white"
-                    >
+                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white">
                       <Share2 className="w-4 h-4 mr-2" />
                       Share
                     </Button>
@@ -353,7 +315,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
           </div>
 
           {/* Sidebar */}
-          <div className="xl:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-4">
             {/* Contact Card */}
             <div className="bg-white rounded-lg border p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold mb-4">Contact Information</h3>
