@@ -104,13 +104,13 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                   fill 
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/40"></div>
                 
                 {/* Agent Info Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <div className="relative">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1.5 shadow-lg">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1.5 shadow-xl">
                         <Image 
                           src={agent.avatar} 
                           alt={agent.name} 
@@ -119,35 +119,35 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                           className="w-full h-full rounded-full object-cover"
                         />
                       </div>
-                      <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white rounded-full p-1">
+                      <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white rounded-full p-1 shadow-lg">
                         <CheckCircle className="w-2 h-2" />
                       </div>
                     </div>
                     
                     <div className="flex-1 text-white">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-lg sm:text-xl font-bold">{agent.name}</h2>
-                        <Badge variant="secondary" className="text-sm px-3 py-1 bg-white/20 text-white border-white/30">agent</Badge>
+                      <div className="flex items-center gap-3 mb-3">
+                        <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">{agent.name}</h2>
+                        <Badge variant="secondary" className="text-sm px-3 py-1.5 bg-white text-gray-900 border-white shadow-lg font-semibold">agent</Badge>
                       </div>
-                      <p className="text-white/90 text-base mb-2">{agent.company}</p>
-                      <div className="flex items-center gap-3 text-base">
-                        <span className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          {agent.experience}
+                      <p className="text-white text-lg mb-3 font-medium drop-shadow-lg">{agent.company}</p>
+                      <div className="flex items-center gap-4 text-base">
+                        <span className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                          <Clock className="w-4 h-4 text-white" />
+                          <span className="text-white font-medium">{agent.experience}</span>
                         </span>
-                        <span className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          {agent.contactInfo.address}
+                        <span className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                          <MapPin className="w-4 h-4 text-white" />
+                          <span className="text-white font-medium">{agent.contactInfo.address}</span>
                         </span>
                       </div>
                     </div>
                     
                     <div className="flex gap-3">
-                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-8 px-3 text-sm border-white/30">
+                      <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 h-10 px-4 text-sm border-white shadow-lg font-semibold text-gray-900 hover:text-gray-700">
                         <Heart className="w-4 h-4 mr-2" />
                         Save
                       </Button>
-                      <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-8 px-3 text-sm border-white/30">
+                      <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 h-10 px-4 text-sm border-white shadow-lg font-semibold text-gray-900 hover:text-gray-700">
                         <Share2 className="w-4 h-4 mr-2" />
                         Share
                       </Button>
