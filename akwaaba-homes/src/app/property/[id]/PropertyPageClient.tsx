@@ -358,7 +358,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                           <div className="bg-white p-4 rounded-lg">
                             <h4 className="font-semibold mb-2 text-sm sm:text-base">View on Map</h4>
                             <p className="text-gray-700 text-sm mb-3">
-                              Click the button below to view this property's exact location on Google Maps.
+                              Click the button below to view this property&apos;s exact location on Google Maps.
                             </p>
                             <Button 
                               variant="outline" 
@@ -376,7 +376,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                           <div className="bg-white p-4 rounded-lg">
                             <h4 className="font-semibold mb-2 text-sm sm:text-base">Location Search</h4>
                             <p className="text-gray-700 text-sm mb-3">
-                              Search for this property's location on Google Maps using the address.
+                              Search for this property&apos;s location on Google Maps using the address.
                             </p>
                             <Button 
                               variant="outline" 
