@@ -63,6 +63,7 @@ interface AgentPageClientProps {
 export default function AgentPageClient({ agent, properties }: AgentPageClientProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [activeTab, setActiveTab] = useState<'about' | 'properties'>('about');
   const [currency] = useState<'GHS'>('GHS');
 
   const toggleSaved = () => {
@@ -75,7 +76,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <button 
+            <button
               onClick={() => window.history.back()}
               className="flex items-center gap-1 hover:text-primary transition-colors text-xs sm:text-sm"
             >
@@ -137,177 +138,143 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
               </div>
             </div>
 
-            {/* Agent Bio */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4">About {agent.name}</h3>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                {agent.bio}
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Award className="w-5 h-5 text-primary" />
-                    Specializations
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.specializations.map((spec, index) => (
-                      <Badge key={index} variant="outline">
-                        {spec}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-primary" />
-                    Languages
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.contactInfo.languages.map((lang, index) => (
-                      <Badge key={index} variant="secondary">
-                        {lang}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Properties Section */}
+            {/* Tab Navigation */}
             <div className="bg-white rounded-lg border">
-              <div className="p-4 sm:p-6 border-b">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold">
-                      Properties by {agent.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {properties.length} properties available
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={viewMode === 'grid' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setViewMode('grid')}
-                    >
-                      <Grid3X3 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === 'list' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setViewMode('list')}
-                    >
-                      <List className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+              <div className="flex border-b">
+                <button
+                  onClick={() => setActiveTab('about')}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === 'about'
+                      ? 'text-primary border-b-2 border-primary bg-primary/5'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => setActiveTab('properties')}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === 'properties'
+                      ? 'text-primary border-b-2 border-primary bg-primary/5'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  Properties ({properties.length})
+                </button>
               </div>
 
+              {/* Tab Content */}
               <div className="p-4 sm:p-6">
-                {viewMode === 'grid' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    {properties.map((property) => (
-                      <div key={property.id} className="bg-gray-50 rounded-lg overflow-hidden border hover:shadow-md transition-shadow">
-                        <div className="relative h-48">
-                          <Image
-                            src={property.images[0]}
-                            alt={property.title}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute top-2 right-2">
-                            <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'}>
-                              {property.tier}
+                {activeTab === 'about' ? (
+                  /* About Tab Content */
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4">About {agent.name}</h3>
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                      {agent.bio}
+                    </p>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2">
+                          <Award className="w-5 h-5 text-primary" />
+                          Specializations
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {agent.specializations.map((spec, index) => (
+                            <Badge key={index} variant="outline">
+                              {spec}
                             </Badge>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                            {property.title}
-                          </h4>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center gap-1">
-                              <Bed className="w-4 h-4" />
-                              {property.specifications.bedrooms}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Bath className="w-4 h-4" />
-                              {property.specifications.bathrooms}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Square className="w-4 h-4" />
-                              {property.specifications.size} {property.specifications.sizeUnit}
-                            </span>
-                          </div>
-                          <div className="text-lg font-bold text-primary mb-3">
-                            {formatDiasporaPrice(property.price, currency).primary}
-                          </div>
-                          <Link href={`/property/${property.id}`}>
-                            <Button variant="outline" size="sm" className="w-full">
-                              View Details
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                          </Link>
+                          ))}
                         </div>
                       </div>
-                    ))}
+
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center gap-2">
+                          <Globe className="w-5 h-5 text-primary" />
+                          Languages
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {agent.contactInfo.languages.map((lang, index) => (
+                            <Badge key={index} variant="secondary">
+                              {lang}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {properties.map((property) => (
-                      <div key={property.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
-                        <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
-                          <Image
-                            src={property.images[0]}
-                            alt={property.title}
-                            fill
-                            className="object-cover rounded-lg"
-                          />
-                          <div className="absolute top-1 right-1">
-                            <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">
-                              {property.tier}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                            {property.title}
-                          </h4>
-                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                            {property.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center gap-1">
-                              <Bed className="w-4 h-4" />
-                              {property.specifications.bedrooms}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Bath className="w-4 h-4" />
-                              {property.specifications.bathrooms}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Square className="w-4 h-4" />
-                              {property.specifications.size} {property.specifications.sizeUnit}
-                            </span>
-                          </div>
-                          <div className="text-lg font-bold text-primary">
-                            {formatDiasporaPrice(property.price, currency).primary}
-                          </div>
-                        </div>
-                        <div className="flex flex-col justify-center">
-                          <Link href={`/property/${property.id}`}>
-                            <Button variant="outline" size="sm">
-                              View Details
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                          </Link>
-                        </div>
+                  /* Properties Tab Content */
+                  <div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-semibold">Properties by {agent.name}</h3>
+                        <p className="text-gray-600 text-sm">{properties.length} properties available</p>
                       </div>
-                    ))}
+                      <div className="flex items-center gap-2">
+                        <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('grid')}>
+                          <Grid3X3 className="w-4 h-4" />
+                        </Button>
+                        <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('list')}>
+                          <List className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {viewMode === 'grid' ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        {properties.map((property) => (
+                          <div key={property.id} className="bg-gray-50 rounded-lg overflow-hidden border hover:shadow-md transition-shadow">
+                            <div className="relative h-48">
+                              <Image src={property.images[0]} alt={property.title} fill className="object-cover" />
+                              <div className="absolute top-2 right-2">
+                                <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'}>{property.tier}</Badge>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{property.title}</h4>
+                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                                <span className="flex items-center gap-1"><Bed className="w-4 h-4" />{property.specifications.bedrooms}</span>
+                                <span className="flex items-center gap-1"><Bath className="w-4 h-4" />{property.specifications.bathrooms}</span>
+                                <span className="flex items-center gap-1"><Square className="w-4 h-4" />{property.specifications.size} {property.specifications.sizeUnit}</span>
+                              </div>
+                              <div className="text-lg font-bold text-primary mb-3">{formatDiasporaPrice(property.price, currency).primary}</div>
+                              <Link href={`/property/${property.id}`}>
+                                <Button variant="outline" size="sm" className="w-full">View Details<ArrowRight className="w-4 h-4 ml-2" /></Button>
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {properties.map((property) => (
+                          <div key={property.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
+                            <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                              <Image src={property.images[0]} alt={property.title} fill className="object-cover rounded-lg" />
+                              <div className="absolute top-1 right-1">
+                                <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">{property.tier}</Badge>
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{property.title}</h4>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{property.description}</p>
+                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                                <span className="flex items-center gap-1"><Bed className="w-4 h-4" />{property.specifications.bedrooms}</span>
+                                <span className="flex items-center gap-1"><Bath className="w-4 h-4" />{property.specifications.bathrooms}</span>
+                                <span className="flex items-center gap-1"><Square className="w-4 h-4" />{property.specifications.size} {property.specifications.sizeUnit}</span>
+                              </div>
+                              <div className="text-lg font-bold text-primary">{formatDiasporaPrice(property.price, currency).primary}</div>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                              <Link href={`/property/${property.id}`}>
+                                <Button variant="outline" size="sm">View Details<ArrowRight className="w-4 h-4 ml-2" /></Button>
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
