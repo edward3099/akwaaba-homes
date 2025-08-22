@@ -135,10 +135,6 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                           <Clock className="w-4 h-4 text-white flex-shrink-0" />
                           <span className="text-white font-medium whitespace-nowrap">{agent.experience}</span>
                         </div>
-                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg flex-shrink-0">
-                          <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                          <span className="text-white font-medium break-words">{agent.contactInfo.address}</span>
-                        </div>
                       </div>
                     </div>
                     
