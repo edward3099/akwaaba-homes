@@ -108,8 +108,8 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                 
                 {/* Agent Info Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
+                  <div className="flex items-end gap-4">
+                    <div className="relative flex-shrink-0">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1.5 shadow-xl">
                         <Image 
                           src={agent.avatar} 
@@ -124,25 +124,25 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                       </div>
                     </div>
                     
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">{agent.name}</h2>
-                        <Badge variant="secondary" className="text-sm px-3 py-1.5 bg-white text-gray-900 border-white shadow-lg font-semibold">agent</Badge>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-3 mb-2">
+                        <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg break-words">{agent.name}</h2>
+                        <Badge variant="secondary" className="text-sm px-3 py-1.5 bg-white text-gray-900 border-white shadow-lg font-semibold flex-shrink-0">agent</Badge>
                       </div>
-                      <p className="text-white text-lg mb-3 font-medium drop-shadow-lg">{agent.company}</p>
-                      <div className="flex items-center gap-4 text-base">
-                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg">
-                          <Clock className="w-4 h-4 text-white" />
-                          <span className="text-white font-medium">{agent.experience}</span>
+                      <p className="text-white text-lg mb-3 font-medium drop-shadow-lg break-words">{agent.company}</p>
+                      <div className="flex flex-wrap items-center gap-3 text-base">
+                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg flex-shrink-0">
+                          <Clock className="w-4 h-4 text-white flex-shrink-0" />
+                          <span className="text-white font-medium whitespace-nowrap">{agent.experience}</span>
                         </div>
-                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg">
-                          <MapPin className="w-4 h-4 text-white" />
-                          <span className="text-white font-medium">{agent.contactInfo.address}</span>
+                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg flex-shrink-0">
+                          <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                          <span className="text-white font-medium break-words">{agent.contactInfo.address}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 flex-shrink-0">
                       <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 h-10 px-4 text-sm border-white shadow-lg font-semibold text-gray-900 hover:text-gray-700">
                         <Heart className="w-4 h-4 mr-2" />
                         Save
