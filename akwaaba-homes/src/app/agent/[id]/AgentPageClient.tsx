@@ -104,7 +104,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                   fill 
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20"></div>
                 
                 {/* Agent Info Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 px-2 pb-2">
