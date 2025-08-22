@@ -97,39 +97,39 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
           <div className="xl:col-span-2 space-y-3">
             {/* Agent Profile Header (Cover Image, Avatar, Info) */}
             <div className="bg-white rounded-lg border overflow-hidden">
-              <div className="relative h-24 sm:h-32">
+              <div className="relative h-16 sm:h-20">
                 <Image src={agent.coverImage} alt={`${agent.name} cover image`} fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
-              <div className="relative px-3 sm:px-4 pb-3 -mt-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2">
+              <div className="relative px-2 sm:px-3 pb-2 -mt-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-1">
                   <div className="relative">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1 shadow-lg">
-                      <Image src={agent.avatar} alt={agent.name} width={64} height={64} className="w-full h-full rounded-full object-cover" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-1 shadow-lg">
+                      <Image src={agent.avatar} alt={agent.name} width={48} height={48} className="w-full h-full rounded-full object-cover" />
                     </div>
                     {agent.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1">
-                        <CheckCircle className="w-2.5 h-2.5" />
+                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
+                        <CheckCircle className="w-2 h-2" />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 text-white sm:text-gray-900">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                      <h2 className="text-lg sm:text-xl font-bold">{agent.name}</h2>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 mb-1">
+                      <h2 className="text-base sm:text-lg font-bold">{agent.name}</h2>
                       <Badge variant="secondary" className="w-fit text-xs">{agent.type}</Badge>
                     </div>
-                    <p className="text-white/90 sm:text-gray-600 text-sm sm:text-base mb-1">{agent.company}</p>
-                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                    <p className="text-white/90 sm:text-gray-600 text-xs sm:text-sm mb-1">{agent.company}</p>
+                    <div className="flex items-center gap-2 text-xs">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{agent.experience} experience</span>
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{agent.contactInfo.address}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white h-7 px-2 text-xs">
+                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white h-6 px-2 text-xs">
                       <Heart className={`w-3 h-3 mr-1 ${isSaved ? 'fill-current text-red-500' : ''}`} />
                       {isSaved ? 'Saved' : 'Save'}
                     </Button>
-                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-7 px-2 text-xs">
+                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-6 px-2 text-xs">
                       <Share2 className="w-3 h-3 mr-1" />
                       Share
                     </Button>
