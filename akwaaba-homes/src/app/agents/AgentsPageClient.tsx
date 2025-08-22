@@ -148,17 +148,6 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
           </div>
         </div>
 
-        {/* Results Count */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-600">
-            Showing {filteredAgents.length} of {agents.length} agents
-          </p>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Filter className="w-4 h-4" />
-            <span>Filtered by: {selectedSpecialization !== 'all' ? selectedSpecialization : 'All'} • {selectedLocation !== 'all' ? selectedLocation : 'All locations'}</span>
-          </div>
-        </div>
-
         {/* Agents Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredAgents.map((agent) => (
