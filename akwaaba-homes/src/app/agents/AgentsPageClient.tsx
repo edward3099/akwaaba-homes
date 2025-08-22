@@ -88,16 +88,6 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-accent text-white">
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Find Your Perfect Real Estate Agent</h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-            Connect with verified, experienced real estate professionals across Ghana
-          </p>
-        </div>
-      </div>
-
       {/* Search and Filters */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
