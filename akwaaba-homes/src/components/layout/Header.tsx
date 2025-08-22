@@ -26,6 +26,13 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             <Link
+              href="/agents"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
+            >
+              Agents
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </Link>
+            <Link
               href="/privacy"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
             >
@@ -71,6 +78,13 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden border-t bg-background animate-slide-up">
             <div className="px-3 pt-3 pb-4 space-y-2">
+              <Link
+                href="/agents"
+                className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Agents
+              </Link>
               <Link
                 href="/privacy"
                 className="block px-3 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors tap-target touch-manipulation"
