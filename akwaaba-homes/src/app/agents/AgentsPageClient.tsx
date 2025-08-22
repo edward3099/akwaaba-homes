@@ -222,22 +222,6 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-gray-50 rounded-lg p-1.5">
-                    <div className="text-sm font-semibold text-primary">{agent.stats.totalProperties}</div>
-                    <div className="text-xs text-gray-600">Properties</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-1.5">
-                    <div className="text-sm font-semibold text-green-600">{agent.stats.propertiesSold}</div>
-                    <div className="text-xs text-gray-600">Sold</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-1.5">
-                    <div className="text-sm font-semibold text-blue-600">{agent.stats.propertiesRented}</div>
-                    <div className="text-xs text-gray-600">Rented</div>
-                  </div>
-                </div>
-
                 {/* Contact Info */}
                 <div className="space-y-1 text-xs text-gray-600">
                   <div className="flex items-center gap-1">
