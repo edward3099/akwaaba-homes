@@ -139,11 +139,11 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
         </div>
 
         {/* Agents Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredAgents.map((agent) => (
             <Card key={agent.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
               {/* Agent Cover Image */}
-              <div className="relative h-48">
+              <div className="relative h-32">
                 <Image
                   src={agent.coverImage}
                   alt={`${agent.name} cover`}
@@ -151,38 +151,38 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                
+
                 {/* Verification Badge */}
                 {agent.isVerified && (
-                  <div className="absolute top-3 right-3 bg-primary text-white rounded-full p-2">
-                    <CheckCircle className="w-4 h-4" />
+                  <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1.5">
+                    <CheckCircle className="w-3 h-3" />
                   </div>
                 )}
               </div>
 
               {/* Agent Info */}
-              <CardHeader className="pb-3">
-                <div className="flex items-start gap-3">
+              <CardHeader className="pb-2 px-4">
+                <div className="flex items-start gap-2">
                   {/* Avatar */}
                   <div className="relative">
                     <Image
                       src={agent.avatar}
                       alt={agent.name}
-                      width={60}
-                      height={60}
+                      width={40}
+                      height={40}
                       className="rounded-full object-cover"
                     />
                     {agent.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1">
-                        <CheckCircle className="w-3 h-3" />
+                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
+                        <CheckCircle className="w-2.5 h-2.5" />
                       </div>
                     )}
                   </div>
 
                   {/* Name and Company */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg text-gray-900 mb-1">{agent.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{agent.company}</p>
+                    <h3 className="font-semibold text-sm text-gray-900 mb-0.5">{agent.name}</h3>
+                    <p className="text-xs text-gray-600 mb-1">{agent.company}</p>
                     <Badge variant="secondary" className="text-xs">
                       {agent.type}
                     </Badge>
@@ -190,16 +190,16 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 px-4">
                 {/* Experience and Rating */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="w-4 h-4" />
+                  <div className="flex items-center gap-1 text-xs text-gray-600">
+                    <Clock className="w-3 h-3" />
                     <span>{agent.experience}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {renderStars(agent.stats.clientSatisfaction)}
-                    <span className="text-sm text-gray-600 ml-1">
+                    <span className="text-xs text-gray-600 ml-1">
                       {agent.stats.clientSatisfaction}
                     </span>
                   </div>
@@ -207,59 +207,59 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
 
                 {/* Specializations */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Specializations</h4>
+                  <h4 className="text-xs font-medium text-gray-700 mb-1">Specializations</h4>
                   <div className="flex flex-wrap gap-1">
-                    {agent.specializations.slice(0, 3).map((spec, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
+                    {agent.specializations.slice(0, 2).map((spec, index) => (
+                      <Badge key={index} variant="outline" className="text-xs px-1.5 py-0.5">
                         {spec}
                       </Badge>
                     ))}
-                    {agent.specializations.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{agent.specializations.length - 3} more
+                    {agent.specializations.length > 2 && (
+                      <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                        +{agent.specializations.length - 2} more
                       </Badge>
                     )}
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="bg-gray-50 rounded-lg p-2">
-                    <div className="text-lg font-semibold text-primary">{agent.stats.totalProperties}</div>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-gray-50 rounded-lg p-1.5">
+                    <div className="text-sm font-semibold text-primary">{agent.stats.totalProperties}</div>
                     <div className="text-xs text-gray-600">Properties</div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-2">
-                    <div className="text-lg font-semibold text-green-600">{agent.stats.propertiesSold}</div>
+                  <div className="bg-gray-50 rounded-lg p-1.5">
+                    <div className="text-sm font-semibold text-green-600">{agent.stats.propertiesSold}</div>
                     <div className="text-xs text-gray-600">Sold</div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-2">
-                    <div className="text-lg font-semibold text-blue-600">{agent.stats.propertiesRented}</div>
+                  <div className="bg-gray-50 rounded-lg p-1.5">
+                    <div className="text-sm font-semibold text-blue-600">{agent.stats.propertiesRented}</div>
                     <div className="text-xs text-gray-600">Rented</div>
                   </div>
                 </div>
 
                 {/* Contact Info */}
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span>{agent.contactInfo.address}</span>
+                <div className="space-y-1 text-xs text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-gray-400" />
+                    <span className="truncate">{agent.contactInfo.address}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span>{agent.contactInfo.workingHours}</span>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span className="truncate">{agent.contactInfo.workingHours}</span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   <Link href={`/agent/${agent.id}`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button variant="outline" size="sm" className="w-full h-7 text-xs">
                       View Profile
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   </Link>
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    <Phone className="w-4 h-4" />
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700 h-7 w-7 p-0">
+                    <Phone className="w-3 h-3" />
                   </Button>
                 </div>
               </CardContent>
