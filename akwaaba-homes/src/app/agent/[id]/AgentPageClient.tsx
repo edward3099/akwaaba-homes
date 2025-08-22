@@ -222,25 +222,25 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                     </div>
 
                     {viewMode === 'grid' ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {properties.map((property) => (
                           <div key={property.id} className="bg-gray-50 rounded-lg overflow-hidden border hover:shadow-md transition-shadow">
-                            <div className="relative h-32 sm:h-36">
+                            <div className="relative h-24 sm:h-28">
                               <Image src={property.images[0]} alt={property.title} fill className="object-cover" />
                               <div className="absolute top-1 right-1">
                                 <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">{property.tier}</Badge>
                               </div>
                             </div>
-                            <div className="p-3">
-                              <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm">{property.title}</h4>
-                              <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                            <div className="p-2">
+                              <h4 className="font-semibold text-gray-900 mb-1 line-clamp-2 text-xs">{property.title}</h4>
+                              <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
                                 <span className="flex items-center gap-1"><Bed className="w-3 h-3" />{property.specifications.bedrooms}</span>
                                 <span className="flex items-center gap-1"><Bath className="w-3 h-3" />{property.specifications.bathrooms}</span>
                                 <span className="flex items-center gap-1"><Square className="w-3 h-3" />{property.specifications.size} {property.specifications.sizeUnit}</span>
                               </div>
-                              <div className="text-base font-bold text-primary mb-2">{formatDiasporaPrice(property.price, currency).primary}</div>
+                              <div className="text-sm font-bold text-primary mb-1">{formatDiasporaPrice(property.price, currency).primary}</div>
                               <Link href={`/property/${property.id}`}>
-                                <Button variant="outline" size="sm" className="w-full h-7 text-xs">View Details<ArrowRight className="w-3 h-3 ml-1" /></Button>
+                                <Button variant="outline" size="sm" className="w-full h-6 text-xs">View Details<ArrowRight className="w-3 h-3 ml-1" /></Button>
                               </Link>
                             </div>
                           </div>
