@@ -129,20 +129,9 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                         <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg break-words">{agent.name}</h2>
                         <Badge variant="secondary" className="text-sm px-3 py-1.5 bg-white text-gray-900 border-white shadow-lg font-semibold flex-shrink-0">agent</Badge>
                       </div>
-                      <p className="text-white text-lg mb-3 font-medium drop-shadow-lg break-words">{agent.company}</p>
-                      <div className="flex flex-wrap items-center gap-3 text-base">
-                        <div className="flex items-center gap-2 bg-black/50 px-3 py-2 rounded-lg flex-shrink-0">
-                          <Clock className="w-4 h-4 text-white flex-shrink-0" />
-                          <span className="text-white font-medium whitespace-nowrap">{agent.experience}</span>
-                        </div>
-                      </div>
                     </div>
                     
                     <div className="flex gap-3 flex-shrink-0">
-                      <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 h-10 px-4 text-sm border-white shadow-lg font-semibold text-gray-900 hover:text-gray-700">
-                        <Heart className="w-4 h-4 mr-2" />
-                        Save
-                      </Button>
                       <Button variant="outline" size="sm" className="bg-white hover:bg-gray-100 h-10 px-4 text-sm border-white shadow-lg font-semibold text-gray-900 hover:text-gray-700">
                         <Share2 className="w-4 h-4 mr-2" />
                         Share
