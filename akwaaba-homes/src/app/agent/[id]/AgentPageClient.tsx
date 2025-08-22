@@ -125,10 +125,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg break-words">{agent.name}</h2>
-                        <Badge variant="secondary" className="text-sm px-3 py-1.5 bg-white text-gray-900 border-white shadow-lg font-semibold flex-shrink-0">agent</Badge>
-                      </div>
+                      {/* Agent name and badge removed for cleaner design */}
                     </div>
                     
                     <div className="flex gap-3 flex-shrink-0">
