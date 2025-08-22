@@ -12,24 +12,15 @@ import {
   Mail, 
   MessageCircle, 
   MapPin, 
-  Calendar, 
   Bed, 
   Bath, 
   Square, 
-  Eye,
   CheckCircle,
   Clock,
-  Shield,
   ChevronLeft,
-  Star,
-  Building,
   Award,
-  TrendingUp,
-  Users,
-  Clock3,
   Globe,
   ArrowRight,
-  Filter,
   Grid3X3,
   List
 } from 'lucide-react';
@@ -76,27 +67,6 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
 
   const toggleSaved = () => {
     setIsSaved(!isSaved);
-  };
-
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-    }
-
-    if (hasHalfStar) {
-      stars.push(<Star key="half" className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />);
-    }
-
-    const remainingStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
-    }
-
-    return stars;
   };
 
   return (
@@ -171,7 +141,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                     </p>
                     <div className="flex items-center gap-4 text-sm sm:text-base">
                       <span className="flex items-center gap-1">
-                        <Clock3 className="w-4 h-4" />
+                        <Clock className="w-4 h-4" />
                         {agent.experience} experience
                       </span>
                       <span className="flex items-center gap-1">
@@ -201,37 +171,6 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                       Share
                     </Button>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Agent Statistics */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4">Performance Statistics</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
-                    {agent.stats.totalProperties}
-                  </div>
-                  <div className="text-sm text-gray-600">Total Properties</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
-                    {agent.stats.propertiesSold}
-                  </div>
-                  <div className="text-sm text-gray-600">Properties Sold</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">
-                    {agent.stats.propertiesRented}
-                  </div>
-                  <div className="text-sm text-gray-600">Properties Rented</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl sm:text-3xl font-bold text-yellow-600 mb-1">
-                    {agent.stats.clientSatisfaction}
-                  </div>
-                  <div className="text-sm text-gray-600">Client Rating</div>
                 </div>
               </div>
             </div>
@@ -476,50 +415,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
               </div>
             </div>
 
-            {/* Client Satisfaction */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold mb-4">Client Satisfaction</h3>
-              <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  {renderStars(agent.stats.clientSatisfaction)}
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {agent.stats.clientSatisfaction}/5
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Based on client reviews
-                </p>
-                <div className="text-sm text-gray-600">
-                  <div className="flex items-center justify-between mb-1">
-                    <span>Response Time</span>
-                    <span className="font-medium">{agent.stats.responseTime}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-gradient-to-br from-primary to-primary/80 text-white rounded-lg p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold mb-4">Quick Stats</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Properties Sold</span>
-                  <span className="font-bold">{agent.stats.propertiesSold}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Properties Rented</span>
-                  <span className="font-bold">{agent.stats.propertiesRented}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Total Properties</span>
-                  <span className="font-bold">{agent.stats.totalProperties}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Experience</span>
-                  <span className="font-bold">{agent.experience}</span>
-                </div>
-              </div>
-            </div>
+            {/* Properties Section */}
           </div>
         </div>
       </div>
