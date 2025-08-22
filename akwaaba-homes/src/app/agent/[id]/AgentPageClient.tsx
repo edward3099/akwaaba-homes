@@ -95,42 +95,60 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 xl:gap-8">
           {/* Main Content Column */}
           <div className="xl:col-span-2 space-y-3">
-            {/* Agent Profile Header (Cover Image, Avatar, Info) */}
+            {/* Agent Profile Header */}
             <div className="bg-white rounded-lg border overflow-hidden">
-              <div className="relative h-16 sm:h-20">
-                <Image src={agent.coverImage} alt={`${agent.name} cover image`} fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="relative h-8 sm:h-12">
+                <Image 
+                  src={agent.coverImage} 
+                  alt={`${agent.name} cover image`} 
+                  fill 
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               </div>
-              <div className="relative px-2 sm:px-3 pb-2 -mt-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-1">
+              
+              <div className="relative px-2 pb-1 -mt-3">
+                <div className="flex items-center gap-1">
                   <div className="relative">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-1 shadow-lg">
-                      <Image src={agent.avatar} alt={agent.name} width={48} height={48} className="w-full h-full rounded-full object-cover" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full p-0.5 shadow-lg">
+                      <Image 
+                        src={agent.avatar} 
+                        alt={agent.name} 
+                        width={32} 
+                        height={32} 
+                        className="w-full h-full rounded-full object-cover"
+                      />
                     </div>
-                    {agent.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
-                        <CheckCircle className="w-2 h-2" />
-                      </div>
-                    )}
+                    <div className="absolute -bottom-0.5 -right-0.5 bg-primary text-white rounded-full p-0.5">
+                      <CheckCircle className="w-1 h-1" />
+                    </div>
                   </div>
+                  
                   <div className="flex-1 text-white sm:text-gray-900">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 mb-1">
-                      <h2 className="text-base sm:text-lg font-bold">{agent.name}</h2>
-                      <Badge variant="secondary" className="w-fit text-xs">{agent.type}</Badge>
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <h2 className="text-xs sm:text-sm font-bold">{agent.name}</h2>
+                      <Badge variant="secondary" className="text-xs px-1 py-0">agent</Badge>
                     </div>
-                    <p className="text-white/90 sm:text-gray-600 text-xs sm:text-sm mb-1">{agent.company}</p>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{agent.experience} experience</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{agent.contactInfo.address}</span>
+                    <p className="text-white/90 sm:text-gray-600 text-xs">{agent.company}</p>
+                    <div className="flex items-center gap-1 text-xs">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-2 h-2" />
+                        {agent.experience}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-2 h-2" />
+                        {agent.contactInfo.address}
+                      </span>
                     </div>
                   </div>
+                  
                   <div className="flex gap-1">
-                    <Button variant="outline" size="sm" onClick={toggleSaved} className="bg-white/90 hover:bg-white h-6 px-2 text-xs">
-                      <Heart className={`w-3 h-3 mr-1 ${isSaved ? 'fill-current text-red-500' : ''}`} />
-                      {isSaved ? 'Saved' : 'Save'}
+                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-4 px-1.5 text-xs">
+                      <Heart className="w-2 h-2 mr-0.5" />
+                      Save
                     </Button>
-                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-6 px-2 text-xs">
-                      <Share2 className="w-3 h-3 mr-1" />
+                    <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white h-4 px-1.5 text-xs">
+                      <Share2 className="w-2 h-2 mr-0.5" />
                       Share
                     </Button>
                   </div>
