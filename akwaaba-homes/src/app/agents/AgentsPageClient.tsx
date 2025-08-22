@@ -101,7 +101,7 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
       {/* Search and Filters */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
@@ -117,7 +117,7 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
             </div>
 
             {/* Specialization Filter */}
-            <div className="w-full sm:w-48">
+            <div className="w-32 sm:w-48">
               <select
                 value={selectedSpecialization}
                 onChange={(e) => setSelectedSpecialization(e.target.value)}
@@ -132,7 +132,7 @@ export default function AgentsPageClient({ agents }: AgentsPageClientProps) {
             </div>
 
             {/* Location Filter */}
-            <div className="w-full sm:w-48">
+            <div className="w-32 sm:w-48">
               <select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
