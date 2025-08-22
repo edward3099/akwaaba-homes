@@ -5,28 +5,27 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Heart, 
-  Share2, 
-  Phone, 
-  Mail, 
-  MessageCircle, 
+  ChevronLeft, 
   MapPin, 
-  Calendar, 
   Bed, 
   Bath, 
   Square, 
-  Eye,
+  Phone, 
+  MessageCircle, 
+  Calendar, 
+  Shield, 
+  Clock, 
+  Eye, 
   CheckCircle,
-  Clock,
-  Shield,
-  ChevronLeft,
   ArrowLeft,
   ArrowRight,
   Building,
   Star,
   FileText,
   Map,
-  Flag
+  Flag,
+  Share2,
+  Mail
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
@@ -39,16 +38,11 @@ interface PropertyPageClientProps {
 
 export default function PropertyPageClient({ property }: PropertyPageClientProps) {
   const [currency] = useState<CurrencyCode>('GHS');
-  const [isSaved, setIsSaved] = useState(false);
   const [showInspectionForm, setShowInspectionForm] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('details');
 
   const priceDisplay = formatDiasporaPrice(property.price, currency);
-
-  const toggleSaved = () => {
-    setIsSaved(!isSaved);
-  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -220,32 +214,21 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                 <div className="flex overflow-x-auto">
                   <button
                     onClick={() => setActiveTab('details')}
-                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                       activeTab === 'details'
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-primary text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
                     <FileText className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
                     Details
                   </button>
                   <button
-                    onClick={() => setActiveTab('area-guide')}
-                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
-                      activeTab === 'area-guide'
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
-                    Area Guide
-                  </button>
-                  <button
                     onClick={() => setActiveTab('map')}
-                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                       activeTab === 'map'
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-primary text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
                     <Map className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
@@ -253,10 +236,10 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                   </button>
                   <button
                     onClick={() => setActiveTab('report')}
-                    className={`px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                       activeTab === 'report'
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-primary text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
                     <Flag className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
@@ -368,7 +351,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                                 window.open(googleMapsUrl, '_blank');
                               }}
                             >
-                              <Map className="w-4 h-4 mr-2" />
+                              <ChevronLeft className="w-4 h-4 mr-2" />
                               View on Google Maps
                             </Button>
                           </div>
@@ -387,7 +370,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                                 window.open(googleMapsUrl, '_blank');
                               }}
                             >
-                              <Map className="w-4 h-4 mr-2" />
+                              <ChevronLeft className="w-4 h-4 mr-2" />
                               Search on Google Maps
                             </Button>
                           </div>
@@ -408,7 +391,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                       className="w-full text-sm sm:text-base" 
                       size="sm"
                     >
-                      <Flag className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Report Property
                     </Button>
                   </div>
@@ -480,19 +463,6 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                   Schedule Inspection
                 </Button>
               </div>
-            </div>
-
-            {/* Save Property */}
-            <div className="bg-white rounded-lg border p-4 sm:p-6 xl:p-6 text-center">
-              <Button
-                variant="outline"
-                className="w-full text-sm sm:text-base"
-                size="sm"
-                onClick={toggleSaved}
-              >
-                <Heart className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 ${isSaved ? 'fill-current text-red-500' : ''}`} />
-                {isSaved ? 'Saved' : 'Save Property'}
-              </Button>
             </div>
 
             {/* Diaspora Support */}

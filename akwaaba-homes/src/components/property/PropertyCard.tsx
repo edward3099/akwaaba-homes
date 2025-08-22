@@ -7,18 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Heart, 
-  MapPin, 
   Bed, 
   Bath, 
   Square, 
+  MapPin, 
   Phone, 
-  MessageCircle,
-  Shield,
-  Calendar,
-  TrendingDown,
-  Star,
-  Verified
+  MessageCircle, 
+  Star, 
+  Shield, 
+  Verified 
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
@@ -27,7 +24,6 @@ interface PropertyCardProps {
   property: Property;
   viewMode?: 'grid' | 'list';
   showCurrency?: CurrencyCode;
-  onSave?: (propertyId: string) => void;
   onContact?: (property: Property) => void;
   className?: string;
 }
@@ -36,18 +32,10 @@ export function PropertyCard({
   property, 
   viewMode = 'grid', 
   showCurrency = 'GHS',
-  onSave,
   onContact,
   className = ''
 }: PropertyCardProps) {
-  const [isSaved, setIsSaved] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsSaved(!isSaved);
-    onSave?.(property.id);
-  };
 
   const handleContact = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -166,14 +154,7 @@ export function PropertyCard({
                 </div>
 
                 {/* Save Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSave}
-                  className="absolute top-1 sm:top-2 right-1 sm:right-2 bg-white/80 hover:bg-white h-6 w-6 sm:h-8 sm:w-8 p-0"
-                >
-                  <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-                </Button>
+                {/* Removed Save Button */}
 
                 {/* Verification Badge */}
                 {property.verification.isVerified && (
@@ -320,14 +301,7 @@ export function PropertyCard({
             </div>
 
             {/* Save Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSave}
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-            >
-              <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-            </Button>
+            {/* Removed Save Button */}
 
             {/* Verification Badge */}
             {property.verification.isVerified && (

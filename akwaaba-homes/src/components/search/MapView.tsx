@@ -12,7 +12,7 @@ import { Property, CurrencyCode } from '@/lib/types';
 interface MapViewProps {
   properties: Property[];
   currency: CurrencyCode;
-  onPropertySave?: (propertyId: string) => void;
+  onPropertySelect?: (property: Property) => void;
   onPropertyContact?: (property: Property) => void;
   className?: string;
 }
@@ -20,7 +20,6 @@ interface MapViewProps {
 export function MapView({ 
   properties, 
   currency, 
-  onPropertySave, 
   onPropertyContact,
   className = '' 
 }: MapViewProps) {
@@ -116,7 +115,6 @@ export function MapView({
                   property={selectedProperty}
                   viewMode="list"
                   showCurrency={currency}
-                  onSave={onPropertySave}
                   onContact={onPropertyContact}
                   className="border-0 rounded-none"
                 />
@@ -152,7 +150,6 @@ export function MapView({
               property={selectedProperty}
               viewMode="list"
               showCurrency={currency}
-              onSave={onPropertySave}
               onContact={onPropertyContact}
               className="border-0"
             />

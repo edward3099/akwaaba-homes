@@ -230,6 +230,11 @@ function SearchResults() {
     handleSearch(newFilters);
   };
 
+  const handleContact = (property: Property) => {
+    console.log('Contact for property:', property.title);
+    // In a real app, you would navigate to a contact page or open a chat
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Search Header */}
@@ -515,12 +520,13 @@ function SearchResults() {
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <PropertyCard 
-                    property={property} 
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
                     viewMode={viewMode}
                     showCurrency={currency}
-                    onSave={(id) => console.log('Saved property:', id)}
-                    onContact={(property) => console.log('Contact for property:', property.title)}
+                    onContact={handleContact}
+                    className="h-full"
                   />
                 </div>
               ))}

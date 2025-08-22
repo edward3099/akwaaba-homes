@@ -830,7 +830,6 @@ export function FeaturedProperties() {
               <PropertyCard 
                 property={property} 
                 viewMode="grid"
-                onSave={(id) => console.log('Saved property:', id)}
                 onContact={(property) => console.log('Contact for property:', property.title)}
               />
             </div>

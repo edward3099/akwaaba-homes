@@ -281,9 +281,8 @@ export interface SearchFormData {
 // Component Props Types
 export interface PropertyCardProps {
   property: Property;
-  viewMode: 'grid' | 'list';
+  viewMode?: 'grid' | 'list';
   showCurrency?: CurrencyCode;
-  onSave?: (propertyId: string) => void;
   onContact?: (property: Property) => void;
   className?: string;
 }

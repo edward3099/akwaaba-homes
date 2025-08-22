@@ -6,23 +6,26 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Heart, 
+  ChevronLeft, 
+  CheckCircle, 
   Share2, 
+  Building, 
   Phone, 
   Mail, 
-  MessageCircle, 
   MapPin, 
-  Bed, 
-  Bath, 
-  Square, 
-  CheckCircle,
-  Clock,
-  ChevronLeft,
+  Calendar, 
+  Eye, 
+  Star, 
+  ArrowRight,
   Award,
   Globe,
-  ArrowRight,
   Grid3X3,
-  List
+  List,
+  Bed,
+  Bath,
+  Square,
+  Clock,
+  MessageCircle
 } from 'lucide-react';
 import { Property } from '@/lib/types';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
@@ -61,14 +64,9 @@ interface AgentPageClientProps {
 }
 
 export default function AgentPageClient({ agent, properties }: AgentPageClientProps) {
-  const [isSaved, setIsSaved] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState<'about' | 'properties'>('properties');
   const [currency] = useState<'GHS'>('GHS');
-
-  const toggleSaved = () => {
-    setIsSaved(!isSaved);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
