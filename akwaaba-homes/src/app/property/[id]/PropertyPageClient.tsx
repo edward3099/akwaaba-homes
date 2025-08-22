@@ -211,38 +211,38 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             {/* Tabs Section */}
             <div className="bg-white rounded-lg border">
               <div className="border-b">
-                <div className="flex overflow-x-auto">
+                <div className="flex justify-center sm:justify-start overflow-x-auto px-4 sm:px-6 py-2">
                   <button
                     onClick={() => setActiveTab('details')}
-                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                    className={`px-4 py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors mx-1 sm:mx-2 whitespace-nowrap ${
                       activeTab === 'details'
                         ? 'bg-primary text-white'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
                     Details
                   </button>
                   <button
                     onClick={() => setActiveTab('map')}
-                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                    className={`px-4 py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors mx-1 sm:mx-2 whitespace-nowrap ${
                       activeTab === 'map'
                         ? 'bg-primary text-white'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Map className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                    <Map className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
                     View on Map
                   </button>
                   <button
                     onClick={() => setActiveTab('report')}
-                    className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                    className={`px-4 py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors mx-1 sm:mx-2 whitespace-nowrap ${
                       activeTab === 'report'
                         ? 'bg-primary text-white'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Flag className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                    <Flag className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
                     Report
                   </button>
                 </div>
