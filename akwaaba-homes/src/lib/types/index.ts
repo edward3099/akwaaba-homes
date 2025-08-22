@@ -70,7 +70,7 @@ export interface Property {
   expiresAt: string; // 30 days from creation
   
   // Visibility Tier
-  tier: 'basic' | 'standard' | 'premium';
+  tier: 'normal' | 'premium';
   
   // Diaspora Features
   diasporaFeatures?: {
@@ -182,7 +182,7 @@ export interface Agent extends User {
 }
 
 export interface ListingTier {
-  id: 'basic' | 'standard' | 'premium';
+  id: 'normal' | 'premium';
   name: string;
   price: number; // in GHS
   features: string[];

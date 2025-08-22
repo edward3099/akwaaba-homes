@@ -103,7 +103,7 @@ const mockProperties: Property[] = [
     createdAt: '2024-01-12',
     updatedAt: '2024-01-12',
     expiresAt: '2024-02-12',
-    tier: 'standard',
+    tier: 'normal',
   },
   {
     id: '3',
@@ -150,7 +150,7 @@ const mockProperties: Property[] = [
     createdAt: '2024-01-08',
     updatedAt: '2024-01-08',
     expiresAt: '2024-02-08',
-    tier: 'basic',
+    tier: 'normal',
   },
   {
     id: '6',
@@ -244,7 +244,7 @@ const mockProperties: Property[] = [
     createdAt: '2024-01-03',
     updatedAt: '2024-01-03',
     expiresAt: '2024-02-03',
-    tier: 'standard',
+    tier: 'normal',
   },
   {
     id: '8',
@@ -291,7 +291,7 @@ const mockProperties: Property[] = [
     createdAt: '2024-01-20',
     updatedAt: '2024-01-20',
     expiresAt: '2024-02-20',
-    tier: 'standard',
+    tier: 'normal',
   },
   {
     id: '9',
@@ -436,7 +436,7 @@ const mockProperties: Property[] = [
     createdAt: '2024-01-25',
     updatedAt: '2024-01-25',
     expiresAt: '2024-02-25',
-    tier: 'standard',
+    tier: 'normal',
   },
 ];
 

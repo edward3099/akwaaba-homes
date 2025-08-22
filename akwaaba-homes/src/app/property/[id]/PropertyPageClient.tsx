@@ -443,11 +443,17 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
               <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Marketed by</h3>
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full mx-auto mb-2 sm:mb-3 flex items-center justify-center">
-                    <Building className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600" />
-                  </div>
-                  <p className="font-medium text-sm sm:text-base">{property.seller.name}</p>
-                  <p className="text-xs sm:text-sm text-gray-600">{property.seller.type}</p>
+                  <button 
+                    onClick={() => window.location.href = `/agent/${property.seller.id}`}
+                    className="group w-full transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg p-2 -m-2"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full mx-auto mb-2 sm:mb-3 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                      <Building className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-primary transition-colors" />
+                    </div>
+                    <p className="font-medium text-sm sm:text-base group-hover:text-primary transition-colors">{property.seller.name}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 group-hover:text-primary/70 transition-colors">{property.seller.type}</p>
+                    <p className="text-xs text-primary mt-1 opacity-0 group-hover:opacity-100 transition-opacity">View Profile →</p>
+                  </button>
                 </div>
                 
                 <div className="space-y-2 sm:space-y-3">
