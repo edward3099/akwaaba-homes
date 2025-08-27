@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Automate Responsive Design and Basic Performance Tests
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Use BrowserMCP's capabilities to test the application's responsive design across different viewports (mobile, tablet, desktop) and conduct basic performance checks like page load times.
+# Details:
+Create `tests/cross_functional/responsive_performance.spec.js`. 1. **Responsive Checks**: Reuse existing navigation tests (e.g., search, view property). Run them with different viewport settings provided by BrowserMCP: mobile (`{width: 375, height: 812}`) and tablet (`{width: 768, height: 1024}`). Assert that critical UI elements like the navigation menu and property grids adapt correctly without visual bugs. 2. **Performance Checks**: For key pages (Homepage, Search Results), use Browser's Performance API via BrowserMCP to capture `window.performance.timing`. Calculate the `loadEventEnd - navigationStart` and assert it is below a defined threshold (e.g., 3000ms).
+
+# Test Strategy:
+Run core navigation and interaction tests on multiple viewport configurations. The tests pass if no layout issues are detected and if the page load time metrics for critical pages are within the acceptable range.

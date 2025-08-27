@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Implement Reusable Authenticated State
+# Status: pending
+# Dependencies: 7
+# Priority: high
+# Description: Configure Playwright to log in a user once and reuse the authenticated session across multiple tests to improve performance and reliability.
+# Details:
+Create a global setup file specified in `playwright.config.ts` (`globalSetup: require.resolve('./global-setup')`). This script will programmatically log in a test user (e.g., customer, agent) and save the storage state to a file using `page.context().storageState({ path: 'user.json' })`. Tests for authenticated users will then use this state via `test.use({ storageState: 'user.json' })`.
+
+# Test Strategy:
+Create a test that requires authentication. Run it and verify it passes without explicitly logging in within the test itself. Check that the `user.json` file is created after the global setup runs.

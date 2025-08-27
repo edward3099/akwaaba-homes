@@ -78,6 +78,11 @@ export function HeroSection() {
             className="mb-3 sm:mb-4 md:mb-6 px-2"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={() => setIsPaused(false)}
+            tabIndex={0}
+            role="region"
+            aria-label="Animated headline text"
           >
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-bold leading-tight text-center">
               <span 

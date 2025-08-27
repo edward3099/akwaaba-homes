@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   Star
 } from 'lucide-react';
-import { Property, SearchFilters, CurrencyCode } from '@/lib/types';
+import { Property, SearchFilters, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface AdvancedFiltersProps {
@@ -226,8 +226,8 @@ export function AdvancedFilters({
         </CardHeader>
         <CardContent className="pt-0 space-y-4">
           <div>
-            <label className="text-xs text-muted-foreground mb-2 block">Bedrooms</label>
-            <div className="grid grid-cols-6 gap-1">
+            <label id="bedrooms-label" className="text-xs text-muted-foreground mb-2 block">Bedrooms</label>
+            <div className="grid grid-cols-6 gap-1" role="group" aria-labelledby="bedrooms-label">
               {[1, 2, 3, 4, 5, '6+'].map((bed) => (
                 <Button
                   key={bed}
@@ -238,6 +238,7 @@ export function AdvancedFilters({
                     handleFilterChange('bedrooms', { min: value });
                   }}
                   className="text-xs p-1 h-8"
+                  aria-pressed={localFilters.bedrooms?.min === (typeof bed === 'string' ? 6 : bed)}
                 >
                   {bed}
                 </Button>
@@ -246,8 +247,8 @@ export function AdvancedFilters({
           </div>
           
           <div>
-            <label className="text-xs text-muted-foreground mb-2 block">Bathrooms</label>
-            <div className="grid grid-cols-6 gap-1">
+            <label id="bathrooms-label" className="text-xs text-muted-foreground mb-2 block">Bathrooms</label>
+            <div className="grid grid-cols-6 gap-1" role="group" aria-labelledby="bathrooms-label">
               {[1, 2, 3, 4, 5, '6+'].map((bath) => (
                 <Button
                   key={bath}
@@ -258,6 +259,7 @@ export function AdvancedFilters({
                     handleFilterChange('bathrooms', { min: value });
                   }}
                   className="text-xs p-1 h-8"
+                  aria-pressed={localFilters.bathrooms?.min === (typeof bath === 'string' ? 6 : bath)}
                 >
                   {bath}
                 </Button>

@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: E2E Test: Unauthenticated Property Search and Filtering
+# Status: pending
+# Dependencies: 3, 5
+# Priority: high
+# Description: Write Playwright tests to validate the property search and filtering functionality for users who are not logged in.
+# Details:
+Using the POM structure, create a test file `tests/unauthenticated/search.spec.ts`. The test should navigate to the home page, enter a location into the search bar, apply filters (e.g., price range, number of bedrooms), and assert that the displayed results match the filter criteria.
+
+# Test Strategy:
+Run the test suite. It should pass by correctly identifying the number of search results and verifying that key details on the result cards match the applied filters.

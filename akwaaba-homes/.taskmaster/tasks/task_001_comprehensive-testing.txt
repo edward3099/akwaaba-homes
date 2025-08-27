@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Initialize Test Project and Install Dependencies
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Set up the project structure for the testing suite, initialize a `package.json` file, and install Playwright and other core dependencies.
+# Details:
+Create a new directory for the testing suite. Run `npm init -y`. Install Playwright by running `npm init playwright@latest`. This will scaffold the necessary configuration files (`playwright.config.ts`), example tests, and install browser binaries. Also, install `dotenv` for managing environment variables: `npm install -D dotenv`.
+
+# Test Strategy:
+Verify that `playwright.config.ts` is created, `package.json` lists `@playwright/test` as a dev dependency, and running `npx playwright test` executes the example test successfully.

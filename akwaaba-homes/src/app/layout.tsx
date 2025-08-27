@@ -1,29 +1,34 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
+import "../styles/accessibility.css";
 import { Header } from "@/components/layout/Header";
+import { AuthProvider } from "@/lib/auth/authContext";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const poppins = Poppins({ 
+  subsets: ["latin"], 
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins" 
 });
 
 export const metadata: Metadata = {
-  title: "AkwaabaHomes - Find Your Dream Home in Ghana",
-  description: "Ghana's most trusted real estate platform. Discover verified properties from licensed agents and developers. Perfect for locals and diaspora buyers.",
-  keywords: "Ghana real estate, properties for sale, houses for rent, land for sale, Accra properties, Kumasi houses, diaspora investment",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
+  title: "AkwaabaHomes - Your Gateway to Premium Real Estate",
+  description: "Discover exceptional properties in Ghana with AkwaabaHomes. From luxury homes to investment opportunities, find your perfect property with our expert guidance.",
+  keywords: "Ghana real estate, luxury homes, property investment, Accra properties, real estate agents",
+  authors: [{ name: "AkwaabaHomes Team" }],
+  openGraph: {
+    title: "AkwaabaHomes - Premium Real Estate in Ghana",
+    description: "Your gateway to exceptional properties across Ghana",
+    type: "website",
+    locale: "en_US",
   },
 };
+
+// Simple Toaster component
+function Toaster() {
+  return null; // Placeholder for now
+}
 
 export default function RootLayout({
   children,
@@ -32,11 +37,72 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${poppins.variable} antialiased`}
-      >
-        <Header />
-        {children}
+      <head>
+        {/* Accessibility meta tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#3b82f6" />
+        <meta name="color-scheme" content="light dark" />
+        
+        {/* Preload accessibility CSS */}
+        <link rel="preload" href="/styles/accessibility.css" as="style" />
+      </head>
+      <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+        {/* Skip Links for Accessibility */}
+        <a href="#main-content" className="skip-link focus:top-6">
+          Skip to main content
+        </a>
+        <a href="#navigation" className="skip-link focus:top-6">
+          Skip to navigation
+        </a>
+        
+        <AuthProvider>
+          <Header />
+          <main id="main-content" role="main" tabIndex={-1}>
+            {children}
+          </main>
+          <Toaster />
+        </AuthProvider>
+        
+        {/* Accessibility Scripts */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Focus management for skip links
+              document.addEventListener('DOMContentLoaded', function() {
+                const skipLinks = document.querySelectorAll('.skip-link');
+                skipLinks.forEach(link => {
+                  link.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                      e.preventDefault();
+                      target.focus();
+                      target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  });
+                });
+              });
+              
+              // Announce page changes to screen readers
+              if (typeof window !== 'undefined') {
+                window.addEventListener('load', function() {
+                  const announcement = document.createElement('div');
+                  announcement.setAttribute('aria-live', 'polite');
+                  announcement.setAttribute('aria-atomic', 'true');
+                  announcement.setAttribute('class', 'sr-only');
+                  announcement.textContent = 'Page loaded successfully';
+                  document.body.appendChild(announcement);
+                  
+                  setTimeout(() => {
+                    if (document.body.contains(announcement)) {
+                      document.body.removeChild(announcement);
+                    }
+                  }, 1000);
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

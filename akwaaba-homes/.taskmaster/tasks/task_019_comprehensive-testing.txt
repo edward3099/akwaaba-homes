@@ -1,0 +1,11 @@
+# Task ID: 19
+# Title: Establish Performance Benchmarks
+# Status: pending
+# Dependencies: 6, 7
+# Priority: low
+# Description: Use Playwright's tracing and metrics capabilities to capture and assert performance benchmarks for critical user flows.
+# Details:
+Enable tracing in `playwright.config.ts` (`trace: 'on-first-retry'`). For key pages, use the Performance API to measure metrics. Example: `const lcp = await page.evaluate(() => new Promise(resolve => { new PerformanceObserver((list) => { const entries = list.getEntries(); const lastEntry = entries[entries.length - 1]; resolve(lastEntry.startTime); }).observe({ type: 'largest-contentful-paint', buffered: true }); })); expect(lcp).toBeLessThan(2500);`
+
+# Test Strategy:
+Run the performance tests and record the baseline metrics. The test passes if the measured metrics (like LCP, FCP) are within the defined acceptable thresholds (e.g., under 2.5 seconds).

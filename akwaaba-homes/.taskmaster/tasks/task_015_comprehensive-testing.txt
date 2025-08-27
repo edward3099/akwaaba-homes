@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Supabase Edge Function Testing
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Implement tests for Supabase Edge Functions to validate their logic and integration.
+# Details:
+For each Edge Function, create a corresponding test file. Use a library like `undici` or `node-fetch` to make HTTP requests to the locally running function endpoint (provided by `supabase start`). Test success cases with valid payloads and JWTs, as well as failure cases with invalid data, and assert the correctness of the HTTP response status and body.
+
+# Test Strategy:
+Verify that the Edge Function returns the expected status codes (e.g., 200 for success, 400 for bad request, 401 for unauthorized) and response payloads for a variety of inputs.

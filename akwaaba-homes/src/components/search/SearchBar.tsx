@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, Home, DollarSign, Filter } from 'lucide-react';
-import { Property, CurrencyCode } from '@/lib/types';
+import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface SearchBarProps {

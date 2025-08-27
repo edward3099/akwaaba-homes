@@ -1,0 +1,116 @@
+# API Testing PRD for AkwaabaHomes Agent Dashboard
+
+## Project Overview
+Test the newly created backend API endpoints and frontend integration for the Agent Dashboard functionality. This includes testing the full data flow from frontend forms to backend APIs and database operations.
+
+## Current Status
+- ✅ Backend API endpoints created
+- ✅ Frontend pages created and integrated
+- ✅ Test data created in database
+- ✅ Test scripts and documentation created
+- ⏳ Ready for comprehensive testing
+
+## Testing Objectives
+
+### Primary Goals
+1. Verify all API endpoints respond correctly
+2. Test frontend-backend integration
+3. Validate data flow and persistence
+4. Test authentication and authorization
+5. Verify error handling and validation
+
+### Success Criteria
+- All API endpoints return correct responses
+- Frontend forms submit data successfully
+- Data is correctly stored and retrieved
+- Authentication works for protected routes
+- Error handling provides useful feedback
+
+## Testing Scope
+
+### API Endpoints to Test
+1. **Contact Form API** (`/api/contact`)
+   - POST: Submit contact form
+   - GET: Retrieve contact submissions
+
+2. **Agent Properties API** (`/api/agent/properties`)
+   - GET: List agent properties
+   - POST: Create new property
+
+3. **Individual Property API** (`/api/agent/properties/[id]`)
+   - PUT: Update property
+   - DELETE: Remove property
+
+4. **Agent Clients API** (`/api/agent/clients`)
+   - GET: List agent clients
+
+### Frontend Pages to Test
+1. **Contact Page** (`/contact`)
+2. **Agent Dashboard** (`/agent/dashboard`)
+3. **Properties Management** (`/agent/properties`)
+4. **Add New Property** (`/agent/properties/new`)
+5. **Client Management** (`/agent/clients`)
+
+## Testing Approach
+
+### Phase 1: Public Endpoint Testing
+- Test contact form submission
+- Verify data storage
+- Test contact submissions retrieval
+
+### Phase 2: Authentication Testing
+- Test agent login flow
+- Verify role-based access control
+- Test protected route access
+
+### Phase 3: CRUD Operations Testing
+- Test property creation
+- Test property listing
+- Test property updates
+- Test property deletion
+
+### Phase 4: Integration Testing
+- Test full user workflows
+- Verify data consistency
+- Test error scenarios
+
+## Test Data Available
+- 19 properties in database
+- 11 contact submissions
+- 12 inquiries
+- 6 agent users
+- Test property images
+
+## Testing Tools
+- Manual testing through frontend
+- Automated test script (`test-apis.js`)
+- Browser developer tools
+- Supabase dashboard for data verification
+
+## Expected Outcomes
+- Complete API functionality verification
+- Frontend-backend integration validation
+- Performance and error handling assessment
+- Documentation of any issues found
+- Recommendations for improvements
+
+## Timeline
+- Phase 1: 30 minutes
+- Phase 2: 30 minutes
+- Phase 3: 45 minutes
+- Phase 4: 45 minutes
+- Total: 2.5 hours
+
+## Risk Assessment
+- Authentication issues may block testing
+- Database connection problems
+- Frontend build errors
+- API validation failures
+
+## Next Steps
+1. Execute testing plan systematically
+2. Document all findings
+3. Fix any issues discovered
+4. Update testing documentation
+5. Prepare final testing report
+

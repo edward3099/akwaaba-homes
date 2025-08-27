@@ -1,0 +1,11 @@
+# Task ID: 21
+# Title: Validate Responsive Design on Mobile
+# Status: pending
+# Dependencies: 4, 6, 9
+# Priority: medium
+# Description: Run the core E2E test suite against mobile viewport configurations to validate responsive design and touch interactions.
+# Details:
+Execute the existing test suites using the mobile projects defined in the Playwright config: `npx playwright test --project="Mobile Chrome"`. Identify and fix any tests that fail due to layout changes (e.g., elements being hidden behind a hamburger menu). Add mobile-specific assertions where necessary, such as checking for the visibility of a mobile-only navigation bar.
+
+# Test Strategy:
+A significant portion of the test suite (e.g., >80%) should pass on the mobile emulation projects without modification. The test report should confirm execution on the specified mobile device viewports.

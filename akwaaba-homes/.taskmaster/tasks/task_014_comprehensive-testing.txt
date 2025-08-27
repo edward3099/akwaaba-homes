@@ -1,0 +1,37 @@
+# Task ID: 14
+# Title: Real-time Feature Test with Multiple Browser Contexts
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Test a real-time feature, such as notifications or chat, by simulating two different users interacting simultaneously.
+# Details:
+Write a Playwright test that creates two browser contexts (`browser.newContext()`). Log in one user (e.g., a customer) in the first context and another (e.g., an agent) in the second. Have the customer send a message or inquiry. In the agent's context, use `page.waitForSelector()` or a similar method to assert that a real-time notification or message appears without a page reload.
+
+# Test Strategy:
+The test is successful if the action performed in the first browser context triggers a visible update in the second browser context within a reasonable timeout, validating the Supabase Realtime subscription.
+
+# Subtasks:
+## 1. Scaffold Test with Two Browser Contexts [pending]
+### Dependencies: None
+### Description: Create the basic structure of a Playwright test file that initializes two separate browser contexts and pages. This sets the foundation for simulating two independent user sessions.
+### Details:
+In a new test file (e.g., `real-time.spec.ts`), use the `browser` fixture to create two contexts: `const customerContext = await browser.newContext();` and `const agentContext = await browser.newContext();`. Then, create a new page for each context: `const customerPage = await customerContext.newPage();` and `const agentPage = await agentContext.newPage();`.
+
+## 2. Implement User Login for Both Contexts [pending]
+### Dependencies: 14.1
+### Description: Log in a 'customer' user in the first browser context and an 'agent' user in the second. This requires separate user credentials and establishes the two distinct user sessions needed for the test.
+### Details:
+Using the `customerPage`, navigate to the login page and authenticate as the customer. Concurrently, using the `agentPage`, navigate to the agent login/dashboard and authenticate as the agent. Ensure both sessions are active and independent before proceeding.
+
+## 3. Simulate Customer Action to Trigger Real-time Event [pending]
+### Dependencies: 14.2
+### Description: In the customer's browser context, perform the action that is expected to trigger a real-time event, such as sending a chat message or submitting a support ticket.
+### Details:
+Using the `customerPage` object, navigate to the chat or messaging interface. Locate the text input, fill it with a test message, and click the 'send' button. This action should trigger a backend event that is broadcast via the real-time service.
+
+## 4. Assert Real-time Update in Agent Context [pending]
+### Dependencies: 14.3
+### Description: In the agent's browser context, wait for and verify that the corresponding real-time notification or message appears on the page without requiring a manual refresh.
+### Details:
+Using the `agentPage` object, use an explicit wait like `page.waitForSelector()` or `expect(locator).toBeVisible()` to check for the new element containing the customer's message or a notification alert. The assertion must have a reasonable timeout to account for network latency.
+

@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Automate Customer Authenticated Flow Tests (Account, Favorites, Inquiry)
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Develop test scripts for customer account management features, including new user registration, login/logout, saving favorite properties, and submitting property inquiry forms.
+# Details:
+Create a test file `tests/customer/authenticated_flows.spec.js`. Using the shared login function, implement tests for: 1. **Registration & Login**: Automate the sign-up process with a unique email, assert successful registration, log out, and then log back in to verify the credentials work. 2. **Save Favorite**: Log in, navigate to a property, click the 'Save Favorite' button, go to the user's favorites page, and assert the property is listed there. 3. **Submit Inquiry**: Log in, navigate to a property, fill out and submit the contact/inquiry form, and assert that a success confirmation is displayed.
+
+# Test Strategy:
+Run tests using both pre-provisioned and dynamically created test accounts. Verify that user-specific data (favorites, inquiries) is correctly associated with the account by checking the UI.

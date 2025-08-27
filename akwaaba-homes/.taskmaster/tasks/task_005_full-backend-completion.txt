@@ -1,0 +1,49 @@
+# Task ID: 5
+# Title: Admin Dashboard and Management System
+# Status: pending
+# Dependencies: 1, 2, 3, 4
+# Priority: medium
+# Description: Develop a comprehensive admin dashboard for managing users, agents, properties, and platform settings. This system will provide administrators with tools for content moderation, analytics, and system configuration using Supabase.
+# Details:
+Begin by using Context7 to research best practices for designing intuitive and efficient admin dashboards for real estate platforms. Structure the Next.js application to include a dedicated '/admin' route protected by role-based access control, ensuring only users with an 'admin' role can access it. The dashboard will feature several modules: 1) User Management: Implement full CRUD functionality for user profiles, allowing admins to view, edit, suspend, or delete users from the `profiles` table. 2) Agent Management: Integrate with the system from Task 4 to provide a centralized view of all agents, manage their verification status, and oversee their property listings. 3) Property Management: Build upon Task 3 to allow admins to moderate all property listings, with the ability to edit or delete any property, regardless of the assigned agent. 4) Analytics: Create a dashboard view that visualizes key platform metrics such as user growth, property listing volume, and agent sign-ups by querying aggregated data from Supabase. 5) System Configuration: Develop a UI for managing global platform settings (e.g., featured properties, commission rates), storing these values in a new `platform_settings` table. All backend operations must be performed via secure calls to Supabase, leveraging RLS policies that grant full data access exclusively to the 'admin' role.
+
+# Test Strategy:
+First, log in as a user with the 'admin' role and verify successful access to the '/admin' dashboard. Attempt to access this route as a standard user and an agent to confirm access is denied. Within the dashboard, test the User Management module by editing a test user's details and then deleting another, confirming the changes in the Supabase `profiles` table. For Property Management, locate a property created in Task 3 and test the admin's ability to edit and delete it. Verify the Agent Management section correctly displays agent application statuses from Task 4. Check the Analytics dashboard to ensure it renders charts and data without errors. Finally, modify a setting in the System Configuration panel and confirm the change is persisted in the `platform_settings` table and reflected on the public-facing application where applicable.
+
+# Subtasks:
+## 1. Implement Admin Layout and Role-Based Access Control (RBAC) [pending]
+### Dependencies: None
+### Description: Create the foundational structure for the admin dashboard, including the main layout, navigation, and a robust role-based access control system to protect the '/admin' route, ensuring only users with an 'admin' role can access it.
+### Details:
+Develop a higher-order component or middleware in Next.js to protect all routes under '/admin'. This check should verify the user is authenticated and has the 'admin' role in their Supabase profile. Design and implement the main admin dashboard layout, including a sidebar for navigation to the different management modules (Users, Agents, Properties, etc.).
+
+## 2. Develop User Management CRUD Interface [pending]
+### Dependencies: 5.1
+### Description: Build the User Management module within the admin dashboard, providing administrators with full CRUD (Create, Read, Update, Delete) capabilities for all user profiles from the `profiles` table.
+### Details:
+Create a UI table to display all users from the `profiles` table in Supabase, with features for pagination, search, and sorting. Implement forms/modals for admins to view detailed user information, edit profile data, change user roles, and suspend or delete user accounts. All operations must use secure Supabase client calls governed by RLS policies.
+
+## 3. Build Agent Management and Verification Interface [pending]
+### Dependencies: 5.1
+### Description: Create the Agent Management module, allowing admins to view, manage, and verify real estate agents. This interface will provide a centralized view of all agents and their property listings.
+### Details:
+Develop a view that lists all users with the 'agent' role. Implement functionality for admins to review agent profiles and update their verification status (e.g., 'pending', 'verified', 'rejected'). Provide a way for admins to view all property listings associated with a specific agent, integrating with the system from Task 4.
+
+## 4. Implement Global Property Management and Moderation View [pending]
+### Dependencies: 5.1
+### Description: Develop a comprehensive property management view for administrators, enabling them to moderate, edit, or delete any property listing on the platform, regardless of the assigned agent.
+### Details:
+Build upon the property listing components from Task 3 to create a global view of all properties in the system. Implement administrative controls to edit property details, change listing status (e.g., 'active', 'pending_review', 'rejected'), or permanently delete listings. Ensure all actions are performed via secure Supabase calls.
+
+## 5. Create Analytics and Metrics Dashboard [pending]
+### Dependencies: 5.1
+### Description: Design and implement an analytics dashboard that visualizes key platform metrics, providing administrators with insights into user growth, property listing volume, and agent sign-ups.
+### Details:
+Create a new page within the admin dashboard dedicated to analytics. Use a charting library like Recharts or Chart.js to display data. Develop Supabase database functions or views to efficiently aggregate data for metrics such as new user sign-ups per week, total active property listings, and new agent registrations over time. Fetch and display this aggregated data in charts and graphs.
+
+## 6. Develop System Configuration Page [pending]
+### Dependencies: 5.1
+### Description: Build a user interface for administrators to manage global platform settings, such as featured properties and commission rates, storing these values in a new `platform_settings` table.
+### Details:
+Create a new `platform_settings` table in Supabase to store key-value pairs for global configurations. Develop a form-based UI in the admin dashboard where admins can view and update these settings. For example, create an input for setting the platform's commission rate and a multi-select component to choose which properties are featured on the homepage.
+

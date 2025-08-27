@@ -1,0 +1,49 @@
+# Task ID: 7
+# Title: Implement Advanced Search and Filtering System
+# Status: pending
+# Dependencies: 1, 2, 3
+# Priority: medium
+# Description: Implement a comprehensive search and filtering system for properties, featuring full-text search, advanced faceted filtering, geolocation capabilities, and saved searches for users.
+# Details:
+Begin by using Context7 to research advanced search patterns for real estate platforms, focusing on PostgreSQL's full-text search and PostGIS capabilities. In Supabase, enable the `pg_trgm` extension for fuzzy string matching and create a `tsvector` column on the `properties` table, populating it with concatenated, weighted text from the property's title, description, and address. Implement a database trigger to automatically update this `tsvector` column on any property insert or update. Enable the PostGIS extension and add a `geography` column to the `properties` table to store latitude/longitude coordinates. Create a new `saved_searches` table linked to `profiles` via user_id to store serialized search criteria. Develop a primary RPC function in Supabase, `search_properties`, that accepts a JSON object of filters (e.g., keywords, price_min, price_max, beds, baths, location_point, radius_km). This function will perform a combined query using the `tsvector` for keyword matching, standard WHERE clauses for faceted filters, and `ST_DWithin` for geolocation searches. The frontend will feature a main search bar with autocomplete and a detailed filter panel. Integrate a map component (e.g., Leaflet) to visualize and interact with geolocation search results. Implement the 'Save Search' functionality, allowing authenticated users to persist their current filter set to their profile.
+
+# Test Strategy:
+Verify full-text search by querying for keywords present in a property's description but not its title, and confirm it appears in the results. Test faceted filtering by applying multiple constraints simultaneously (e.g., price between $400k-$500k, 3+ bedrooms, 2+ bathrooms) and ensuring the returned property set strictly adheres to all criteria. For geolocation, search for properties within a 5-mile radius of a specific coordinate and manually verify on a map that all results are within the boundary and properties outside are excluded. Test the 'Saved Search' feature by logging in, applying a complex set of filters, saving the search, logging out, logging back in, and confirming the saved search can be recalled and re-executed successfully. Finally, test for edge cases, such as searches with no results and searches with no filters applied, ensuring the system responds gracefully.
+
+# Subtasks:
+## 1. Configure Database for Advanced Search (FTS & PostGIS) [pending]
+### Dependencies: None
+### Description: Set up the PostgreSQL database in Supabase to support advanced search. This includes enabling the `pg_trgm` and PostGIS extensions, adding `tsvector` and `geography` columns to the `properties` table, and creating a trigger to automatically update the search vector.
+### Details:
+Enable the `pg_trgm` extension for fuzzy string matching and the PostGIS extension for geolocation. Modify the `properties` table to include a `tsvector` column for full-text search and a `geography` column for coordinates. Implement a database trigger that automatically populates and updates the `tsvector` column whenever a property's text fields are inserted or updated.
+
+## 2. Develop Core `search_properties` RPC Function [pending]
+### Dependencies: 7.1
+### Description: Create the primary Supabase RPC function, `search_properties`. This function will accept a JSON object with various filter criteria (keywords, price, beds, location, radius) and execute a combined query using full-text search, standard WHERE clauses, and PostGIS's `ST_DWithin` for geolocation.
+### Details:
+The RPC function must be designed to handle a flexible JSON object of filters. It will construct a dynamic SQL query that combines a `tsvector` match for keywords, standard range and equality checks for faceted filters (e.g., `price_min`, `beds`), and a `ST_DWithin` function call to find properties within a specified kilometer radius of a given point.
+
+## 3. Build Frontend Search Bar and Filter Panel UI [pending]
+### Dependencies: 7.2
+### Description: Develop the user interface for the search system. This includes a main search bar with autocomplete suggestions and a detailed filter panel with controls for price range, number of bedrooms/bathrooms, and other property attributes.
+### Details:
+Create a responsive and intuitive UI for search and filtering. The main search bar should provide real-time feedback or autocomplete. The filter panel should be a modal or sidebar component containing sliders, dropdowns, and input fields for all available search facets. The state of these filters should be managed efficiently and used to call the `search_properties` RPC function.
+
+## 4. Integrate Map Component for Geolocation Search [pending]
+### Dependencies: 7.2, 7.3
+### Description: Integrate a map library like Leaflet into the search results page. The map will visualize properties based on geolocation data and allow users to interactively define a search area to filter results.
+### Details:
+Implement a map view alongside the standard list view for search results. Property locations will be displayed as markers on the map. The map should support standard interactions like zoom and pan. Add functionality for users to search within the visible map area or draw a custom search radius, which will then trigger a new search via the `search_properties` function.
+
+## 5. Implement Backend for Saved Searches [pending]
+### Dependencies: 7.1
+### Description: Create the `saved_searches` table in the database, linked to the `profiles` table. Develop the necessary API endpoints or RPC functions for authenticated users to create, view, and delete their saved search criteria.
+### Details:
+Define the schema for the `saved_searches` table, including a `user_id` foreign key to `profiles`, a `name` for the search, and a `jsonb` column to store the serialized filter object. Implement Row Level Security policies to ensure users can only access their own saved searches. Create Supabase RPC functions for CRUD operations on these saved searches.
+
+## 6. Implement Frontend 'Save Search' Functionality [pending]
+### Dependencies: 7.3, 7.5
+### Description: Add a 'Save Search' button to the filter panel. Implement the UI flow for authenticated users to save their current set of filters, view their list of saved searches on their profile page, and re-run a saved search with a single click.
+### Details:
+Integrate a 'Save Search' button that, when clicked, prompts the authenticated user to name their search and calls the backend function to persist the current filter state. On the user's profile page, display a list of their saved searches. Clicking a saved search should populate the filter panel with the saved criteria and execute the search.
+

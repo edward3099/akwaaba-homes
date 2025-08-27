@@ -1,0 +1,43 @@
+# Task ID: 6
+# Title: File Storage and Image Management System
+# Status: pending
+# Dependencies: 1, 2, 3, 4
+# Priority: medium
+# Description: Implement a comprehensive image upload, optimization, and management system for properties and user profiles. This system will leverage Supabase Storage for file operations, including image compression, format conversion, and CDN integration.
+# Details:
+Begin by using Context7 to research best practices for image optimization (e.g., WebP, AVIF), storage in Next.js/Supabase, and CDN strategies. Configure Supabase Storage by creating two buckets: 'property-images' and 'profile-avatars', with appropriate Row Level Security policies to ensure users can only upload/manage their own files. Implement a Supabase Edge Function triggered on object creation to automatically perform image optimization: resize images to standard dimensions, compress them, and convert them to WebP format. In the Next.js frontend, develop a reusable file upload component that provides a drag-and-drop interface, image previews, and progress indicators. Integrate this component into the property creation/editing form (from Task 3) and the user/agent profile management page (from Task 4). Utilize the Next.js `<Image>` component to serve the optimized images from the Supabase CDN, ensuring lazy loading and responsiveness.
+
+# Test Strategy:
+Verify the upload functionality by logging in as an agent, navigating to the property management page, and uploading multiple images to a property. Confirm the files appear in the 'property-images' Supabase Storage bucket and that optimized WebP versions are created by the Edge Function. Repeat the process for a user profile picture, checking the 'profile-avatars' bucket. Test security by attempting to upload a file to a property owned by another agent; the RLS policy should block the request. Use browser developer tools to inspect the live site, confirming that images are served in the WebP format from the Supabase CDN and that the Next.js `<Image>` component is correctly applying responsive attributes.
+
+# Subtasks:
+## 1. Configure Supabase Storage Buckets and RLS Policies [pending]
+### Dependencies: None
+### Description: Set up the necessary storage buckets in Supabase for property images and user avatars. Implement Row Level Security (RLS) policies to ensure data privacy and control access, allowing users to manage only their own files.
+### Details:
+Create two public buckets: 'property-images' and 'profile-avatars'. Define RLS policies that allow authenticated users to upload files and restrict update/delete operations to the file's owner, identified via user ID in the file path or metadata.
+
+## 2. Develop Supabase Edge Function for Image Optimization [pending]
+### Dependencies: 6.1
+### Description: Create a serverless Edge Function that is triggered automatically whenever a new image is uploaded to a storage bucket. This function will handle on-the-fly image processing, including resizing, compression, and format conversion.
+### Details:
+The function should be triggered on object creation in both buckets. It will resize images to standard dimensions, apply compression, and convert the format to WebP. The optimized image should replace the original or be stored with a specific suffix.
+
+## 3. Build Reusable Next.js File Upload Component [pending]
+### Dependencies: 6.1
+### Description: Develop a generic, reusable file upload component in the Next.js frontend. This component will provide the user interface and logic for selecting and uploading files to Supabase Storage, including progress feedback.
+### Details:
+The component must feature a drag-and-drop interface, a file selection button, client-side validation for file types and size, display image previews for selected files, and show a progress bar during the upload process. It should be designed to be easily integrated into different forms.
+
+## 4. Integrate Upload Component into Property Management Forms [pending]
+### Dependencies: 6.3
+### Description: Integrate the reusable file upload component into the property creation and editing forms (from Task 3) to handle multiple property images.
+### Details:
+Add the component to the property management UI. Ensure that when images are uploaded, their URLs are correctly associated with the property record in the database. The form should handle multiple image uploads for a single property.
+
+## 5. Integrate Upload Component into User/Agent Profile Page [pending]
+### Dependencies: 6.3
+### Description: Integrate the reusable file upload component into the user and agent profile management page (from Task 4) to handle avatar uploads.
+### Details:
+Add the component to the profile editing page, configured for single file upload. Upon a successful upload, the user's profile record in the database should be updated with the new avatar URL served from the Supabase CDN.
+

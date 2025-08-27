@@ -1,0 +1,37 @@
+# Task ID: 2
+# Title: Authentication System Enhancement
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Enhance the authentication system using Next.js and Supabase, implementing modern security practices such as email verification, password strength validation, robust session management, and secure JWT handling.
+# Details:
+This task involves a comprehensive overhaul of the user authentication flow. Begin by researching modern authentication best practices for Next.js and Supabase integration. Implement a mandatory email verification step upon user registration, preventing unverified accounts from accessing protected resources. Integrate client-side and server-side password strength validation using a library like zxcvbn to enforce strong password policies. Refine session management by leveraging Supabase's session handling capabilities, ensuring secure cookie-based sessions with appropriate flags (HttpOnly, Secure, SameSite). Implement logic for securely storing and refreshing JWTs to maintain user sessions without compromising security. All authentication operations (signup, login, logout, password reset) must be handled through the Supabase client library, ensuring consistency and security. Implement clear, user-friendly error messages and feedback for all authentication-related actions.
+
+# Test Strategy:
+Verify the signup flow by registering a new user and confirming they receive a verification email; ensure they cannot log in until the email link is clicked. Test the password strength validator by attempting to sign up with weak, common, and strong passwords, verifying the UI feedback and server rejection. For session management, log in and verify the session persists after a page refresh and is cleared upon logout. Use browser developer tools to inspect session cookies for correct security flags. Test JWT refresh by simulating a token expiration scenario and confirming the application seamlessly refreshes it without interrupting the user. Trigger and verify all error states, such as 'user already exists', 'invalid credentials', and 'invalid password reset token'.
+
+# Subtasks:
+## 1. Implement Email Verification Flow [pending]
+### Dependencies: None
+### Description: Set up and configure the email verification process for new user registrations using Supabase Auth. Unverified users should be restricted from accessing protected routes.
+### Details:
+Configure Supabase Auth to automatically send a verification email upon user signup. Create a dedicated Next.js page or API route to handle the verification link callback from the user's email. Implement logic to prevent users with unverified emails from logging in or accessing protected parts of the application. Customize the email template to align with the application's branding.
+
+## 2. Integrate Password Strength Validation [pending]
+### Dependencies: None
+### Description: Implement a robust password strength validation system on both the client and server to enforce strong password policies during user registration and password updates.
+### Details:
+Integrate a library like zxcvbn into the Next.js registration and password reset forms to provide real-time, client-side feedback on password strength. Implement a corresponding server-side validation check, either within a Next.js API route or a Supabase Edge Function, to reject weak passwords before they are processed by Supabase Auth. Define and document the password policy (e.g., minimum score, common passwords).
+
+## 3. Configure Secure Session and JWT Management [pending]
+### Dependencies: None
+### Description: Refine session management by leveraging Supabase's server-side auth helpers for Next.js to handle secure, cookie-based sessions and JWT refresh logic.
+### Details:
+Integrate the `@supabase/ssr` package to manage user sessions securely across server components, client components, and API routes. Configure the Supabase client to use cookie-based storage. Ensure all session cookies are set with appropriate security flags: HttpOnly, Secure, and SameSite=Lax. Implement the logic for automatically refreshing JWTs to maintain user sessions without requiring re-authentication.
+
+## 4. Build Authentication UI/UX with Error Handling [pending]
+### Dependencies: 2.1, 2.2, 2.3
+### Description: Develop the user interface for all authentication forms (signup, login, logout, password reset) and implement clear, user-friendly feedback and error handling.
+### Details:
+Create responsive React components for the signup, login, password reset request, and new password forms. Integrate the client-side password strength meter from subtask 2.2. Implement state management to handle loading states and display clear, non-technical error messages for all possible authentication failures (e.g., 'Invalid credentials', 'Email already in use', 'Password is too weak', 'Verification email sent'). Ensure the logout functionality securely clears the user's session and redirects appropriately.
+

@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Automate Agent Property Management Tests (CRUD)
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create automated tests for the agent's core property management workflow, covering the creation of new listings with image uploads, editing existing listings, and changing property statuses (e.g., active, sold).
+# Details:
+Create `tests/agent/property_management.spec.js`. Log in as an agent user. 1. **Create Property**: Navigate to the 'List New Property' form, fill in all required fields, use BrowserMCP's file upload method to add images, and submit. Assert the new property appears in the agent's dashboard. 2. **Edit Property**: Select the newly created property, update its price and description, save, and assert the changes are reflected on the public listing page. 3. **Update Status**: Change the property's status to 'Sold' and assert it is no longer visible in public search results.
+
+# Test Strategy:
+Verify that properties created and modified by the script are correctly reflected in both the agent's dashboard and the public-facing site. Ensure that image uploads are successful and images are displayed correctly.

@@ -16,7 +16,7 @@ import {
   X,
   ChevronDown
 } from 'lucide-react';
-import { SearchFilters, Property, CurrencyCode } from '@/lib/types';
+import { SearchFilters, Property, CurrencyCode } from '@/lib/types/index';
 
 interface MobileSearchBarProps {
   onSearch: (filters: SearchFilters) => void;

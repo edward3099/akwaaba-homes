@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 import { format } from 'date-fns';
 
 interface InspectionSchedulerProps {

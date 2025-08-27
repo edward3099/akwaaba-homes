@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create Test Data Seeding Script
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Develop a script to populate the local Supabase database with consistent test data, including users for each role, properties, and related entities.
+# Details:
+Create a seed script in `/supabase/seed.sql`. This SQL script should use `INSERT` statements to create users (in `auth.users` and `public.profiles`), properties, agents, and admin accounts. Use a library like `faker-js` if generating the script programmatically. The Supabase CLI automatically runs this script after `supabase db reset`.
+
+# Test Strategy:
+Run `supabase db reset`. After the command completes, connect to the local database and verify that the tables contain the expected test data by running `SELECT` queries.

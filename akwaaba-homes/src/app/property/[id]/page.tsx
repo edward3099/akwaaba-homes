@@ -1,4 +1,4 @@
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 import PropertyPageClient from './PropertyPageClient';
 
 // Mock property data - in production, fetch based on id

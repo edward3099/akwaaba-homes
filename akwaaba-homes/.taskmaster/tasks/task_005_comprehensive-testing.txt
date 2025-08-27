@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Implement Page Object Model (POM) Structure
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Scaffold the directory structure and create base classes for the Page Object Model to ensure maintainable and reusable test code.
+# Details:
+Create a `tests/pages` directory. Inside, create files for each major page or component, e.g., `homePage.ts`, `loginPage.ts`, `propertyDetailsPage.ts`. Each class will encapsulate the selectors and methods for interacting with that page. For example, `loginPage.ts` will have methods like `login(username, password)`.
+
+# Test Strategy:
+Create a simple test that imports and uses a method from a Page Object class (e.g., `homePage.goto()`). The test should pass, demonstrating that the structure is correctly implemented.

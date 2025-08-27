@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: E2E Test: User Registration and Login Flow
+# Status: pending
+# Dependencies: 3, 5
+# Priority: high
+# Description: Develop tests for the user sign-up and login processes, including handling successful authentication and error states.
+# Details:
+Create `tests/auth/login.spec.ts`. Use the `loginPage` POM. Test successful login with valid credentials from the seed data. Test failure cases like incorrect password and non-existent user. For registration, test new user creation and verify the user is added to the Supabase `auth.users` table.
+
+# Test Strategy:
+Tests should assert that successful login redirects to the user dashboard. Failure tests should assert that appropriate error messages are displayed. The registration test should check for a confirmation email if applicable.

@@ -1,0 +1,11 @@
+# Task ID: 17
+# Title: Integrate Accessibility Testing
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Add automated accessibility checks to the E2E test suite to ensure compliance with WCAG 2.1 AA standards.
+# Details:
+Install the `axe-playwright` library: `npm install -D axe-playwright`. Create a utility function that injects Axe and runs an analysis. Call this utility in the `afterEach` hook or at the end of critical tests (e.g., after a page is fully loaded). `const accessibilityScanResults = await new AxeBuilder({ page }).analyze(); expect(accessibilityScanResults.violations).toEqual([]);`
+
+# Test Strategy:
+Introduce a deliberate accessibility violation (e.g., an image without an alt tag) on a test page. Run the corresponding test and verify that it fails with a clear report of the violation from Axe.

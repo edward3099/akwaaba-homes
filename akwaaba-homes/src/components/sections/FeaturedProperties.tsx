@@ -3,449 +3,160 @@
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { MapPin, ChevronDown } from 'lucide-react';
-import { Property } from '@/lib/types';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useProperties } from '@/lib/hooks/useApi';
+import { DatabaseProperty, DatabasePropertyImage } from '@/lib/types/database';
 
-// Mock data - in production this would come from an API
-const mockProperties: Property[] = [
-  {
-    id: '1',
-    title: 'Luxury 4-Bedroom Villa in East Legon',
-    description: 'Stunning modern villa with panoramic city views, private pool, and premium finishes throughout.',
-    price: 850000,
-    currency: 'GHS',
-    status: 'for-sale',
-    type: 'house',
+// Extended interface for API response that includes property_images
+interface PropertyWithImages extends DatabaseProperty {
+  property_images?: DatabasePropertyImage[];
+}
+
+  // Transform database property to frontend property format
+const transformDatabaseProperty = (dbProperty: PropertyWithImages) => {
+  // Get valid images and filter out any invalid URLs
+  const validImages = dbProperty.property_images
+    ?.map((img: DatabasePropertyImage) => img.image_url)
+    .filter((url): url is string => 
+      Boolean(url) && 
+      typeof url === 'string' && 
+      url.trim() !== '' && 
+      (url.startsWith('http') || url.startsWith('/'))
+    ) || [];
+  
+  // Use placeholder if no valid images
+  const transformedImages = validImages.length > 0 ? validImages : ['/placeholder-property.svg'];
+
+  return {
+    id: dbProperty.id,
+    title: dbProperty.title,
+    description: dbProperty.description || '',
+    price: dbProperty.price,
+    currency: dbProperty.currency,
+    status: dbProperty.listing_type === 'sale' ? 'for-sale' : 'for-rent',
+    type: dbProperty.property_type,
     location: {
-      address: 'East Legon Hills',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.6037, lng: -0.1870 },
+      address: dbProperty.address,
+      city: dbProperty.city,
+      region: dbProperty.region,
+      country: 'Ghana' as const,
+      coordinates: {
+        lat: dbProperty.latitude || 0,
+        lng: dbProperty.longitude || 0,
+      },
     },
     specifications: {
-      bedrooms: 4,
-      bathrooms: 3,
-      size: 3200,
-      sizeUnit: 'sqft',
-      lotSize: 5000,
-      lotSizeUnit: 'sqft',
-      yearBuilt: 2023,
-      parkingSpaces: 2,
+      bedrooms: dbProperty.bedrooms,
+      bathrooms: dbProperty.bathrooms,
+      size: dbProperty.square_feet || 0,
+      sizeUnit: 'sqft' as const,
+      lotSize: dbProperty.land_size,
+      lotSizeUnit: 'sqft' as const,
+      yearBuilt: dbProperty.year_built,
+      parkingSpaces: undefined,
     },
-    images: [
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Swimming Pool', 'Garden', 'Security', 'Parking'],
-    amenities: ['24/7 Security', 'Backup Generator', 'Borehole Water'],
+    images: transformedImages,
+    features: dbProperty.features,
+    amenities: dbProperty.amenities,
     seller: {
-      id: 'seller1',
-      name: 'Kwame Asante Properties',
-      type: 'agent',
-      phone: '+233244123456',
-      whatsapp: '+233244123456',
-      isVerified: true,
-      company: 'Premium Estates Ghana',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-      verificationDate: '2024-01-15',
-    },
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-15',
-    expiresAt: '2024-02-10',
-    tier: 'premium',
-  },
-  {
-    id: '2',
-    title: 'Modern 3-Bedroom Apartment in Airport Residential',
-    description: 'Contemporary apartment with modern amenities, close to Kotoka International Airport.',
-    price: 450000,
-    currency: 'GHS',
-    status: 'for-sale',
-    type: 'apartment',
-    location: {
-      address: 'Airport Residential Area',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.6037, lng: -0.1870 },
-    },
-    specifications: {
-      bedrooms: 3,
-      bathrooms: 2,
-      size: 1800,
-      sizeUnit: 'sqft',
-      yearBuilt: 2022,
-      parkingSpaces: 1,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Balcony', 'Modern Kitchen', 'Air Conditioning'],
-    amenities: ['Elevator', '24/7 Security', 'Gym', 'Swimming Pool'],
-    seller: {
-      id: 'seller2',
-      name: 'Ama Owusu',
-      type: 'agent',
-      phone: '+233244654321',
-      whatsapp: '+233244654321',
-      isVerified: true,
-      company: 'Accra Prime Properties',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12',
-    expiresAt: '2024-02-12',
-    tier: 'normal',
-  },
-  {
-    id: '3',
-    title: '2-Bedroom House in Kumasi',
-    description: 'Comfortable family home in a quiet neighborhood with easy access to schools and markets.',
-    price: 280000,
-    currency: 'GHS',
-    status: 'for-sale',
-    type: 'house',
-    location: {
-      address: 'Ahodwo',
-      city: 'Kumasi',
-      region: 'Ashanti',
-      country: 'Ghana',
-      coordinates: { lat: 6.6885, lng: -1.6244 },
-    },
-    specifications: {
-      bedrooms: 2,
-      bathrooms: 1,
-      size: 1200,
-      sizeUnit: 'sqft',
-      lotSize: 2000,
-      lotSizeUnit: 'sqft',
-      yearBuilt: 2020,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Garden', 'Parking', 'Security Fence'],
-    amenities: ['Water Tank', 'Solar Ready'],
-    seller: {
-      id: 'seller3',
-      name: 'Kofi Mensah',
-      type: 'individual',
-      phone: '+233244789012',
-      whatsapp: '+233244789012',
+      id: dbProperty.seller_id,
+      name: 'Property Seller', // Will be populated from user service
+      type: 'agent' as const,
+      phone: '',
       isVerified: true,
     },
     verification: {
       isVerified: true,
       documentsUploaded: true,
+      verificationDate: dbProperty.created_at,
     },
-    createdAt: '2024-01-08',
-    updatedAt: '2024-01-08',
-    expiresAt: '2024-02-08',
-    tier: 'normal',
-  },
-  {
-    id: '6',
-    title: 'Luxury Villa in Cape Coast',
-    description: 'Stunning oceanfront villa with panoramic sea views and private beach access.',
-    price: 1200000,
-    currency: 'GHS',
-    status: 'for-sale',
-    type: 'house',
-    location: {
-      address: 'Cape Coast Castle Road',
-      city: 'Cape Coast',
-      region: 'Central',
-      country: 'Ghana',
-      coordinates: { lat: 5.1053, lng: -1.2466 },
-    },
-    specifications: {
-      bedrooms: 5,
-      bathrooms: 4,
-      size: 4500,
-      sizeUnit: 'sqft',
-      lotSize: 8000,
-      lotSizeUnit: 'sqft',
-      yearBuilt: 2021,
-      parkingSpaces: 3,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Ocean View', 'Private Beach', 'Swimming Pool', 'Garden'],
-    amenities: ['24/7 Security', 'Backup Generator', 'Borehole Water', 'Solar Panels'],
-    seller: {
-      id: 'seller6',
-      name: 'Cape Coast Estates',
-      type: 'developer',
-      phone: '+233244789012',
-      whatsapp: '+233244789012',
-      isVerified: true,
-      company: 'Cape Coast Estates Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-05',
-    updatedAt: '2024-01-05',
-    expiresAt: '2024-02-05',
-    tier: 'premium',
-  },
-  {
-    id: '7',
-    title: 'Commercial Space in Takoradi',
-    description: 'Prime commercial property in the heart of Takoradi business district.',
-    price: 850000,
-    currency: 'GHS',
-    status: 'for-sale',
-    type: 'commercial',
-    location: {
-      address: 'Harbor Road',
-      city: 'Takoradi',
-      region: 'Western',
-      country: 'Ghana',
-      coordinates: { lat: 4.9011, lng: -1.7833 },
-    },
-    specifications: {
-      size: 2500,
-      sizeUnit: 'sqft',
-      yearBuilt: 2020,
-      parkingSpaces: 5,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['High Traffic Area', 'Modern Design', 'Parking'],
-    amenities: ['24/7 Security', 'Backup Generator', 'Loading Bay'],
-    seller: {
-      id: 'seller7',
-      name: 'Western Properties',
-      type: 'developer',
-      phone: '+233244789013',
-      whatsapp: '+233244789013',
-      isVerified: true,
-      company: 'Western Properties Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-03',
-    updatedAt: '2024-01-03',
-    expiresAt: '2024-02-03',
-    tier: 'normal',
-  },
-  {
-    id: '8',
-    title: '2-Bedroom Apartment for Rent in Osu',
-    description: 'Modern apartment in the heart of Osu, close to restaurants, shops, and nightlife.',
-    price: 2500,
-    currency: 'GHS',
-    status: 'for-rent',
-    type: 'apartment',
-    location: {
-      address: 'Osu Oxford Street',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.5600, lng: -0.1869 },
-    },
-    specifications: {
-      bedrooms: 2,
-      bathrooms: 1,
-      size: 1200,
-      sizeUnit: 'sqft',
-      yearBuilt: 2021,
-      parkingSpaces: 1,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Balcony', 'Modern Kitchen', 'Air Conditioning'],
-    amenities: ['24/7 Security', 'Elevator', 'Gym'],
-    seller: {
-      id: 'seller8',
-      name: 'Osu Properties',
-      type: 'agent',
-      phone: '+233244789014',
-      whatsapp: '+233244789014',
-      isVerified: true,
-      company: 'Osu Properties Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-20',
-    updatedAt: '2024-01-20',
-    expiresAt: '2024-02-20',
-    tier: 'normal',
-  },
-  {
-    id: '9',
-    title: '3-Bedroom House for Rent in East Legon',
-    description: 'Spacious family home with garden and parking, perfect for families.',
-    price: 3500,
-    currency: 'GHS',
-    status: 'for-rent',
-    type: 'house',
-    location: {
-      address: 'East Legon',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.6037, lng: -0.1870 },
-    },
-    specifications: {
-      bedrooms: 3,
-      bathrooms: 2,
-      size: 2000,
-      sizeUnit: 'sqft',
-      lotSize: 3000,
-      lotSizeUnit: 'sqft',
-      yearBuilt: 2020,
-      parkingSpaces: 2,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Garden', 'Parking', 'Security', 'Modern Kitchen'],
-    amenities: ['24/7 Security', 'Backup Generator', 'Water Tank'],
-    seller: {
-      id: 'seller9',
-      name: 'East Legon Rentals',
-      type: 'agent',
-      phone: '+233244789015',
-      whatsapp: '+233244789015',
-      isVerified: true,
-      company: 'East Legon Rentals Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-18',
-    updatedAt: '2024-01-18',
-    expiresAt: '2024-02-18',
-    tier: 'premium',
-  },
-  {
-    id: '10',
-    title: 'Luxury Villa for Short Let in Labadi',
-    description: 'Exclusive villa perfect for short stays, close to Labadi Beach.',
-    price: 800,
-    currency: 'GHS',
-    status: 'short-let',
-    type: 'house',
-    location: {
-      address: 'Labadi Beach Road',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.5500, lng: -0.1667 },
-    },
-    specifications: {
-      bedrooms: 4,
-      bathrooms: 3,
-      size: 3000,
-      sizeUnit: 'sqft',
-      lotSize: 4000,
-      lotSizeUnit: 'sqft',
-      yearBuilt: 2022,
-      parkingSpaces: 3,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Beach Access', 'Swimming Pool', 'Garden', 'Ocean View'],
-    amenities: ['24/7 Security', 'Housekeeping', 'Concierge', 'WiFi'],
-    seller: {
-      id: 'seller10',
-      name: 'Labadi Luxury Stays',
-      type: 'agent',
-      phone: '+233244789016',
-      whatsapp: '+233244789016',
-      isVerified: true,
-      company: 'Labadi Luxury Stays Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-22',
-    updatedAt: '2024-01-22',
-    expiresAt: '2024-02-22',
-    tier: 'premium',
-  },
-  {
-    id: '11',
-    title: 'Modern Apartment for Short Let in Cantonments',
-    description: 'Contemporary apartment perfect for business travelers and tourists.',
-    price: 450,
-    currency: 'GHS',
-    status: 'short-let',
-    type: 'apartment',
-    location: {
-      address: 'Cantonments',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana',
-      coordinates: { lat: 5.5600, lng: -0.1869 },
-    },
-    specifications: {
-      bedrooms: 2,
-      bathrooms: 1,
-      size: 1500,
-      sizeUnit: 'sqft',
-      yearBuilt: 2023,
-      parkingSpaces: 1,
-    },
-    images: [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    features: ['Modern Design', 'Fully Furnished', 'Air Conditioning', 'Balcony'],
-    amenities: ['24/7 Security', 'WiFi', 'Housekeeping', 'Gym Access'],
-    seller: {
-      id: 'seller11',
-      name: 'Cantonments Stays',
-      type: 'agent',
-      phone: '+233244789017',
-      whatsapp: '+233244789017',
-      isVerified: true,
-      company: 'Cantonments Stays Ltd',
-    },
-    verification: {
-      isVerified: true,
-      documentsUploaded: true,
-    },
-    createdAt: '2024-01-25',
-    updatedAt: '2024-01-25',
-    expiresAt: '2024-02-25',
-    tier: 'normal',
-  },
-];
+    createdAt: dbProperty.created_at,
+    updatedAt: dbProperty.updated_at,
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+    tier: dbProperty.is_featured ? 'premium' : 'normal',
+  };
+};
 
 export function FeaturedProperties() {
-  // Add state for property type selection
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>('for-sale');
+  const [currentPage, setCurrentPage] = useState(1);
+  const propertiesPerPage = 6; // Show 6 properties per page
   
+    const {
+    loading,
+    error,
+    data,
+    getFeaturedProperties,
+    clearError
+  } = useProperties();
+
+  // Extract properties from the data structure
+  const properties = data?.properties || null;
+
+  // Debug logging
+  console.log('FeaturedProperties Debug:', {
+    loading,
+    error,
+    data,
+    properties,
+    propertiesType: typeof properties,
+    isArray: Array.isArray(properties),
+    length: properties?.length
+  });
+
+  useEffect(() => {
+    // Load featured properties on component mount
+    console.log('FeaturedProperties: Calling getFeaturedProperties(6)');
+    
+    let ignore = false;
+    const fetchData = async () => {
+      try {
+        const result = await getFeaturedProperties(6);
+        if (!ignore) {
+          console.log('FeaturedProperties: Data fetched successfully', result);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('FeaturedProperties: Error fetching data', error);
+        }
+      }
+    };
+    
+    fetchData();
+    
+    return () => {
+      ignore = true; // Cleanup to prevent race conditions
+    };
+  }, []); // Empty dependency array - run only once on mount
+
+  // Debug logging for useEffect
+  console.log('FeaturedProperties: useEffect triggered');
+
+  // Debug logging
+  useEffect(() => {
+    console.log('FeaturedProperties Debug:', {
+      loading,
+      error,
+      data,
+      properties,
+      propertiesType: typeof properties,
+      isArray: Array.isArray(properties),
+      length: properties?.length
+    });
+  }, [loading, error, data, properties]);
+
+
+
+  // Transform database properties to frontend format with better safety
+  const transformedProperties = useMemo(() => {
+    if (!properties || !Array.isArray(properties)) {
+      return [];
+    }
+    return properties.map(transformDatabaseProperty);
+  }, [properties]);
+
   // Filter properties based on selected property type
-  const filteredProperties = mockProperties.filter(property => {
+  const filteredProperties = transformedProperties.filter((property: any) => {
     switch (selectedPropertyType) {
       case 'for-sale':
         return property.status === 'for-sale';
@@ -454,19 +165,26 @@ export function FeaturedProperties() {
       case 'short-let':
         return property.status === 'short-let';
       default:
-        return true; // Show all properties if no specific type is selected
+        return true;
     }
   });
 
-  // Handle property type selection
+  // Calculate pagination
+  const totalProperties = filteredProperties.length;
+  const totalPages = Math.ceil(totalProperties / propertiesPerPage);
+  const startIndex = (currentPage - 1) * propertiesPerPage;
+  const endIndex = startIndex + propertiesPerPage;
+  const currentPageProperties = filteredProperties.slice(startIndex, endIndex);
+
+  // Reset to first page when property type changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPropertyType]);
+
   const handlePropertyTypeChange = (type: string) => {
     setSelectedPropertyType(type);
   };
 
-  // Add state for pagination
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Handle page changes
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -478,10 +196,59 @@ export function FeaturedProperties() {
   };
 
   const handleNextPage = () => {
-    if (currentPage < 5) {
+    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
+  };
+
+  // Show loading state first
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading featured properties...</p>
+          </div>
+        </div>
+      </section>
+    );
   }
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline"
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Add safety check to prevent null reference errors - only after loading and error checks
+  if (!transformedProperties || transformedProperties.length === 0) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-gray-600">No properties available</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
 
   return (
     <section className="py-6 bg-muted/30">
@@ -821,7 +588,7 @@ export function FeaturedProperties() {
 
         {/* Properties Grid */}
         <div className="grid gap-2 sm:gap-3 mb-12 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-          {filteredProperties.map((property, index) => (
+          {currentPageProperties.map((property: any, index: number) => (
             <div 
               key={property.id}
               className="animate-fade-in"
@@ -837,46 +604,49 @@ export function FeaturedProperties() {
         </div>
 
         {/* Pagination */}
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="px-3 py-2"
-              disabled={currentPage === 1}
-              onClick={handlePreviousPage}
-            >
-              Previous
-            </Button>
-            
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((page) => (
-                <Button
-                  key={page}
-                  size="sm"
-                  variant={currentPage === page ? "default" : "outline"}
-                  className="px-3 py-2 min-w-[40px]"
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </Button>
-              ))}
+        {totalPages > 1 && (
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="px-3 py-2"
+                disabled={currentPage === 1}
+                onClick={handlePreviousPage}
+              >
+                Previous
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    size="sm"
+                    variant={currentPage === page ? "default" : "outline"}
+                    className="px-3 py-2 min-w-[40px]"
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+              
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="px-3 py-2"
+                disabled={currentPage === totalPages}
+                onClick={handleNextPage}
+              >
+                Next
+              </Button>
             </div>
             
-          <Button 
-              size="sm" 
-            variant="outline" 
-              className="px-3 py-2"
-              onClick={handleNextPage}
-          >
-              Next
-          </Button>
+            <p className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages} • Showing {startIndex + 1}-{Math.min(endIndex, totalProperties)} of {totalProperties} verified properties
+            </p>
           </div>
-          
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredProperties.length} of 5,000+ verified properties
-          </p>
-        </div>
+        )}
 
 
       </div>

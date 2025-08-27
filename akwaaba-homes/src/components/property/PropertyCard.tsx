@@ -17,7 +17,7 @@ import {
   Shield, 
   Verified 
 } from 'lucide-react';
-import { Property, CurrencyCode } from '@/lib/types';
+import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
 
 interface PropertyCardProps {
@@ -36,6 +36,19 @@ export function PropertyCard({
   className = ''
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Ensure images array exists and has valid URLs
+  const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
+    ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '')
+    : [];
+  
+  // Use a fallback image if no valid images are available
+  const currentImage = validImages.length > 0 && validImages[currentImageIndex] 
+    ? validImages[currentImageIndex] 
+    : '/placeholder-property.svg';
+  
+  // Ensure currentImageIndex doesn't exceed valid images length
+  const safeImageIndex = Math.min(currentImageIndex, Math.max(0, validImages.length - 1));
 
   const handleContact = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -109,18 +122,46 @@ export function PropertyCard({
           <Link href={`/property/${property.id}`} className="block">
             <div className="flex flex-col md:flex-row">
               {/* Image Section */}
-              <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0">
+              <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0 overflow-hidden">
                 <Image
-                  src={property.images[currentImageIndex] || '/placeholder-property.jpg'}
+                  src={currentImage}
                   alt={property.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
+                  style={{ objectFit: 'cover' }}
+                  onError={(e) => {
+                    console.error('Image failed to load:', currentImage);
+                    // Fallback to placeholder if image fails
+                    const target = e.target as HTMLImageElement;
+                    if (target) {
+                      // Try to set placeholder, but if that also fails, create a simple fallback
+                      target.onerror = null; // Prevent infinite loop
+                      target.src = '/placeholder-property.svg';
+                      
+                      // If placeholder also fails, create a simple colored div as fallback
+                      target.onerror = () => {
+                        target.style.display = 'none';
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                        fallbackDiv.innerHTML = `
+                          <div class="text-center text-slate-600">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            <p class="text-sm">Image unavailable</p>
+                          </div>
+                        `;
+                        target.parentNode?.insertBefore(fallbackDiv, target);
+                      };
+                    }
+                  }}
                 />
                 
-                {/* Image Navigation */}
-                {property.images.length > 1 && (
+                {/* Image Navigation - Only show if there are multiple valid images */}
+                {validImages.length > 1 && (
                   <div className="absolute bottom-2 left-2 flex space-x-1">
-                    {property.images.slice(0, 4).map((_, index) => (
+                    {validImages.slice(0, 4).map((_, index) => (
                       <button
                         key={index}
                         onClick={(e) => {
@@ -128,13 +169,13 @@ export function PropertyCard({
                           setCurrentImageIndex(index);
                         }}
                         className={`w-2 h-2 rounded-full transition-colors ${
-                          index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                          index === safeImageIndex ? 'bg-white' : 'bg-white/50'
                         }`}
                       />
                     ))}
-                    {property.images.length > 4 && (
+                    {validImages.length > 4 && (
                       <span className="text-white text-xs bg-black/50 px-1 rounded">
-                        +{property.images.length - 4}
+                        +{validImages.length - 4}
                       </span>
                     )}
                   </div>
@@ -263,16 +304,44 @@ export function PropertyCard({
           {/* Image Section */}
           <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
             <Image
-              src={property.images[currentImageIndex] || '/placeholder-property.jpg'}
+              src={currentImage}
               alt={property.title}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
               className="property-image rounded-t-lg object-cover group-hover:scale-105 transition-transform duration-300"
+              style={{ objectFit: 'cover' }}
+              onError={(e) => {
+                console.error('Image failed to load:', currentImage);
+                // Fallback to placeholder if image fails
+                const target = e.target as HTMLImageElement;
+                if (target) {
+                  // Try to set placeholder, but if that also fails, create a simple fallback
+                  target.onerror = null; // Prevent infinite loop
+                  target.src = '/placeholder-property.svg';
+                  
+                  // If placeholder also fails, create a simple colored div as fallback
+                  target.onerror = () => {
+                    target.style.display = 'none';
+                    const fallbackDiv = document.createElement('div');
+                    fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                    fallbackDiv.innerHTML = `
+                      <div class="text-center text-slate-600">
+                        <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        <p class="text-sm">Image unavailable</p>
+                      </div>
+                    `;
+                    target.parentNode?.insertBefore(fallbackDiv, target);
+                  };
+                }
+              }}
             />
             
-            {/* Image Navigation */}
-            {property.images.length > 1 && (
+            {/* Image Navigation - Only show if there are multiple valid images */}
+            {validImages.length > 1 && (
               <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 flex space-x-1">
-                {property.images.slice(0, 4).map((_, index) => (
+                {validImages.slice(0, 4).map((_, index) => (
                   <button
                     key={index}
                     onClick={(e) => {
@@ -280,7 +349,7 @@ export function PropertyCard({
                       setCurrentImageIndex(index);
                     }}
                     className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
-                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                      index === safeImageIndex ? 'bg-white' : 'bg-white/50'
                     }`}
                   />
                 ))}

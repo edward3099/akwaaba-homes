@@ -1,0 +1,37 @@
+# Task ID: 12
+# Title: E2E Test: Admin - Property Approval and User Moderation
+# Status: pending
+# Dependencies: 8, 10
+# Priority: medium
+# Description: Develop tests for the admin dashboard, focusing on the workflows for approving new property listings and managing user accounts.
+# Details:
+Create `tests/admin/moderation.spec.ts` using an authenticated admin session. A prerequisite test step (or setup) should create a property by an agent that is pending approval. The admin test will log in, navigate to the approval queue, approve the property, and verify its status changes. Another test will cover suspending a user account.
+
+# Test Strategy:
+Assert that after admin approval, the property's status is updated in the database and it becomes publicly visible. The user moderation test should confirm that a suspended user can no longer log in.
+
+# Subtasks:
+## 1. Implement Setup Hook to Create a Pending Property [pending]
+### Dependencies: None
+### Description: Create a programmatic setup function or a global setup hook in Playwright that uses an authenticated agent user to create a new property listing. This property should be in a 'pending approval' state, ready for the admin tests.
+### Details:
+This hook will likely involve making a direct API call or using a utility function to log in as an agent and submit the property form data. The ID of the created property and the agent user should be stored and made available to the subsequent tests. This avoids UI-based creation which is slower and more brittle.
+
+## 2. Test Admin Workflow for Property Approval [pending]
+### Dependencies: 12.1
+### Description: Write a Playwright test where an admin user logs in, navigates to the property approval queue, finds the property created in the setup hook, and approves it.
+### Details:
+The test should be located in `tests/admin/moderation.spec.ts`. It must assert that after approval, the property's status is updated in the UI and backend (e.g., it disappears from the pending queue). A further assertion should check if the property is now publicly visible.
+
+## 3. Test Admin Workflow for User Suspension [pending]
+### Dependencies: None
+### Description: Develop a test case where an admin user logs in, navigates to the user management section, searches for a specific user (e.g., a pre-existing test user), and suspends their account.
+### Details:
+This test will also be in `tests/admin/moderation.spec.ts`. The test needs to identify a target user, perform the suspension action through the admin UI, and verify that the user's status is updated to 'suspended' in the dashboard.
+
+## 4. Verify Login Failure for Suspended User [pending]
+### Dependencies: 12.3
+### Description: Create a test that attempts to log in as the user who was suspended in the previous subtask. The test should verify that the login attempt fails and an appropriate error message is displayed.
+### Details:
+This test will attempt a login using the suspended user's credentials. It should assert that the application does not grant access and instead shows a message indicating the account is suspended or inactive. This confirms the backend logic for suspension is working correctly.
+

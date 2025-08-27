@@ -1,0 +1,1505 @@
+{
+  "project": {
+    "name": "AkwaabaHomes Comprehensive Testing",
+    "description": "End-to-end testing of the entire real estate platform using BrowserMCP, Supabase MCP, and Context7",
+    "version": "2.0.0"
+  },
+  "tags": {
+    "master": {
+      "name": "master",
+      "description": "Main testing tasks for AkwaabaHomes platform",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Foundation Testing and Environment Setup",
+          "description": "Validate project setup, database connectivity, authentication system, and basic routing to establish a solid foundation for comprehensive testing",
+          "status": "done",
+          "priority": "high",
+          "dependencies": [],
+          "details": "This phase establishes the testing foundation by validating the core infrastructure. Use BrowserMCP for frontend validation, Supabase MCP for backend verification, and Context7 for any technical guidance needed.\n\n**Key Activities:**\n- Project environment validation\n- Database connectivity testing\n- Authentication system verification\n- Basic routing and navigation testing\n- Mobile responsiveness baseline\n\n**Success Criteria:**\n- All basic routes accessible\n- Database connections stable\n- Authentication working\n- No 404 errors\n- Mobile layout functional\n\n**✅ FOUNDATION TESTING COMPLETED:**\n✅ **Project Environment Validation** - Development server running successfully on localhost:3000\n✅ **Basic Route Accessibility** - All main customer routes (homepage, properties, about) returning HTTP 200\n✅ **Authentication System** - Auth routes working with proper redirects for unauthenticated users\n✅ **Database Connectivity** - Properties API endpoint responding with HTTP 200\n✅ **No 404 Errors Found** - All tested routes are accessible and functional\n✅ **Component Analysis** - FeaturedProperties component fully implemented with working pagination and search functionality\n\n**Key Findings:**\n- All main customer routes are accessible and functional\n- FeaturedProperties component has complete search form with property type tabs\n- Pagination system is fully functional with Previous/Next buttons\n- Property filtering (Buy/Rent/Short Let) is working correctly\n- All form inputs and buttons have proper event handlers\n- No broken functionality found in the core components",
+          "testStrategy": "Use BrowserMCP to navigate all basic routes, Supabase MCP to verify database connections, and Context7 for any technical issues encountered. Document all findings and establish baseline performance metrics.",
+          "subtasks": [
+            {
+              "id": 1.1,
+              "title": "Project Environment Validation",
+              "description": "Verify development server is running and accessible",
+              "status": "done",
+              "details": "✅ Development server successfully started on localhost:3000\n✅ All main routes responding with HTTP 200\n✅ No 404 errors found in basic route testing"
+            },
+            {
+              "id": 1.2,
+              "title": "Database Connectivity Testing",
+              "description": "Validate Supabase integration and API endpoints",
+              "status": "done",
+              "details": "✅ Properties API endpoint responding with HTTP 200\n✅ Database connectivity confirmed working\n✅ API routes accessible and functional"
+            },
+            {
+              "id": 1.3,
+              "title": "Authentication System Verification",
+              "status": "done",
+              "details": "✅ Auth routes working with proper redirects\n✅ Signin/signup routes accessible\n✅ Admin routes properly protected (redirecting unauthenticated users)\n✅ Agent dashboard accessible"
+            },
+            {
+              "id": 1.4,
+              "title": "Basic Routing and Navigation Testing",
+              "status": "done",
+              "details": "✅ All main customer routes accessible\n✅ Navigation structure working\n✅ No broken links or 404 errors found"
+            },
+            {
+              "id": 1.5,
+              "title": "Component Functionality Analysis",
+              "status": "done",
+              "details": "✅ FeaturedProperties component fully implemented\n✅ Search form with property type tabs working\n✅ Pagination system functional with proper button handlers\n✅ Property filtering (Buy/Rent/Short Let) operational\n✅ All form inputs and buttons have proper event handlers"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Customer Experience Testing",
+          "description": "Test all customer-facing functionality including property browsing, search, filtering, and navigation to ensure seamless user experience",
+          "status": "in-progress",
+          "priority": "high",
+          "dependencies": [
+            1
+          ],
+          "details": "This phase focuses on testing the complete customer journey from homepage to property details. Use BrowserMCP for interactive testing, Supabase MCP for backend validation, and Context7 for any technical guidance needed.\n\n**Key Activities:**\n- Homepage functionality and navigation\n- Property search and filtering\n- Property listing and pagination\n- Property detail pages\n- Contact and inquiry forms\n- Mobile responsiveness testing\n- Button functionality validation\n\n**Success Criteria:**\n- All search filters working correctly\n- Property pagination functioning properly\n- Property cards displaying correctly\n- Contact forms operational\n- Mobile layout responsive\n- No broken buttons or interactions\n\n**PROGRESS UPDATE - Customer Experience Testing Started:**\n✅ **Component Analysis Complete** - FeaturedProperties component fully analyzed\n✅ **Search Form Validation** - Complete search form with property type tabs, location input, and advanced filters\n✅ **Button Functionality** - All buttons have proper onClick handlers and state management\n✅ **Pagination System** - Fully functional pagination with Previous/Next buttons and page numbers\n✅ **Property Filtering** - Working property type filtering (Buy/Rent/Short Let)\n\n**Next Steps:**\n- Test actual button interactions using BrowserMCP\n- Validate search form submission\n- Test property card interactions\n- Verify pagination functionality\n- Test mobile responsiveness",
+          "testStrategy": "Use BrowserMCP to test all interactive elements, validate form submissions, and test mobile responsiveness. Use Supabase MCP to verify backend operations and Context7 for any technical issues encountered.",
+          "subtasks": [
+            {
+              "id": 2.1,
+              "title": "Homepage Search Functionality Testing",
+              "description": "Test the complete search form including property type tabs, location input, and advanced filters",
+              "status": "pending",
+              "details": "Ready to test search form interactions, property type switching, and form submission functionality"
+            },
+            {
+              "id": 2.2,
+              "title": "Property Listing and Pagination Testing",
+              "description": "Validate property cards display, pagination navigation, and property filtering",
+              "status": "pending",
+              "details": "Ready to test property card interactions, pagination buttons, and property type filtering"
+            },
+            {
+              "id": 2.3,
+              "title": "Property Detail Page Testing",
+              "description": "Test property detail pages, image galleries, and contact forms",
+              "status": "pending",
+              "details": "Ready to test property detail navigation, image viewing, and contact form functionality"
+            },
+            {
+              "id": 2.4,
+              "title": "Mobile Responsiveness Testing",
+              "description": "Validate mobile layout, touch interactions, and responsive design",
+              "status": "pending",
+              "details": "Ready to test mobile responsiveness across different device sizes"
+            },
+            {
+              "id": 2.5,
+              "title": "Button and Interaction Testing",
+              "description": "Test all button functionality, form submissions, and user interactions",
+              "status": "pending",
+              "details": "Ready to validate all button clicks, form submissions, and interactive elements"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Agent Dashboard Functionality Testing",
+          "description": "Test the complete agent dashboard system including profile management, property listing workflows, dashboard analytics, and mobile optimization",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [
+            1
+          ],
+          "details": "Comprehensive testing of the agent dashboard using BrowserMCP to validate all agent-specific functionality. Ensure agents can effectively manage their profiles, properties, and business operations.\n\n**Testing Areas:**\n- Agent authentication and access control\n- Profile management system (CRUD operations)\n- Property listing creation and management\n- Dashboard analytics and statistics\n- Communication tools and notifications\n- Mobile responsiveness and touch optimization\n\n**Success Criteria:**\n- All agent features functional\n- Profile management working\n- Property workflows complete\n- Dashboard data accurate\n- Mobile experience optimized",
+          "testStrategy": "Use BrowserMCP to test agent workflows, validate all dashboard features, and ensure mobile responsiveness. Use Supabase MCP to verify data integrity and Context7 for technical guidance.",
+          "subtasks": []
+        },
+        {
+          "id": 4,
+          "title": "Admin Dashboard Operations Testing",
+          "description": "Test the complete admin dashboard system including user management, property approval workflows, agent verification, and system monitoring",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [
+            1
+          ],
+          "details": "Comprehensive testing of the admin dashboard using BrowserMCP to validate all administrative functions. Ensure administrators can effectively manage the platform, users, and properties.\n\n**Testing Areas:**\n- Admin authentication and security\n- User management operations (CRUD)\n- Property approval workflows\n- Agent verification system\n- System monitoring and analytics\n- Settings and configuration management\n\n**Success Criteria:**\n- All admin features functional\n- User management working\n- Approval workflows complete\n- Verification system operational\n- Monitoring tools functional",
+          "testStrategy": "Use BrowserMCP to test admin workflows, validate all management features, and ensure security. Use Supabase MCP to verify backend operations and Context7 for technical guidance.",
+          "subtasks": []
+        },
+        {
+          "id": 5,
+          "title": "Integration and Performance Testing",
+          "description": "Test API endpoints, database performance, cross-browser compatibility, and overall system integration to ensure optimal performance",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [
+            2,
+            3,
+            4
+          ],
+          "details": "Comprehensive testing of system integration and performance using BrowserMCP for frontend validation and Supabase MCP for backend performance testing.\n\n**Testing Areas:**\n- API endpoint validation and performance\n- Database performance and optimization\n- Cross-browser compatibility\n- Mobile performance optimization\n- Image loading and optimization\n- Caching and performance metrics\n\n**Success Criteria:**\n- API response times < 500ms\n- Page load times < 3 seconds\n- Cross-browser compatibility\n- Mobile performance optimized\n- Caching working effectively",
+          "testStrategy": "Use BrowserMCP to test performance across devices, Supabase MCP to validate API performance, and Context7 for optimization guidance. Document all performance metrics and optimization opportunities.",
+          "subtasks": []
+        },
+        {
+          "id": 6,
+          "title": "Final Validation and Production Readiness",
+          "description": "Conduct end-to-end workflow testing, implement bug fixes, optimize performance, and validate production readiness for the AkwaabaHomes platform",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [
+            5
+          ],
+          "details": "Final phase of testing to ensure the platform is production-ready. This includes comprehensive validation, bug resolution, and final optimization.\n\n**Testing Areas:**\n- End-to-end workflow validation\n- Bug identification and resolution\n- Performance optimization\n- Security validation\n- Documentation completion\n- Production deployment readiness\n\n**Success Criteria:**\n- All workflows functional\n- No critical bugs remaining\n- Performance optimized\n- Security validated\n- Documentation complete\n- Production ready",
+          "testStrategy": "Use BrowserMCP for final user flow validation, Supabase MCP for security and performance validation, and Context7 for any final technical guidance. Document all findings and create production readiness report.",
+          "subtasks": []
+        },
+        {
+          "id": 25,
+          "title": "End-to-End Testing for Akwaaba Homes Platform",
+          "description": "Comprehensive end-to-end testing scenarios for customers, agents, and administrators using BrowserMCP, Supabase MCP, and Context7",
+          "status": "in-progress",
+          "priority": "high",
+          "dependencies": [
+            1
+          ],
+          "details": "This task focuses on comprehensive end-to-end testing scenarios covering all user types and workflows. Use BrowserMCP for frontend validation, Supabase MCP for backend operations, and Context7 for error resolution.\n\n**Testing Scenarios:**\n- Customer property search and rental workflows\n- Agent property posting and management\n- Admin user management and verification\n- Database operations validation\n- Frontend functionality validation\n- Error handling and edge cases\n\n**Success Criteria:**\n- All user workflows functional end-to-end\n- Database operations validated\n- Frontend interactions working\n- Error handling robust\n- Mobile experience optimized",
+          "testStrategy": "Use BrowserMCP for every scenario, Supabase MCP for backend validation, and Context7 for any errors encountered. Test complete user journeys from start to finish.",
+          "subtasks": [
+            {
+              "id": 25.1,
+              "title": "Set up Test Environment and Data",
+              "description": "Configure testing environment and populate database with realistic test data for comprehensive testing",
+              "status": "in-progress",
+              "details": "Setting up comprehensive test environment with realistic data for customers, agents, and administrators"
+            },
+            {
+              "id": 25.2,
+              "title": "Customer: Property Search and Filtering E2E Test",
+              "description": "Test complete customer journey for property search, filtering, and browsing",
+              "status": "pending",
+              "details": "Ready to test customer property search workflows"
+            },
+            {
+              "id": 25.3,
+              "title": "Customer: Property Viewing and Inquiry Submission E2E Test",
+              "description": "Test property detail viewing and inquiry submission workflows",
+              "status": "pending",
+              "details": "Ready to test property viewing and inquiry workflows"
+            },
+            {
+              "id": 25.4,
+              "title": "Customer: User Registration and Authentication E2E Test",
+              "description": "Test complete user registration and authentication workflows",
+              "status": "pending",
+              "details": "Ready to test user authentication workflows"
+            },
+            {
+              "id": 25.5,
+              "title": "Customer: Favorites and Saved Searches E2E Test",
+              "description": "Test favorites and saved search functionality",
+              "status": "pending",
+              "details": "Ready to test favorites and saved search workflows"
+            },
+            {
+              "id": 25.6,
+              "title": "Agent: Registration and Profile Setup E2E Test",
+              "description": "Test agent registration and profile management workflows",
+              "status": "pending",
+              "details": "Ready to test agent registration workflows"
+            },
+            {
+              "id": 25.7,
+              "title": "Agent: Property Posting and Management E2E Test",
+              "description": "Test complete property posting and management workflows",
+              "status": "pending",
+              "details": "Ready to test agent property workflows"
+            },
+            {
+              "id": 25.8,
+              "title": "Agent: Client Inquiry Management E2E Test",
+              "description": "Test agent inquiry management and communication workflows",
+              "status": "pending",
+              "details": "Ready to test agent inquiry workflows"
+            },
+            {
+              "id": 25.9,
+              "title": "Agent: Dashboard Analytics and Reporting E2E Test",
+              "description": "Test agent dashboard analytics and reporting functionality",
+              "status": "pending",
+              "details": "Ready to test agent dashboard workflows"
+            },
+            {
+              "id": 25.1,
+              "title": "Admin: User Management and Verification E2E Test",
+              "description": "Test admin user management and verification workflows",
+              "status": "pending",
+              "details": "Ready to test admin user management workflows"
+            },
+            {
+              "id": 25.11,
+              "title": "Admin: Property Approval and Moderation E2E Test",
+              "description": "Test admin property approval and moderation workflows",
+              "status": "pending",
+              "details": "Ready to test admin property workflows"
+            },
+            {
+              "id": 25.12,
+              "title": "Admin: System Monitoring and Analytics E2E Test",
+              "description": "Test admin system monitoring and analytics functionality",
+              "status": "pending",
+              "details": "Ready to test admin monitoring workflows"
+            },
+            {
+              "id": 25.13,
+              "title": "Database Operations Validation (Supabase MCP)",
+              "description": "Validate all database operations using Supabase MCP",
+              "status": "pending",
+              "details": "Ready to validate database operations"
+            },
+            {
+              "id": 25.14,
+              "title": "Frontend Functionality Validation (BrowserMCP)",
+              "description": "Validate all frontend functionality using BrowserMCP",
+              "status": "pending",
+              "details": "Ready to validate frontend functionality"
+            },
+            {
+              "id": 25.15,
+              "title": "Error Handling and Edge Cases Validation",
+              "description": "Test error handling and edge cases across all scenarios",
+              "status": "pending",
+              "details": "Ready to test error handling and edge cases"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "created": "2025-08-27T00:00:00.000Z",
+    "updated": "2025-08-27T00:00:00.000Z",
+    "description": "Comprehensive testing plan for AkwaabaHomes platform using BrowserMCP, Supabase MCP, and Context7",
+    "notes": [
+      "Use Context7 for error resolution and technical guidance on each task",
+      "Use Supabase MCP for all backend operations, database testing, and API validation",
+      "Use BrowserMCP for all frontend testing, user interaction simulation, and mobile responsiveness validation",
+      "Focus on button functionality, page accessibility, and complete user workflows",
+      "Ensure no 404 errors and all routes are functional",
+      "Maintain mobile-first responsive design validation throughout testing"
+    ]
+  },
+  "full-backend-completion": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Audit Dashboard Links and Test Sign Out Functionality",
+        "description": "With the frontend for the missing pages now complete, this task expands to include creating the necessary backend API endpoints and testing the full data flow. The original goals of verifying all dashboard links and testing the sign-out functionality remain critical.",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "details": "The frontend components for `/agent/properties`, `/agent/properties/new`, `/agent/clients`, and `/contact` are implemented. The next phase involves creating the backend API endpoints for these pages to handle data operations (e.g., fetching properties, creating new listings, viewing clients). Once the backend is in place, test the full data flow from frontend to backend. The sign-out test remains a priority: use browser developer tools to verify the call to `/api/auth/logout` is successful, session data is cleared, and protected routes are inaccessible post-logout.",
+        "testStrategy": "1. Manual E2E testing of frontend: Systematically click every navigation link on `/agent/dashboard` to verify correct routing. 2. Test sign-out functionality: Click 'Sign Out', verify redirection, check that the back button doesn't work, attempt to access protected routes, and confirm session data is cleared from storage. 3. Backend API testing: Verify the new endpoints for properties and clients work as expected. 4. Full data flow E2E testing: Test creating a new property and viewing clients through the UI to ensure data is correctly sent to and retrieved from the backend.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Audit of dashboard links completed. Identified missing pages for Property Management (`/agent/properties`, `/agent/properties/new`), Client Management (`/agent/clients`), and Support (`/contact`).",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Implement the missing pages identified in the audit, including forms, data display, and responsive design for `/agent/properties`, `/agent/properties/new`, `/agent/clients`, and `/contact`.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Start the local development server and navigate to the Agent Dashboard at /agent/dashboard to begin verification.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Verify that all navigation links on the dashboard now correctly route to their respective pages: Profile, Manage Properties, List New Property, View Clients, and Contact Support.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Perform detailed E2E tests on the sign-out functionality, following the steps outlined in the test strategy to confirm session termination.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "",
+            "description": "Create a comprehensive report documenting the results of the link verification and the outcome of the sign-out functionality tests.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "",
+            "description": "Create backend API endpoints for the new pages to support creating new properties, managing existing properties, and viewing clients.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "",
+            "description": "Test the full data flow between the frontend forms/dashboards and the newly created backend API endpoints.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Create 'Contact Support' Page",
+        "description": "Develop the missing `/contact` page. This page should provide users with a way to contact the support team, likely through a form or by displaying contact information.",
+        "details": "Create a new route and component for `/contact`. The page should feature a simple form with fields for Name, Email, Subject, and Message. Use `react-hook-form` (v7.x) with `zod` for validation to ensure all fields are filled correctly. On submission, send the data to a Supabase Edge Function or a dedicated table named `support_tickets`. Implement clear loading and success/error feedback states using a library like `react-hot-toast`. Ensure the page layout is responsive using Tailwind CSS.",
+        "testStrategy": "Unit test the form component for validation logic (e.g., required fields, email format). Integration test the form submission to the Supabase backend, mocking the API call. E2E test: fill out and submit the form, then verify the data appears in the `support_tickets` table in Supabase.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Develop 'List New Property' Page and Form",
+        "description": "Create the `/agent/properties/new` page, which will contain a form for agents to list a new property. This includes all necessary input fields for property details.",
+        "details": "Implement a multi-step or single-page form for creating a new property. Use `react-hook-form` and `zod` for robust validation of fields like address, price (numeric), number of bedrooms/bathrooms, description, and image uploads. For image uploads, integrate with Supabase Storage. Use a UI component library like `shadcn/ui` to build the form elements for consistency. The form should handle loading states during submission and provide clear user feedback on success or failure.",
+        "testStrategy": "Unit test individual form components and validation rules with `zod`. Component tests should verify that error messages appear for invalid input. E2E test the entire property creation flow, including image uploads, and confirm the form resets upon successful submission.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Integrate Property Creation with Supabase Backend",
+        "description": "Connect the 'List New Property' form to the Supabase backend. This involves creating the necessary table and API logic to store new property data.",
+        "details": "Define and create a `properties` table in Supabase with columns corresponding to the form fields (e.g., `address TEXT`, `price NUMERIC`, `bedrooms INT`, `agent_id UUID REFERENCES auth.users(id)`). The form's `onSubmit` handler will use the Supabase JS client (`@supabase/supabase-js` v2.x) to insert a new row into the `properties` table. Ensure the `agent_id` is automatically populated from the currently authenticated user's ID. Implement proper error handling for database insertion failures (e.g., constraint violations, network errors).",
+        "testStrategy": "Integration test the API endpoint or Supabase client function responsible for creating a property. Test success cases by verifying the new record in the database. Test failure cases, such as submitting data with a non-existent `agent_id` or incorrect data types, and ensure appropriate errors are returned to the client.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Build 'Manage Properties' Dashboard",
+        "description": "Create the `/agent/properties` page to display a list of all properties associated with the currently logged-in agent, with options to manage them.",
+        "details": "This page will fetch data from the `properties` table in Supabase, filtering by the current agent's `user.id`. Use `TanStack Query (React Query)` v5.x for efficient data fetching, caching, and handling of loading/error states. Display the properties in a responsive grid or table format. Each property entry should display key information (address, price, status) and include 'Edit' and 'Delete' buttons.",
+        "testStrategy": "Integration test the data fetching logic to ensure it correctly retrieves properties only for the logged-in agent. E2E test the dashboard's UI: verify the loading state appears, properties are displayed correctly, and an empty state message is shown if the agent has no properties.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement 'View Clients' Dashboard",
+        "description": "Develop the `/agent/clients` page to display a list of clients associated with the agent.",
+        "details": "Create a `clients` table in Supabase with fields like `name`, `email`, `phone`, and a foreign key `agent_id`. The `/agent/clients` page will fetch and display a list of clients for the authenticated agent. Use `TanStack Query` for data management. The UI should present client information clearly in a responsive table or list, including contact details. This page will be read-only initially, focusing on displaying data.",
+        "testStrategy": "Write integration tests for the client data fetching function. E2E test the page to confirm it displays the correct list of clients for a logged-in agent. Test edge cases like an agent with zero clients, ensuring a user-friendly message is displayed.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Edit/Delete Functionality for Properties",
+        "description": "Add functionality to the 'Manage Properties' dashboard to allow agents to edit and delete their property listings.",
+        "details": "The 'Edit' button on the `/agent/properties` dashboard should link to a pre-populated version of the 'List New Property' form (e.g., `/agent/properties/edit/[id]`). On submission, it should update the existing record in Supabase. The 'Delete' button should trigger a confirmation modal before performing a soft or hard delete on the property record using its ID. Use Supabase Row Level Security (RLS) to ensure agents can only edit/delete their own properties.",
+        "testStrategy": "Integration test the update and delete API logic. E2E test the flow: click 'Edit', change a value, save, and verify the change on the dashboard. Test the delete flow: click 'Delete', confirm in the modal, and verify the property is removed from the list.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Secure Agent Routes with Role-Based Access Control (RBAC)",
+        "description": "Implement authentication and role-based access control for all `/agent/*` routes to ensure only authenticated agents can access them.",
+        "details": "Using a framework like Next.js, implement middleware (e.g., `middleware.ts`) with `@supabase/auth-helpers-nextjs`. The middleware will check for a valid user session on every request to a path matching `/agent/:path*`. If no session exists, it will redirect the user to the login page. Further checks can be added to verify the user has an 'agent' role, which can be stored in the `auth.users` table's `raw_user_meta_data` or a separate `profiles` table.",
+        "testStrategy": "Write integration tests for the middleware logic. E2E test the security: 1. As a logged-out user, attempt to access `/agent/properties` and verify redirection to login. 2. Log in as a non-agent user (if applicable) and verify access is denied. 3. Log in as an agent and verify access is granted.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Setup Automated Testing Environment",
+        "description": "Initialize and configure the testing frameworks for both backend API and frontend end-to-end testing. With the development server now stable, the focus is on implementing Jest for API testing and Cypress for E2E tests.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "The initial development environment stabilization is complete. ESLint errors, server compilation issues, and package-lock.json conflicts have been resolved. The next step is to install and configure Jest for API testing. This includes creating `jest.config.js` and setting up `.env.test` for test-specific configurations. Once the API testing setup is validated, Cypress will be installed for end-to-end testing.",
+        "testStrategy": "Verify that a simple test case can be executed successfully for both Jest and Cypress. For Jest, create a test that pings a health check endpoint (if available) or the base URL. For Cypress, create a test that simply visits the homepage and asserts the title is correct. Successful execution of these initial tests confirms the environment is set up correctly.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Resolved package-lock.json conflicts and stabilized dependencies.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Fixed all ESLint errors, enabling a successful project build.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Resolved server compilation issues; the development server now starts and runs reliably.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Install and configure Jest for API testing, including jest.config.js and .env.test.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Install and configure Cypress for end-to-end testing, scaffolding the initial project structure.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "",
+            "description": "Create a basic Jest test (e.g., health check) and a basic Cypress test (e.g., visit homepage) to validate the complete setup.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Phase 1: Test Public Contact Form API Endpoint",
+        "description": "Test the `/api/contact` endpoint for both submitting new contact forms (POST) and retrieving existing submissions (GET). This covers the public-facing API functionality and internal security for data retrieval.",
+        "status": "done",
+        "dependencies": [
+          9
+        ],
+        "priority": "high",
+        "details": "Using Jest and `supertest`, create a test suite for the `/api/contact` endpoint. The tests will cover both successful and unsuccessful submissions, as well as security for retrieving data.\n\n**POST /api/contact**:\n- Test with valid data including `name`, `email`, `subject`, and `message` fields, and assert a 201 Created response.\n- Test with invalid data (e.g., missing `email`, invalid email format, missing `message`) and assert a 400 Bad Request response with a descriptive error message. The backend validation should be consistent with the frontend `zod` schema (see Task 2).\n- After a successful POST, query the Supabase `support_tickets` table directly to verify the data was saved correctly.\n\n**GET /api/contact**:\n- This route should be protected for admin/agent use. Test that an unauthenticated request receives a 401 Unauthorized or 403 Forbidden error.",
+        "testStrategy": "For POST requests, validate the HTTP status code (201 for success, 400 for validation errors) and the response body. Verify data persistence by checking the `support_tickets` table in the database. For GET requests, verify that the endpoint is protected and returns an appropriate error (401/403) for unauthenticated users. For validation tests, ensure the error messages are clear and identify the specific invalid field.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Set up Jest test suite for the /api/contact endpoint using supertest.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Write test case for successful POST request with valid data (name, email, subject, message) and assert a 201 Created status.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Write test cases for failed POST requests with invalid data (e.g., missing email, invalid email format) and assert a 400 Bad Request status with appropriate error messages.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "In the successful POST test, add a step to query the 'support_tickets' table to verify the submission was saved correctly.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Write test case for GET request to ensure the endpoint is protected, asserting a 401 Unauthorized or 403 Forbidden status for unauthenticated users.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Phase 2: Implement and Test Agent Authentication",
+        "description": "Verify the agent login flow and test role-based access control for protected routes, ensuring only users with an 'agent' role can access agent-specific dashboards. This is critical for testing all authenticated agent endpoints.",
+        "status": "done",
+        "dependencies": [
+          9
+        ],
+        "priority": "high",
+        "details": "Create a dedicated test suite for authentication. Script the login process by sending a POST request to the login endpoint with test agent credentials. \n- On successful login, extract the authentication token (e.g., JWT) from the response.\n- Create a reusable helper function in Jest that takes this token and adds it to the `Authorization` header for subsequent requests (e.g., `Bearer <token>`).\n- Test a protected endpoint (e.g., `/api/agent/properties`) with a valid token, an invalid/expired token, and no token to verify the authentication middleware is working correctly.\n- Add a specific test case for role-based access control (RBAC): attempt to access an agent-only route with a valid token from a user that does *not* have the 'agent' role and verify access is denied.",
+        "testStrategy": "Assert that a valid login attempt returns a 200 OK status and an auth token. Assert that an invalid login attempt returns a 401 Unauthorized status. Verify that requests to protected routes succeed with a valid token and fail with a 401 Unauthorized status without a valid token. Additionally, test that a logged-in user without the 'agent' role receives a 403 Forbidden status when attempting to access agent-specific routes.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Set up the authentication test suite in Jest.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Implement a test for the agent login endpoint, covering success (200 + token) and failure (401) cases.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Create a reusable helper function to manage the auth token for subsequent API requests in tests.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Write tests for a protected agent endpoint (e.g., `/api/agent/properties`) to verify authentication middleware (valid token, invalid token, no token).",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Implement a test case for Role-Based Access Control (RBAC) by attempting to access an agent route with a non-agent user's token and asserting a 403 Forbidden response.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Phase 3: Test Agent Properties API (GET & POST)",
+        "description": "Test the ability for an authenticated agent to retrieve their list of properties and create a new property via the `/api/agent/properties` endpoint.",
+        "status": "done",
+        "dependencies": [
+          11
+        ],
+        "priority": "medium",
+        "details": "Using the authenticated request helper from task 11, implement tests for both the GET and POST methods of the `/api/agent/properties` endpoint. The tests should cover successful data retrieval, successful resource creation, and error handling for invalid input.",
+        "testStrategy": "For GET, validate the response structure and data against the Supabase dashboard. For POST, verify the creation by making a subsequent GET request to the list endpoint and ensuring the new property is present. Also, check the database directly to confirm persistence.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Set up the test file and import the authenticated request helper from Task 11.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Write test case for GET /api/agent/properties to verify successful retrieval of an agent's property list. Assert 200 OK, array structure, and correct data.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Write test case for POST /api/agent/properties with a valid payload. Assert 201 Created and validate the structure of the returned property object.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Write test case for POST /api/agent/properties with an invalid payload (e.g., missing required fields). Assert a 400 Bad Request response.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Phase 3: Test Individual Property API (PUT & DELETE)",
+        "description": "Test the update (PUT) and delete (DELETE) functionality for a specific property using the `/api/agent/properties/[id]` endpoint.",
+        "status": "done",
+        "dependencies": [
+          12
+        ],
+        "priority": "medium",
+        "details": "This test suite will perform a full CRUD cycle. First, create a new property using the POST endpoint from task 12 to get a fresh ID. \n**PUT /api/agent/properties/[id]**:\n- Create an update payload with modified data (e.g., change the price or description).\n- Make a PUT request to the endpoint with the new property's ID.\n- Assert a 200 OK response and that the response body reflects the updated data.\n- Verify that an agent cannot update a property belonging to another agent.\n**DELETE /api/agent/properties/[id]**:\n- Make a DELETE request using the same ID.\n- Assert a 200 OK or 204 No Content response.\n- Make a subsequent GET request for that ID and assert a 404 Not Found response to confirm deletion.\n- Verify that an agent cannot delete a property belonging to another agent.",
+        "testStrategy": "For PUT, after the update request, perform a GET request on the individual property endpoint to confirm the changes were persisted correctly. For DELETE, verify deletion by attempting to retrieve the property again and confirming it results in a 404 error. Additionally, include negative test cases to verify that an unauthorized user or an agent trying to modify another agent's property receives a 403 Forbidden or 404 Not Found error, confirming Row Level Security (RLS) is effective.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Set up the test file and helper functions for creating a new property via the POST endpoint to use for testing.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Write the test case for a successful property update (PUT /api/agent/properties/[id]).",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Write the test case for a successful property deletion (DELETE /api/agent/properties/[id]).",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Implement security test cases to ensure an agent cannot PUT or DELETE properties owned by another agent.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Run the complete test suite, ensure all tests pass, and verify test data cleanup procedures.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Phase 3: Test Agent Clients API (GET)",
+        "description": "Verify that an authenticated agent can successfully retrieve their list of clients from the `/api/agent/clients` endpoint.",
+        "status": "done",
+        "dependencies": [
+          11
+        ],
+        "priority": "low",
+        "details": "The primary goal is to test the client listing functionality for authenticated agents. This involves verifying successful data retrieval, correct data structure, and proper handling of edge cases like agents with no clients and unauthorized access.",
+        "testStrategy": "The test suite will cover multiple scenarios: a successful request from an authenticated agent, a request from an agent with zero clients, and a rejected request from an unauthenticated user. Data integrity will be checked by comparing the API response structure against the expected client schema.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create test suite for /api/agent/clients",
+            "description": "Set up a new Jest test file for the agent clients API endpoint.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Test successful client list retrieval for authenticated agent",
+            "description": "Use the auth helper from task 11 to make a GET request. Assert a 200 OK status and that the response body is an array.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Validate client object schema in the response",
+            "description": "For the successful retrieval test, verify that the objects in the client array match the expected schema (e.g., have name, email, phone fields).",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Test response for an agent with zero clients",
+            "description": "Ensure the API returns a 200 OK status with an empty array for an agent that has no associated clients.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Test unauthenticated access",
+            "description": "Verify that a GET request to the endpoint without a valid auth token fails with a 401 Unauthorized status code.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Phase 4: Frontend Integration Test for Contact Page",
+        "description": "Perform an end-to-end test on the `/contact` page to ensure the form correctly integrates with the `/api/contact` POST endpoint, including validation and error handling.",
+        "status": "done",
+        "dependencies": [
+          10
+        ],
+        "priority": "medium",
+        "details": "Using Cypress, write a test script that covers the following scenarios:\n\n**Happy Path Test:**\n1. Visits the `/contact` page (`cy.visit('/contact')`).\n2. Intercepts the POST request to `/api/contact` (`cy.intercept('POST', '/api/contact').as('contactSubmit')`).\n3. Fills in the form fields (Name, Email, Subject, Message) with valid test data.\n4. Clicks the submit button (`cy.get('button[type=submit]').click()`).\n5. Waits for the intercepted request to complete (`cy.wait('@contactSubmit')`).\n6. Asserts that the request's response has a `201 Created` status code.\n7. Asserts that a success toast notification (from `react-hot-toast`) is displayed on the UI.\n\n**Validation and Error Handling Tests:**\n1. Test submitting the form with empty required fields. Assert that client-side validation messages appear and that no network request is sent to `/api/contact`.\n2. Test submitting the form with an invalid email format. Assert that a specific validation message for the email field is shown.\n3. Test for server-side errors by mocking a 500 response for the `/api/contact` endpoint and asserting that an appropriate error toast is displayed to the user.",
+        "testStrategy": "The test suite will validate the entire user flow. The 'happy path' test passes if a valid form submission triggers a successful API call (201 status) and the user sees a success toast. The failure-path tests pass if client-side validation prevents form submission with invalid data and if server-side errors are gracefully handled and communicated to the user via the UI.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Create a new Cypress spec file for the contact page integration test.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Implement the 'happy path' test: fill and submit the form with valid data, then assert the API call receives a 201 status and a success toast appears.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Add test cases for client-side validation: attempt to submit with empty required fields and an invalid email format, asserting that validation errors are displayed and no API call is made.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Add a test case for server-side errors: intercept the API call and force a 500 error response, then assert that an appropriate error message or toast is shown to the user.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Phase 4: E2E Test for Agent Property Management Workflow",
+        "description": "Create a comprehensive end-to-end test simulating an agent's full workflow: logging in, creating, viewing, updating, and deleting a property through the frontend dashboard.",
+        "status": "done",
+        "dependencies": [
+          13,
+          15
+        ],
+        "priority": "high",
+        "details": "Using Cypress, create a test that covers the entire user journey for property management. The test will cover the full CRUD (Create, Read, Update, Delete) lifecycle as detailed in the subtasks.",
+        "testStrategy": "This test is validated by the successful completion of the entire Cypress script. Each step should have its own assertions (e.g., `cy.contains('New Property Name')`, `cy.contains('$550,000')`, `cy.contains('New Property Name').should('not.exist')`). This test validates the integration of all property-related frontend pages and backend CRUD APIs.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "",
+            "description": "Set up Cypress test file and implement programmatic agent login and navigation to the new property page.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "",
+            "description": "Implement test for creating a new property: fill and submit the form, intercept the POST request, and verify the new property appears on the dashboard.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "",
+            "description": "Implement test for updating a property: navigate to the edit page, change a value, save, and verify the update on the dashboard.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "",
+            "description": "Implement test for deleting a property: click the delete button, confirm the action, and assert the property is removed from the list.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "",
+            "description": "Refactor the complete test suite for clarity, add necessary waits, and ensure proper test data cleanup.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-27T13:17:37.137Z",
+      "updated": "2025-08-27T14:45:02.343Z",
+      "description": "Tasks for full-backend-completion context"
+    }
+  },
+  "comprehensive-testing": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Test Project and Install Dependencies",
+        "description": "Set up the project structure for the testing suite, initialize a `package.json` file, and install Playwright and other core dependencies.",
+        "details": "Create a new directory for the testing suite. Run `npm init -y`. Install Playwright by running `npm init playwright@latest`. This will scaffold the necessary configuration files (`playwright.config.ts`), example tests, and install browser binaries. Also, install `dotenv` for managing environment variables: `npm install -D dotenv`.",
+        "testStrategy": "Verify that `playwright.config.ts` is created, `package.json` lists `@playwright/test` as a dev dependency, and running `npx playwright test` executes the example test successfully.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Set Up Supabase Local Development Environment",
+        "description": "Install the Supabase CLI and initialize a local Supabase instance to provide a sandboxed environment for database and backend testing.",
+        "details": "Install the Supabase CLI following the official documentation (e.g., via Homebrew, Scoop, or npm). In the project root, run `supabase init` to create the `/supabase` directory. Start the local instance with `supabase start`. This will spin up Docker containers for Postgres, GoTrue, Realtime, Storage, etc., and provide local API keys.",
+        "testStrategy": "Confirm that `supabase start` runs without errors and provides a local Studio URL (e.g., http://localhost:54323). Verify that you can connect to the local Postgres database using the provided credentials.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Test Data Seeding Script",
+        "description": "Develop a script to populate the local Supabase database with consistent test data, including users for each role, properties, and related entities.",
+        "details": "Create a seed script in `/supabase/seed.sql`. This SQL script should use `INSERT` statements to create users (in `auth.users` and `public.profiles`), properties, agents, and admin accounts. Use a library like `faker-js` if generating the script programmatically. The Supabase CLI automatically runs this script after `supabase db reset`.",
+        "testStrategy": "Run `supabase db reset`. After the command completes, connect to the local database and verify that the tables contain the expected test data by running `SELECT` queries.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Configure Playwright for AkwaabaHomes Environment",
+        "description": "Configure `playwright.config.ts` to target different browsers, emulate mobile devices, and set up base URLs for local and staging environments.",
+        "details": "Modify `playwright.config.ts`. Set the `baseURL` using environment variables (e.g., `process.env.BASE_URL || 'http://localhost:3000'`). Configure the `projects` array to include configurations for 'chromium', 'firefox', 'webkit', 'Mobile Chrome' (using `devices['Pixel 5']`), and 'Mobile Safari' (using `devices['iPhone 13']`).",
+        "testStrategy": "Run a simple test against each configured project (`npx playwright test --project=\"Mobile Chrome\"`). Verify that the test runs using the specified browser or device emulation and targets the correct `baseURL`.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Page Object Model (POM) Structure",
+        "description": "Scaffold the directory structure and create base classes for the Page Object Model to ensure maintainable and reusable test code.",
+        "details": "Create a `tests/pages` directory. Inside, create files for each major page or component, e.g., `homePage.ts`, `loginPage.ts`, `propertyDetailsPage.ts`. Each class will encapsulate the selectors and methods for interacting with that page. For example, `loginPage.ts` will have methods like `login(username, password)`.",
+        "testStrategy": "Create a simple test that imports and uses a method from a Page Object class (e.g., `homePage.goto()`). The test should pass, demonstrating that the structure is correctly implemented.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "E2E Test: Unauthenticated Property Search and Filtering",
+        "description": "Write Playwright tests to validate the property search and filtering functionality for users who are not logged in.",
+        "details": "Using the POM structure, create a test file `tests/unauthenticated/search.spec.ts`. The test should navigate to the home page, enter a location into the search bar, apply filters (e.g., price range, number of bedrooms), and assert that the displayed results match the filter criteria.",
+        "testStrategy": "Run the test suite. It should pass by correctly identifying the number of search results and verifying that key details on the result cards match the applied filters.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "E2E Test: User Registration and Login Flow",
+        "description": "Develop tests for the user sign-up and login processes, including handling successful authentication and error states.",
+        "details": "Create `tests/auth/login.spec.ts`. Use the `loginPage` POM. Test successful login with valid credentials from the seed data. Test failure cases like incorrect password and non-existent user. For registration, test new user creation and verify the user is added to the Supabase `auth.users` table.",
+        "testStrategy": "Tests should assert that successful login redirects to the user dashboard. Failure tests should assert that appropriate error messages are displayed. The registration test should check for a confirmation email if applicable.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Reusable Authenticated State",
+        "description": "Configure Playwright to log in a user once and reuse the authenticated session across multiple tests to improve performance and reliability.",
+        "details": "Create a global setup file specified in `playwright.config.ts` (`globalSetup: require.resolve('./global-setup')`). This script will programmatically log in a test user (e.g., customer, agent) and save the storage state to a file using `page.context().storageState({ path: 'user.json' })`. Tests for authenticated users will then use this state via `test.use({ storageState: 'user.json' })`.",
+        "testStrategy": "Create a test that requires authentication. Run it and verify it passes without explicitly logging in within the test itself. Check that the `user.json` file is created after the global setup runs.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "E2E Test: Authenticated Customer - Favorites and Saved Searches",
+        "description": "Write tests to verify that a logged-in customer can add/remove properties to their favorites and save search criteria.",
+        "details": "Create `tests/customer/favorites.spec.ts`. This test will use the authenticated state from the global setup. It will navigate to a property, click the 'favorite' button, then navigate to the user's profile/dashboard and assert that the property is listed in their favorites.",
+        "testStrategy": "The test should pass if the favorited property appears on the favorites page and disappears after being unfavorited. A page reload should be used to ensure the state is persisted in the database.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "E2E Test: Agent - Property Listing Creation and Management",
+        "description": "Create tests for the property agent's journey, including creating a new property listing, uploading photos, and editing existing listings.",
+        "details": "Create `tests/agent/property-management.spec.ts` using an authenticated agent session. The test will navigate to the agent dashboard, fill out the 'create listing' form, and use `page.setInputFiles()` to handle photo uploads. It will then verify the new listing appears on the dashboard and in public search results. An additional test will cover editing this listing.",
+        "testStrategy": "Assert that the new property is visible in the agent's dashboard and can be found via public search. The edit test should verify that updated details (e.g., price) are reflected correctly.",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Test New Property Listing Creation Flow",
+            "description": "Implement a test case that simulates an agent creating a new property listing. This includes navigating to the creation form, filling in all required fields, and uploading property photos.",
+            "dependencies": [],
+            "details": "Within `tests/agent/property-management.spec.ts`, create a test block for 'should create a new property listing'. Use an authenticated agent session. Automate filling out the form fields with test data. Use `page.setInputFiles()` to simulate the upload of one or more mock image files.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Verify New Listing on Agent Dashboard",
+            "description": "After a property is created, this test should verify that the new listing appears correctly on the agent's dashboard or 'My Listings' page.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "As part of the creation test flow, navigate to the agent's dashboard after submitting the form. Use locators to find the newly created property in the list. Assert that key details like the address and price match the data used during creation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify New Listing in Public Search Results",
+            "description": "Confirm that a newly created and approved property listing is visible and searchable by the public.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "After the property is created, perform a public search using criteria that should match the new listing (e.g., its location). Assert that the property appears in the search results and that its details are displayed correctly to an unauthenticated user. Note: This may require an admin approval step to be mocked or handled in a setup hook if listings are not public by default.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Test Editing an Existing Property Listing",
+            "description": "Create a test case for the flow of an agent editing one of their existing property listings and verifying the changes.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Create a separate test block 'should edit an existing property listing'. This test will use the property created in the first subtask (or a similar setup). It will navigate to the edit page for that property, change details like the price, and save. Finally, it will verify that the updated information is reflected on the agent's dashboard.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "DB Test: Validate Agent Row-Level Security (RLS) Policies",
+        "description": "Write database-level tests to ensure agents can only view and modify their own property listings.",
+        "details": "Create a test script using a Node.js test runner (like Jest or Vitest) and a Postgres client library (e.g., `pg`). The script will connect to the local Supabase Postgres. It will create two agents and two properties (one for each). Then, it will authenticate as Agent 1 and attempt to `UPDATE` or `DELETE` the property belonging to Agent 2, asserting that the operation fails and returns 0 rows.",
+        "testStrategy": "The test passes if the authenticated agent can successfully modify their own data but receives an error or zero-row update when attempting to modify another agent's data.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup Database Test Framework",
+            "description": "Install and configure a Node.js test runner (e.g., Vitest) and the `pg` client library. Establish a reusable connection module or helper function to connect to the local Supabase Postgres instance for testing purposes.",
+            "dependencies": [],
+            "details": "The setup should include environment variable configuration for database credentials and a base test file that confirms a successful connection can be made before any tests are run.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Test Data Seeding and Teardown Logic",
+            "description": "Write a script that runs before the tests to create the necessary test data, including two distinct agent users and a property listing for each. Implement a teardown process to clean up the database after tests complete.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "The seeding script should insert records into the `users` and `properties` tables. The user records should be created in a way that allows the test runner to impersonate them (e.g., by knowing their user ID). The teardown should use `TRUNCATE` or `DELETE` with a `CASCADE` option if appropriate.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Write Test for Agent Successfully Modifying Own Property",
+            "description": "Create a test case that authenticates as the first test agent and executes an `UPDATE` statement on the property they own. The test must assert that the update operation succeeds and reports that exactly one row was affected.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "The test will need to use a database client that is configured to run under the security context of the test agent. This is typically done in Postgres using `SET ROLE` or a similar mechanism provided by the Supabase client library.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Write Test for Agent Blocked from Modifying Another's Property",
+            "description": "Create a test case that authenticates as the first test agent and attempts to execute an `UPDATE` or `DELETE` statement on the property owned by the second test agent. The test must assert that the operation is blocked by the RLS policy.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "The assertion should check that the database operation returns 0 for the number of rows affected. This confirms the RLS policy correctly prevented the unauthorized modification. The test should not expect a thrown error unless the policy is configured to do so.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "E2E Test: Admin - Property Approval and User Moderation",
+        "description": "Develop tests for the admin dashboard, focusing on the workflows for approving new property listings and managing user accounts.",
+        "details": "Create `tests/admin/moderation.spec.ts` using an authenticated admin session. A prerequisite test step (or setup) should create a property by an agent that is pending approval. The admin test will log in, navigate to the approval queue, approve the property, and verify its status changes. Another test will cover suspending a user account.",
+        "testStrategy": "Assert that after admin approval, the property's status is updated in the database and it becomes publicly visible. The user moderation test should confirm that a suspended user can no longer log in.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Setup Hook to Create a Pending Property",
+            "description": "Create a programmatic setup function or a global setup hook in Playwright that uses an authenticated agent user to create a new property listing. This property should be in a 'pending approval' state, ready for the admin tests.",
+            "dependencies": [],
+            "details": "This hook will likely involve making a direct API call or using a utility function to log in as an agent and submit the property form data. The ID of the created property and the agent user should be stored and made available to the subsequent tests. This avoids UI-based creation which is slower and more brittle.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Test Admin Workflow for Property Approval",
+            "description": "Write a Playwright test where an admin user logs in, navigates to the property approval queue, finds the property created in the setup hook, and approves it.",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "The test should be located in `tests/admin/moderation.spec.ts`. It must assert that after approval, the property's status is updated in the UI and backend (e.g., it disappears from the pending queue). A further assertion should check if the property is now publicly visible.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Test Admin Workflow for User Suspension",
+            "description": "Develop a test case where an admin user logs in, navigates to the user management section, searches for a specific user (e.g., a pre-existing test user), and suspends their account.",
+            "dependencies": [],
+            "details": "This test will also be in `tests/admin/moderation.spec.ts`. The test needs to identify a target user, perform the suspension action through the admin UI, and verify that the user's status is updated to 'suspended' in the dashboard.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Verify Login Failure for Suspended User",
+            "description": "Create a test that attempts to log in as the user who was suspended in the previous subtask. The test should verify that the login attempt fails and an appropriate error message is displayed.",
+            "dependencies": [
+              "12.3"
+            ],
+            "details": "This test will attempt a login using the suspended user's credentials. It should assert that the application does not grant access and instead shows a message indicating the account is suspended or inactive. This confirms the backend logic for suspension is working correctly.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "DB Test: Validate Admin RLS Policies",
+        "description": "Write database tests to confirm that admin users have the correct elevated privileges to manage all users and properties as defined by RLS policies.",
+        "details": "Similar to the agent RLS test, use a Node.js script to connect to the database. Authenticate as an admin role. Perform `SELECT`, `UPDATE`, and `DELETE` operations on data owned by various users (agents, customers). Assert that all operations succeed as expected, confirming the admin's override capabilities.",
+        "testStrategy": "The test passes if the admin role can successfully perform CRUD operations on records belonging to any user, while non-admin roles are restricted by their respective policies.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Real-time Feature Test with Multiple Browser Contexts",
+        "description": "Test a real-time feature, such as notifications or chat, by simulating two different users interacting simultaneously.",
+        "details": "Write a Playwright test that creates two browser contexts (`browser.newContext()`). Log in one user (e.g., a customer) in the first context and another (e.g., an agent) in the second. Have the customer send a message or inquiry. In the agent's context, use `page.waitForSelector()` or a similar method to assert that a real-time notification or message appears without a page reload.",
+        "testStrategy": "The test is successful if the action performed in the first browser context triggers a visible update in the second browser context within a reasonable timeout, validating the Supabase Realtime subscription.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Scaffold Test with Two Browser Contexts",
+            "description": "Create the basic structure of a Playwright test file that initializes two separate browser contexts and pages. This sets the foundation for simulating two independent user sessions.",
+            "dependencies": [],
+            "details": "In a new test file (e.g., `real-time.spec.ts`), use the `browser` fixture to create two contexts: `const customerContext = await browser.newContext();` and `const agentContext = await browser.newContext();`. Then, create a new page for each context: `const customerPage = await customerContext.newPage();` and `const agentPage = await agentContext.newPage();`.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement User Login for Both Contexts",
+            "description": "Log in a 'customer' user in the first browser context and an 'agent' user in the second. This requires separate user credentials and establishes the two distinct user sessions needed for the test.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "Using the `customerPage`, navigate to the login page and authenticate as the customer. Concurrently, using the `agentPage`, navigate to the agent login/dashboard and authenticate as the agent. Ensure both sessions are active and independent before proceeding.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Simulate Customer Action to Trigger Real-time Event",
+            "description": "In the customer's browser context, perform the action that is expected to trigger a real-time event, such as sending a chat message or submitting a support ticket.",
+            "dependencies": [
+              "14.2"
+            ],
+            "details": "Using the `customerPage` object, navigate to the chat or messaging interface. Locate the text input, fill it with a test message, and click the 'send' button. This action should trigger a backend event that is broadcast via the real-time service.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Assert Real-time Update in Agent Context",
+            "description": "In the agent's browser context, wait for and verify that the corresponding real-time notification or message appears on the page without requiring a manual refresh.",
+            "dependencies": [
+              "14.3"
+            ],
+            "details": "Using the `agentPage` object, use an explicit wait like `page.waitForSelector()` or `expect(locator).toBeVisible()` to check for the new element containing the customer's message or a notification alert. The assertion must have a reasonable timeout to account for network latency.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Supabase Edge Function Testing",
+        "description": "Implement tests for Supabase Edge Functions to validate their logic and integration.",
+        "details": "For each Edge Function, create a corresponding test file. Use a library like `undici` or `node-fetch` to make HTTP requests to the locally running function endpoint (provided by `supabase start`). Test success cases with valid payloads and JWTs, as well as failure cases with invalid data, and assert the correctness of the HTTP response status and body.",
+        "testStrategy": "Verify that the Edge Function returns the expected status codes (e.g., 200 for success, 400 for bad request, 401 for unauthorized) and response payloads for a variety of inputs.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Integrate Visual Regression Testing",
+        "description": "Set up and configure visual regression testing to catch unintended UI changes in key components and pages.",
+        "details": "Enable screenshot testing in `playwright.config.ts`. In key tests (e.g., home page, property details), add the assertion `await expect(page).toHaveScreenshot('home-page.png');`. Run the tests once with `--update-snapshots` to generate the baseline images. Subsequent runs will compare against these baselines. Configure a `threshold` for pixel difference tolerance.",
+        "testStrategy": "After initial snapshot generation, make a minor cosmetic change to a component (e.g., change a color). Run the test again and verify that it fails due to a visual mismatch and that the generated report shows a diff image.",
+        "priority": "low",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Integrate Accessibility Testing",
+        "description": "Add automated accessibility checks to the E2E test suite to ensure compliance with WCAG 2.1 AA standards.",
+        "details": "Install the `axe-playwright` library: `npm install -D axe-playwright`. Create a utility function that injects Axe and runs an analysis. Call this utility in the `afterEach` hook or at the end of critical tests (e.g., after a page is fully loaded). `const accessibilityScanResults = await new AxeBuilder({ page }).analyze(); expect(accessibilityScanResults.violations).toEqual([]);`",
+        "testStrategy": "Introduce a deliberate accessibility violation (e.g., an image without an alt tag) on a test page. Run the corresponding test and verify that it fails with a clear report of the violation from Axe.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement API Mocking for Third-Party Services",
+        "description": "Use Playwright's network interception to mock responses from third-party APIs (e.g., maps, payments) for faster and more stable tests.",
+        "details": "In tests that rely on external services, use `page.route()`. For example, to mock a map API: `await page.route('https://maps.googleapis.com/**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockMapData) }));`. This prevents test failures due to external service outages and removes dependencies.",
+        "testStrategy": "Run a test that normally calls an external API. Verify in the Playwright trace or logs that the network request was intercepted and fulfilled with the mock response, and confirm the UI displays the mock data correctly.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Establish Performance Benchmarks",
+        "description": "Use Playwright's tracing and metrics capabilities to capture and assert performance benchmarks for critical user flows.",
+        "details": "Enable tracing in `playwright.config.ts` (`trace: 'on-first-retry'`). For key pages, use the Performance API to measure metrics. Example: `const lcp = await page.evaluate(() => new Promise(resolve => { new PerformanceObserver((list) => { const entries = list.getEntries(); const lastEntry = entries[entries.length - 1]; resolve(lastEntry.startTime); }).observe({ type: 'largest-contentful-paint', buffered: true }); })); expect(lcp).toBeLessThan(2500);`",
+        "testStrategy": "Run the performance tests and record the baseline metrics. The test passes if the measured metrics (like LCP, FCP) are within the defined acceptable thresholds (e.g., under 2.5 seconds).",
+        "priority": "low",
+        "dependencies": [
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Write Basic Security Tests",
+        "description": "Create tests to check for common security vulnerabilities like unauthorized access and insecure form handling.",
+        "details": "1. **Authorization Test:** As a regular user, attempt to navigate directly to an admin-only URL (e.g., `/admin/dashboard`). Assert that the response is a 403 Forbidden or a redirect to the login page. 2. **XSS Test:** In a form input (e.g., property description), enter a simple XSS payload like `<script>alert('xss')</script>`. Submit the form and assert that the script is not executed (i.e., no alert appears) and the output is properly sanitized.",
+        "testStrategy": "The authorization test passes if the user is blocked from accessing the admin page. The XSS test passes if the application does not execute the injected script when displaying the submitted content.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Validate Responsive Design on Mobile",
+        "description": "Run the core E2E test suite against mobile viewport configurations to validate responsive design and touch interactions.",
+        "details": "Execute the existing test suites using the mobile projects defined in the Playwright config: `npx playwright test --project=\"Mobile Chrome\"`. Identify and fix any tests that fail due to layout changes (e.g., elements being hidden behind a hamburger menu). Add mobile-specific assertions where necessary, such as checking for the visibility of a mobile-only navigation bar.",
+        "testStrategy": "A significant portion of the test suite (e.g., >80%) should pass on the mobile emulation projects without modification. The test report should confirm execution on the specified mobile device viewports.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Verify Cross-Browser Compatibility",
+        "description": "Execute the full test suite across all target browsers (Chrome, Firefox, Safari/Webkit) to ensure consistent functionality.",
+        "details": "Run the entire test suite by executing `npx playwright test`. The configuration file should already be set up to run against `chromium`, `firefox`, and `webkit`. Analyze the test report for any browser-specific failures. These often relate to subtle differences in CSS rendering or JavaScript engine behavior.",
+        "testStrategy": "The test suite passes with a 100% success rate across all three major browser engines. The HTML report should clearly show the results for each browser project.",
+        "priority": "medium",
+        "dependencies": [
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Implement Supabase Backup and Restore Test",
+        "description": "Create a procedure to test the database backup and restore process, ensuring data integrity.",
+        "details": "This is a procedural test. Write a script that: 1. Uses `supabase db dump` to create a backup of the local database. 2. Runs `supabase db reset` to clear the database. 3. Restores the database from the backup file using `psql`. 4. Runs a lightweight set of validation queries (e.g., `SELECT COUNT(*) FROM properties`) to ensure the data has been restored correctly.",
+        "testStrategy": "The test is successful if the data count and key records in the database after the restore match the state before the backup was taken.",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Integrate Tests into CI/CD Pipeline (GitHub Actions)",
+        "description": "Create a GitHub Actions workflow to automatically run the entire test suite on every push and pull request.",
+        "details": "Create a file at `.github/workflows/playwright.yml`. The workflow should define jobs that: 1. Check out the code. 2. Set up Node.js. 3. Install npm dependencies. 4. Install Playwright browsers. 5. Set up and start the Supabase local environment. 6. Run all tests using `npx playwright test`. 7. Upload the Playwright HTML report as a build artifact using `actions/upload-artifact`.",
+        "testStrategy": "Push a commit or open a pull request. Verify that the GitHub Action is triggered, runs through all the steps, and reports a 'success' or 'failure' status. Check that the test report artifact is available for download on a successful run.",
+        "priority": "high",
+        "dependencies": [
+          22
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Workflow Trigger and Base Job Setup",
+            "description": "Create the `.github/workflows/playwright.yml` file and define the basic structure, including the workflow name, triggers for push and pull requests, and the initial job configuration.",
+            "dependencies": [],
+            "details": "In the new `playwright.yml` file, set the `name` for the workflow. Configure the `on` key to trigger the workflow for `push` and `pull_request` events on the `main` branch. Define a single job named `test` that `runs-on: ubuntu-latest`.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Add Steps for Code Checkout, Node Setup, and Caching",
+            "description": "Add the foundational steps to the workflow job for checking out the repository code, setting up the correct Node.js environment, and caching dependencies to speed up subsequent runs.",
+            "dependencies": [
+              "24.1"
+            ],
+            "details": "Use the `actions/checkout@v3` action to fetch the code. Use `actions/setup-node@v3` to configure the required Node.js version. Implement `actions/cache@v3` to cache the npm directory based on the `package-lock.json` file hash. Finally, add a step to run `npm ci` to install all dependencies.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Install Supabase CLI and Start Local Environment",
+            "description": "Add steps to the workflow to install the Supabase CLI and start the local development environment. This ensures the database and other services are running before the tests begin.",
+            "dependencies": [
+              "24.2"
+            ],
+            "details": "Add a `run` step to install the Supabase CLI via npm: `npm install supabase --save-dev`. Follow this with a step to execute `npx supabase start`. Ensure the workflow waits for this command to complete successfully.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add Step to Run Playwright Tests",
+            "description": "Incorporate the command to execute the entire Playwright test suite. This step includes installing the necessary browser binaries required by Playwright.",
+            "dependencies": [
+              "24.3"
+            ],
+            "details": "Add a step to run `npx playwright install --with-deps` to ensure all browsers and system dependencies are installed in the CI runner. Then, add the main test execution step: `npx playwright test`.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Add Step to Upload Test Report Artifact",
+            "description": "Configure the workflow to upload the generated Playwright HTML report as a build artifact, making it accessible for review after the workflow completes.",
+            "dependencies": [
+              "24.4"
+            ],
+            "details": "Use the `actions/upload-artifact@v3` action. Set the `if: always()` condition to ensure the report is uploaded even if the test step fails. Configure the artifact `name` as `playwright-report` and the `path` to the `playwright-report/` directory.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "Configure Test Reporting and Analytics",
+        "description": "Finalize the configuration of the Playwright HTML reporter and document the process for analyzing test results and failures.",
+        "details": "Ensure the `playwright.config.ts` is configured to always generate the HTML reporter: `reporter: 'html'`. The CI pipeline should be set to archive this report. Document for the team how to access and interpret the report, especially the trace viewer, which provides a detailed, step-by-step debugging experience for failed tests.",
+        "testStrategy": "Intentionally cause a test to fail and run the CI pipeline. Download the resulting HTML report artifact. Verify that the report correctly marks the failed test and that the trace file can be opened and inspected to diagnose the failure.",
+        "priority": "medium",
+        "dependencies": [
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-27T19:43:43.493Z",
+      "updated": "2025-08-27T19:56:47.663Z",
+      "description": "Tasks for comprehensive-testing context"
+    }
+  }
+}

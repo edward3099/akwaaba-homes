@@ -1,0 +1,55 @@
+# Task ID: 1
+# Title: Database Schema Setup and Migration
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Design and implement the complete database schema for the real estate application using Supabase. This includes creating all necessary tables, defining relationships, and establishing row-level security policies for data protection.
+# Details:
+Research best practices for real estate application schemas on Supabase. Define and create the following tables using Supabase migrations: `profiles` (extending `auth.users`), `properties` (listing details, linked to a profile), `property_images` (linked to properties), `contact_submissions`, `agent_applications`, and `audit_logs`. Establish foreign key relationships to ensure data integrity (e.g., a property must have an associated agent profile). Implement comprehensive Row Level Security (RLS) policies: public users can read approved properties, authenticated users can submit forms, agents can manage their own listings, and admins have full access. All schema changes must be managed via Supabase CLI migration files.
+
+# Test Strategy:
+Verify the schema by inspecting tables, columns, and relationships in the Supabase Studio. Test foreign key constraints by attempting to insert orphaned records. Create test users for each role (anonymous, authenticated, agent, admin) and execute a suite of queries (SELECT, INSERT, UPDATE, DELETE) against each table to confirm that RLS policies are enforced correctly. Finally, run `supabase db reset` and apply all migrations to ensure the schema can be recreated successfully from the migration files.
+
+# Subtasks:
+## 1. Design the Complete Database Schema [pending]
+### Dependencies: None
+### Description: Create a detailed schema diagram and documentation for all tables (`profiles`, `properties`, `property_images`, `contact_submissions`, `agent_applications`, `audit_logs`), defining columns, data types, and foreign key relationships.
+### Details:
+Use a tool like dbdiagram.io or Lucidchart to visualize the schema. This design will serve as the blueprint for the migration files and ensure all relationships are correctly mapped out before implementation.
+
+## 2. Create Migration for User-Related Tables [pending]
+### Dependencies: None
+### Description: Develop the initial Supabase migration file using the CLI to create the `profiles` table (extending `auth.users`) and the `agent_applications` table, establishing their columns and primary keys.
+### Details:
+Write the SQL for a Supabase migration file to define the `profiles` table with a foreign key to `auth.users` and the `agent_applications` table with a foreign key to `profiles`. This forms the foundation for user and agent data.
+
+## 3. Create Migration for Property-Related Tables [pending]
+### Dependencies: None
+### Description: Develop a Supabase migration file to create the `properties` and `property_images` tables, including foreign key constraints linking them to each other and to the `profiles` table.
+### Details:
+Write the SQL for a Supabase migration file. The `properties` table must have a foreign key to the agent's profile ID. The `property_images` table must have a foreign key to the property ID.
+
+## 4. Create Migration for Auxiliary and Logging Tables [pending]
+### Dependencies: None
+### Description: Develop a Supabase migration file for the `contact_submissions` and `audit_logs` tables, defining their schemas and any necessary relationships.
+### Details:
+Write the SQL for a Supabase migration file. `contact_submissions` may link to both `profiles` (if submitted by a logged-in user) and `properties`. `audit_logs` will be a generic table to log important system events.
+
+## 5. Implement Multi-Role Row Level Security (RLS) Policies [pending]
+### Dependencies: None
+### Description: Write and apply RLS policies via a Supabase migration file for all relevant tables to enforce access control for public, authenticated, agent, and admin roles.
+### Details:
+Define `SELECT`, `INSERT`, `UPDATE`, and `DELETE` policies for each table. For example, agents can only manage their own listings (`properties.agent_id = auth.uid()`), while public users can only read properties with an 'approved' status.
+
+## 6. Develop Database Seeding Script for Testing [pending]
+### Dependencies: None
+### Description: Create a `seed.sql` file to populate the database with realistic test data, including users for each role (agent, admin), properties, images, and other related records.
+### Details:
+The script should be executable via the Supabase CLI. It needs to create sample data that allows for thorough testing of the RLS policies and application functionality, such as an admin user, several agent users, and properties assigned to those agents.
+
+## 7. Validate Schema, RLS, and Seed Data [pending]
+### Dependencies: None
+### Description: Perform a final review and testing of the database setup. Verify that all tables, relationships, constraints, and RLS policies function as designed using the seeded test data.
+### Details:
+Run a series of test queries against the database while authenticated as different user roles (admin, agent, authenticated user, anonymous) to confirm RLS policies are correctly restricting access. Verify foreign key constraints by attempting to insert invalid data.
+

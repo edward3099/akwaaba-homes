@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Signup Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .error { color: red; font-size: 14px; }
+        .success { color: green; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>Test Agent Signup Form</h1>
+    
+    <form id="signupForm">
+        <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input type="text" id="firstName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input type="text" id="lastName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone *</label>
+            <input type="tel" id="phone" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="companyName">Company Name *</label>
+            <input type="text" id="companyName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="businessType">Business Type *</label>
+            <input type="text" id="businessType" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="licenseNumber">License Number *</label>
+            <input type="text" id="licenseNumber" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="experienceYears">Years of Experience *</label>
+            <input type="number" id="experienceYears" min="0" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="bio">Professional Bio * (min 10 characters)</label>
+            <textarea id="bio" rows="4" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password *</label>
+            <input type="password" id="confirmPassword" required>
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="agreeToTerms" required>
+                I agree to the terms and conditions *
+            </label>
+        </div>
+        
+        <button type="submit" id="submitBtn">Submit Application</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        console.log('Test signup form loaded');
+        
+        const form = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const result = document.getElementById('result');
+        
+        // Simple password strength check
+        function checkPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score += 1;
+            if (password.length >= 12) score += 1;
+            if (/[A-Z]/.test(password)) score += 1;
+            if (/[a-z]/.test(password)) score += 1;
+            if (/\d/.test(password)) score += 1;
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+            return score >= 3;
+        }
+        
+        // Form validation
+        function validateForm() {
+            const errors = [];
+            const formData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                companyName: document.getElementById('companyName').value.trim(),
+                businessType: document.getElementById('businessType').value.trim(),
+                licenseNumber: document.getElementById('licenseNumber').value.trim(),
+                experienceYears: document.getElementById('experienceYears').value.trim(),
+                bio: document.getElementById('bio').value.trim(),
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                agreeToTerms: document.getElementById('agreeToTerms').checked
+            };
+            
+            console.log('Form data:', formData);
+            
+            if (!formData.firstName) errors.push('First name is required');
+            if (!formData.lastName) errors.push('Last name is required');
+            if (!formData.email) errors.push('Email is required');
+            if (!formData.phone) errors.push('Phone number is required');
+            if (!formData.companyName) errors.push('Company name is required');
+            if (!formData.businessType) errors.push('Business type is required');
+            if (!formData.licenseNumber) errors.push('License number is required');
+            if (!formData.experienceYears) errors.push('Years of experience is required');
+            if (!formData.bio) errors.push('Professional bio is required');
+            if (formData.bio.length < 10) errors.push('Professional bio must be at least 10 characters');
+            if (!formData.password) errors.push('Password is required');
+            if (!formData.confirmPassword) errors.push('Password confirmation is required');
+            if (formData.password !== formData.confirmPassword) errors.push('Passwords do not match');
+            if (!formData.agreeToTerms) errors.push('You must agree to the terms and conditions');
+            
+            // Check password strength
+            if (formData.password && !checkPasswordStrength(formData.password)) {
+                errors.push('Password does not meet strength requirements');
+            }
+            
+            return { errors, formData };
+        }
+        
+        // Handle form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submitted');
+            
+            const { errors, formData } = validateForm();
+            
+            if (errors.length > 0) {
+                result.innerHTML = `<div class="error">Validation errors: ${errors.join(', ')}</div>`;
+                return;
+            }
+            
+            console.log('Form validation passed, submitting to API...');
+            
+            // Transform data for API
+            const apiPayload = {
+                email: formData.email,
+                password: formData.password,
+                user_metadata: {
+                    first_name: formData.firstName,
+                    last_name: formData.lastName,
+                    phone: formData.phone,
+                    company_name: formData.companyName,
+                    business_type: formData.businessType,
+                    license_number: formData.licenseNumber,
+                    experience_years: parseInt(formData.experienceYears),
+                    bio: formData.bio,
+                    user_type: 'agent',
+                    verification_status: 'pending'
+                }
+            };
+            
+            console.log('API payload:', apiPayload);
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+                
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(apiPayload),
+                });
+                
+                const data = await response.json();
+                console.log('API response:', response.status, data);
+                
+                if (response.ok) {
+                    result.innerHTML = `<div class="success">✅ Signup successful! User ID: ${data.user.id}</div>`;
+                } else {
+                    result.innerHTML = `<div class="error">❌ Signup failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+            }
+        });
+        
+        // Test with sample data
+        function fillSampleData() {
+            document.getElementById('firstName').value = 'Test';
+            document.getElementById('lastName').value = 'Agent';
+            document.getElementById('email').value = 'testagent5@gmail.com';
+            document.getElementById('phone').value = '1234567890';
+            document.getElementById('companyName').value = 'Test Company';
+            document.getElementById('businessType').value = 'Real Estate';
+            document.getElementById('licenseNumber').value = 'TEST202';
+            document.getElementById('experienceYears').value = '5';
+            document.getElementById('bio').value = 'This is a test bio for testing purposes with more than 10 characters';
+            document.getElementById('password').value = 'TestPassword123!';
+            document.getElementById('confirmPassword').value = 'TestPassword123!';
+            document.getElementById('agreeToTerms').checked = true;
+        }
+        
+        // Add button to fill sample data
+        const sampleBtn = document.createElement('button');
+        sampleBtn.textContent = 'Fill Sample Data';
+        sampleBtn.type = 'button';
+        sampleBtn.onclick = fillSampleData;
+        sampleBtn.style.marginBottom = '20px';
+        form.insertBefore(sampleBtn, form.firstChild);
+        
+        console.log('Test signup form ready');
+    </script>
+</body>
+</html>

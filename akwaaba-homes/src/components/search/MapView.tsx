@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { X, List, Grid3X3, Maximize2 } from 'lucide-react';
-import { Property, CurrencyCode } from '@/lib/types';
+import { Property, CurrencyCode } from '@/lib/types/index';
 
 interface MapViewProps {
   properties: Property[];

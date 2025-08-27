@@ -1,0 +1,37 @@
+# Task ID: 10
+# Title: E2E Test: Agent - Property Listing Creation and Management
+# Status: pending
+# Dependencies: 8
+# Priority: high
+# Description: Create tests for the property agent's journey, including creating a new property listing, uploading photos, and editing existing listings.
+# Details:
+Create `tests/agent/property-management.spec.ts` using an authenticated agent session. The test will navigate to the agent dashboard, fill out the 'create listing' form, and use `page.setInputFiles()` to handle photo uploads. It will then verify the new listing appears on the dashboard and in public search results. An additional test will cover editing this listing.
+
+# Test Strategy:
+Assert that the new property is visible in the agent's dashboard and can be found via public search. The edit test should verify that updated details (e.g., price) are reflected correctly.
+
+# Subtasks:
+## 1. Test New Property Listing Creation Flow [pending]
+### Dependencies: None
+### Description: Implement a test case that simulates an agent creating a new property listing. This includes navigating to the creation form, filling in all required fields, and uploading property photos.
+### Details:
+Within `tests/agent/property-management.spec.ts`, create a test block for 'should create a new property listing'. Use an authenticated agent session. Automate filling out the form fields with test data. Use `page.setInputFiles()` to simulate the upload of one or more mock image files.
+
+## 2. Verify New Listing on Agent Dashboard [pending]
+### Dependencies: 10.1
+### Description: After a property is created, this test should verify that the new listing appears correctly on the agent's dashboard or 'My Listings' page.
+### Details:
+As part of the creation test flow, navigate to the agent's dashboard after submitting the form. Use locators to find the newly created property in the list. Assert that key details like the address and price match the data used during creation.
+
+## 3. Verify New Listing in Public Search Results [pending]
+### Dependencies: 10.1
+### Description: Confirm that a newly created and approved property listing is visible and searchable by the public.
+### Details:
+After the property is created, perform a public search using criteria that should match the new listing (e.g., its location). Assert that the property appears in the search results and that its details are displayed correctly to an unauthenticated user. Note: This may require an admin approval step to be mocked or handled in a setup hook if listings are not public by default.
+
+## 4. Test Editing an Existing Property Listing [pending]
+### Dependencies: 10.1
+### Description: Create a test case for the flow of an agent editing one of their existing property listings and verifying the changes.
+### Details:
+Create a separate test block 'should edit an existing property listing'. This test will use the property created in the first subtask (or a similar setup). It will navigate to the edit page for that property, change details like the price, and save. Finally, it will verify that the updated information is reflected on the agent's dashboard.
+

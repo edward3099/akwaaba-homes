@@ -1,0 +1,11 @@
+# Task ID: 16
+# Title: Integrate Visual Regression Testing
+# Status: pending
+# Dependencies: 6
+# Priority: low
+# Description: Set up and configure visual regression testing to catch unintended UI changes in key components and pages.
+# Details:
+Enable screenshot testing in `playwright.config.ts`. In key tests (e.g., home page, property details), add the assertion `await expect(page).toHaveScreenshot('home-page.png');`. Run the tests once with `--update-snapshots` to generate the baseline images. Subsequent runs will compare against these baselines. Configure a `threshold` for pixel difference tolerance.
+
+# Test Strategy:
+After initial snapshot generation, make a minor cosmetic change to a component (e.g., change a color). Run the test again and verify that it fails due to a visual mismatch and that the generated report shows a diff image.

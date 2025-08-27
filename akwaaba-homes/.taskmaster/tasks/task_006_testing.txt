@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Automate Agent Dashboard and Inquiry Management Tests
+# Status: pending
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Develop test scripts to validate the agent's dashboard and communication tools, including receiving and responding to customer inquiries and viewing property performance analytics.
+# Details:
+Create `tests/agent/dashboard_communication.spec.js`. This test requires a setup step where a customer (from Task 4) submits an inquiry for a property created by the agent (from Task 5). 1. **Check Inquiry**: Log in as the agent, navigate to the inquiries section, and assert that the new inquiry is present. 2. **Respond to Inquiry**: Open the inquiry and submit a response. Assert the response is logged in the communication history. 3. **Verify Analytics**: Navigate to the main agent dashboard and assert that analytics widgets (e.g., 'Total Views', 'Inquiry Count') are present and display numerical data.
+
+# Test Strategy:
+This test validates the end-to-end flow from customer inquiry to agent response. The test passes if the agent can successfully view and respond to an inquiry generated in a previous test step.

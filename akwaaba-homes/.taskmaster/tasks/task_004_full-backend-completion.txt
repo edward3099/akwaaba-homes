@@ -1,0 +1,49 @@
+# Task ID: 4
+# Title: Agent Management and Verification System
+# Status: pending
+# Dependencies: 1, 2, 3
+# Priority: high
+# Description: Implement a comprehensive system for managing real estate agents, including an application and verification workflow, profile management, property assignment, and performance tracking, utilizing Supabase for all backend operations.
+# Details:
+First, use Context7 to research industry-standard agent verification workflows and data requirements. Develop a multi-step agent application form in the Next.js frontend that captures personal details, real estate license number, brokerage information, and relevant experience, saving submissions to the `agent_applications` table. Create a secure, admin-only dashboard to review, approve, or reject these applications. Upon approval, a Supabase Edge Function should trigger to update the user's role in the `profiles` table to 'agent', granting them access to agent-specific sections of the application. Implement a profile management page for verified agents to update their bio, contact information, and profile picture. Integrate with the property management system (from Task 3) to allow admins to assign properties to specific agents. Finally, build a basic performance dashboard for agents to view their assigned listings and for admins to get an overview of agent activity.
+
+# Test Strategy:
+Verify the application flow by submitting a new agent application as a standard user and confirming the record is created in the `agent_applications` table with a 'pending' status. Log in as an admin, navigate to the verification dashboard, and test both the 'approve' and 'reject' functionalities, ensuring the application status updates correctly. For an approved application, confirm the user's role is elevated to 'agent' and they can access the agent dashboard. Test the agent profile page by having the newly approved agent update their details and verifying the changes persist in the `profiles` table. As an admin, assign a property to the agent and confirm the foreign key relationship is correctly set in the `properties` table. Finally, test security by attempting to access the admin verification dashboard as a non-admin user and confirming access is denied.
+
+# Subtasks:
+## 1. Design and Implement Agent Application Schema and RLS [pending]
+### Dependencies: None
+### Description: Define and create the `agent_applications` table in Supabase to store agent submission data. Implement Row Level Security (RLS) policies to ensure users can only create their own application and admins can view all applications.
+### Details:
+The schema should include fields for personal details, real estate license number, brokerage information, experience, and a status column (e.g., 'pending', 'approved', 'rejected'). RLS policies are critical for security.
+
+## 2. Develop Frontend Agent Application Form [pending]
+### Dependencies: 4.1
+### Description: Build a multi-step agent application form in the Next.js frontend. The form should collect all necessary information and submit it to the `agent_applications` table in Supabase.
+### Details:
+The form should capture personal details, real estate license number, brokerage information, and relevant experience. Implement client-side and server-side validation for the submitted data.
+
+## 3. Create Admin Dashboard for Application Verification [pending]
+### Dependencies: 4.1, 4.2
+### Description: Develop a secure, admin-only dashboard to review pending agent applications. The dashboard must allow admins to view application details and approve or reject them.
+### Details:
+The UI should fetch and display records from the `agent_applications` table where the status is 'pending'. Implement buttons for 'Approve' and 'Reject' that update the status of the application record in the database. This dashboard should be protected by role-based access control.
+
+## 4. Implement Supabase Edge Function for Role Promotion [pending]
+### Dependencies: 4.3
+### Description: Create a Supabase Edge Function that triggers when an agent application's status is updated to 'approved'. This function will update the corresponding user's role in the `profiles` table to 'agent'.
+### Details:
+The function can be triggered via a database webhook on the `agent_applications` table. It needs to securely handle the logic to find the user's profile based on the application data and update their role, granting them access to agent-specific features.
+
+## 5. Build Agent Profile Management Page [pending]
+### Dependencies: 4.4
+### Description: Implement a dedicated profile management page for verified agents. This page will allow agents to update their personal and professional information, which will be displayed publicly.
+### Details:
+Agents should be able to edit their bio, contact information, and upload/change their profile picture using Supabase Storage. This page should only be accessible to users with the 'agent' role.
+
+## 6. Develop Agent Performance and Listings Dashboard [pending]
+### Dependencies: 4.4, 4.5
+### Description: Build a basic dashboard for agents to view their assigned property listings and for admins to get an overview of agent activity and property assignments.
+### Details:
+For agents, the dashboard will display a list of properties assigned to them, integrating with the property management system. For admins, it will provide a high-level view of all agents and their number of assigned listings.
+

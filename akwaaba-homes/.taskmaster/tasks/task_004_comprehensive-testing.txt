@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Configure Playwright for AkwaabaHomes Environment
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Configure `playwright.config.ts` to target different browsers, emulate mobile devices, and set up base URLs for local and staging environments.
+# Details:
+Modify `playwright.config.ts`. Set the `baseURL` using environment variables (e.g., `process.env.BASE_URL || 'http://localhost:3000'`). Configure the `projects` array to include configurations for 'chromium', 'firefox', 'webkit', 'Mobile Chrome' (using `devices['Pixel 5']`), and 'Mobile Safari' (using `devices['iPhone 13']`).
+
+# Test Strategy:
+Run a simple test against each configured project (`npx playwright test --project="Mobile Chrome"`). Verify that the test runs using the specified browser or device emulation and targets the correct `baseURL`.

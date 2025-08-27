@@ -1,4 +1,4 @@
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 import AgentPageClient from './AgentPageClient';
 
 // Mock agent data - in production, fetch based on id

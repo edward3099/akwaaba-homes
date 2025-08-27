@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Automate Security and Role-Based Access Control Tests
+# Status: pending
+# Dependencies: 4, 5, 7
+# Priority: high
+# Description: Develop scripts to verify that authorization rules and role-based access controls are correctly enforced, preventing users from accessing pages and data not permitted for their role.
+# Details:
+Create `tests/security/authorization.spec.js`. 1. **Customer vs. Agent**: Log in as a customer and attempt to navigate directly to the agent dashboard URL (`/agent/dashboard`). Assert redirection to an error page or the login page. 2. **Agent vs. Admin**: Log in as an agent and attempt to navigate to the admin panel URL (`/admin`). Assert access is denied. 3. **Guest vs. Authenticated**: As a non-logged-in user, attempt to access a protected page like 'My Favorites'. Assert redirection to the login page. 4. **Session Test**: Log in, clear session cookies using BrowserMCP commands, refresh the page, and assert the user is logged out.
+
+# Test Strategy:
+This is a negative testing strategy. For each user role, the test attempts to access unauthorized URLs. The test passes if the application correctly returns a 'Forbidden' status or redirects the user as expected.

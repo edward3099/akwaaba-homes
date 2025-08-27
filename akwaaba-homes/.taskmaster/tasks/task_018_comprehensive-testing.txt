@@ -1,0 +1,11 @@
+# Task ID: 18
+# Title: Implement API Mocking for Third-Party Services
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Use Playwright's network interception to mock responses from third-party APIs (e.g., maps, payments) for faster and more stable tests.
+# Details:
+In tests that rely on external services, use `page.route()`. For example, to mock a map API: `await page.route('https://maps.googleapis.com/**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockMapData) }));`. This prevents test failures due to external service outages and removes dependencies.
+
+# Test Strategy:
+Run a test that normally calls an external API. Verify in the Playwright trace or logs that the network request was intercepted and fulfilled with the mock response, and confirm the UI displays the mock data correctly.

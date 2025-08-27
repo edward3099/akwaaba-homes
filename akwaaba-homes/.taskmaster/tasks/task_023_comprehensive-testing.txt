@@ -1,0 +1,11 @@
+# Task ID: 23
+# Title: Implement Supabase Backup and Restore Test
+# Status: pending
+# Dependencies: 3
+# Priority: low
+# Description: Create a procedure to test the database backup and restore process, ensuring data integrity.
+# Details:
+This is a procedural test. Write a script that: 1. Uses `supabase db dump` to create a backup of the local database. 2. Runs `supabase db reset` to clear the database. 3. Restores the database from the backup file using `psql`. 4. Runs a lightweight set of validation queries (e.g., `SELECT COUNT(*) FROM properties`) to ensure the data has been restored correctly.
+
+# Test Strategy:
+The test is successful if the data count and key records in the database after the restore match the state before the backup was taken.

@@ -19,7 +19,7 @@ import {
   Search,
   ArrowUpDown
 } from 'lucide-react';
-import { Property, SearchFilters, CurrencyCode } from '@/lib/types';
+import { Property, SearchFilters, CurrencyCode } from '@/lib/types/index';
 
 // Extended mock data for search results
 const mockProperties: Property[] = [
@@ -520,9 +520,9 @@ function SearchResults() {
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <PropertyCard
+                  <PropertyCard 
                     key={property.id}
-                    property={property}
+                    property={property} 
                     viewMode={viewMode}
                     showCurrency={currency}
                     onContact={handleContact}

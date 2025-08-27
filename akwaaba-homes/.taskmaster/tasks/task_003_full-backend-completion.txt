@@ -1,0 +1,55 @@
+# Task ID: 3
+# Title: Implement Property Management System with CRUD Functionality
+# Status: pending
+# Dependencies: 1, 2
+# Priority: high
+# Description: Develop a comprehensive property management system featuring full CRUD (Create, Read, Update, Delete) operations for real estate properties. This includes advanced features like search, filtering, pagination, image handling, status tracking, and agent assignment, all integrated with Supabase.
+# Details:
+Begin by using Context7 to research best practices for real estate property management dashboards and data models. Implement a dedicated module in the Next.js application for property management. Create a multi-step form for adding new properties, capturing all fields defined in the `properties` schema (Task 1), including a multi-image uploader that uses Supabase Storage and links to the `property_images` table. Develop a main property listing page with server-side pagination, robust search functionality (by address, city, etc.), and filters (by price, status, beds/baths). The 'Update' functionality should pre-populate the form with existing data. Implement a soft-delete mechanism by updating a `status` column. All database interactions must be performed through secure server-side functions using the Supabase client, respecting the Row Level Security policies. The agent assignment feature should allow an admin to select a user with an 'agent' role from a searchable list and associate them with the property.
+
+# Test Strategy:
+Verify the 'Create' functionality by submitting the new property form and confirming the data's existence and correctness in the `properties` and `property_images` tables in Supabase. Test the 'Read' functionality by checking if the property list paginates correctly and if search and filter queries return the expected results. For 'Update', modify an existing property's details (e.g., price, assigned agent) and verify the changes are persisted and reflected in the UI. Test the 'Delete' function by soft-deleting a property and ensuring it is no longer visible on the main list but its status is updated in the database. Conduct security testing by attempting to modify or delete properties as an unauthorized user, confirming that RLS policies prevent the actions.
+
+# Subtasks:
+## 1. Setup Property Management Module and Routes [pending]
+### Dependencies: None
+### Description: Create the foundational file structure, routing (e.g., /admin/properties, /admin/properties/new, /admin/properties/[id]/edit), and shared layout components for the property management section within the Next.js application.
+### Details:
+Establish a dedicated directory like `app/admin/properties/`. Set up the necessary `page.tsx`, `layout.tsx`, and `loading.tsx` files. This provides the basic structure for all other property management features.
+
+## 2. Develop Reusable Multi-Image Uploader Component [pending]
+### Dependencies: 3.1
+### Description: Build a self-contained React component for handling multiple file uploads. The component will interface with Supabase Storage to upload images and return an array of file paths for database insertion.
+### Details:
+Component should feature drag-and-drop support, image previews, and progress indicators. It must handle API calls to a server-side route that securely uploads files to a designated Supabase Storage bucket.
+
+## 3. Implement 'Create Property' Form and API [pending]
+### Dependencies: 3.1, 3.2
+### Description: Develop the multi-step form for adding new properties, capturing all fields from the `properties` schema. Create a secure server-side API endpoint to handle form submission, validate data, and insert records into the `properties` and `property_images` tables in Supabase.
+### Details:
+The form should integrate the multi-image uploader component. The server-side function will process the main property data and the image URLs from the uploader, creating linked records in the respective tables.
+
+## 4. Develop Property Listing Page with Search, Filter & Pagination [pending]
+### Dependencies: 3.3
+### Description: Create the main property dashboard page that displays a list of all properties. Implement server-side pagination, a search bar (for address, city), and filters (for status, price, beds/baths) to allow for efficient data browsing.
+### Details:
+Data fetching must be done on the server using the Supabase client. Search and filter parameters should be managed via URL query strings to allow for shareable links. The UI should include controls for navigating between pages.
+
+## 5. Implement 'Update Property' Form and API [pending]
+### Dependencies: 3.3, 3.4
+### Description: Create the functionality to edit an existing property. This involves building a form, pre-populating it with the selected property's data, and creating a secure server-side API endpoint to handle the update operation in Supabase.
+### Details:
+The update form should reuse the components from the 'Create Property' form. The API endpoint will receive the property ID and the updated data, validate it, and perform an `update` operation on the corresponding row in the `properties` table.
+
+## 6. Implement Soft-Delete Logic for Properties [pending]
+### Dependencies: 3.4
+### Description: Implement the soft-delete mechanism. This involves creating a server-side function that updates a property's `status` column (e.g., to 'archived') instead of permanently deleting the record from the database.
+### Details:
+Add a 'Delete' or 'Archive' button to the property listing page or details page. The action should trigger a confirmation modal before calling the server-side function. Update the property listing query to exclude records with the 'archived' status by default.
+
+## 7. Implement Agent Assignment Feature [pending]
+### Dependencies: 3.4
+### Description: Develop the UI and backend logic for assigning an agent to a property. This includes a searchable dropdown or modal for selecting a user with an 'agent' role and a server-side function to update the `agent_id` on the property record.
+### Details:
+The assignment UI should be placed on the property edit page or property list. The backend needs a secure endpoint to fetch a list of users with the 'agent' role. The update function will associate the selected agent's user ID with the property's foreign key field.
+

@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: E2E Test: Authenticated Customer - Favorites and Saved Searches
+# Status: pending
+# Dependencies: 6, 8
+# Priority: medium
+# Description: Write tests to verify that a logged-in customer can add/remove properties to their favorites and save search criteria.
+# Details:
+Create `tests/customer/favorites.spec.ts`. This test will use the authenticated state from the global setup. It will navigate to a property, click the 'favorite' button, then navigate to the user's profile/dashboard and assert that the property is listed in their favorites.
+
+# Test Strategy:
+The test should pass if the favorited property appears on the favorites page and disappears after being unfavorited. A page reload should be used to ensure the state is persisted in the database.

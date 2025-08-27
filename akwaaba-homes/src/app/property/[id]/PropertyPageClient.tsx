@@ -27,7 +27,7 @@ import {
   Share2,
   Mail
 } from 'lucide-react';
-import { Property, CurrencyCode } from '@/lib/types';
+import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
 import { InspectionScheduler } from '@/components/property/InspectionScheduler';
 
@@ -136,6 +136,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                     src={property.images[currentImageIndex]}
                     alt={`${property.title} - Image ${currentImageIndex + 1}`}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
                     className="object-cover"
                   />
                   

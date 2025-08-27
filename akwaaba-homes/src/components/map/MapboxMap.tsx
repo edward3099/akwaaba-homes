@@ -12,7 +12,7 @@ import {
   Maximize2,
   Layers
 } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 
 interface MapboxMapProps {
   coordinates: {

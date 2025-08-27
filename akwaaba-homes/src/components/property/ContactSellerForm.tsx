@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { X, Send, User, Mail, Phone, MessageSquare } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 
 interface ContactSellerFormProps {
   property: Property;

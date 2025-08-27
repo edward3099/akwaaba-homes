@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Automate Customer Public Flow Tests (Search, Filter, View)
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create BrowserMCP test scripts to validate the core property discovery experience for non-authenticated users, including searching by location, applying filters, and viewing property details and image galleries.
+# Details:
+Create a test file `tests/customer/public_flows.spec.js`. Implement test cases for: 1. **Property Search**: Navigate to the homepage, enter a location like 'Accra' into the search bar, submit, and assert that the results page shows relevant properties. 2. **Filter Application**: On the results page, apply filters for price, bedrooms, and amenities. Assert that the results update and match the selected criteria. 3. **View Details**: Click on a property listing, and on the detail page, assert that the title, description, image gallery, and map are present and loaded correctly.
+
+# Test Strategy:
+Execute the test suite and verify all assertions pass. Manually cross-reference the automated test results with the actual website functionality to ensure the scripts accurately reflect user interactions.

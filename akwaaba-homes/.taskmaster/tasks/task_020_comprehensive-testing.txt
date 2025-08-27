@@ -1,0 +1,11 @@
+# Task ID: 20
+# Title: Write Basic Security Tests
+# Status: pending
+# Dependencies: 8, 12
+# Priority: medium
+# Description: Create tests to check for common security vulnerabilities like unauthorized access and insecure form handling.
+# Details:
+1. **Authorization Test:** As a regular user, attempt to navigate directly to an admin-only URL (e.g., `/admin/dashboard`). Assert that the response is a 403 Forbidden or a redirect to the login page. 2. **XSS Test:** In a form input (e.g., property description), enter a simple XSS payload like `<script>alert('xss')</script>`. Submit the form and assert that the script is not executed (i.e., no alert appears) and the output is properly sanitized.
+
+# Test Strategy:
+The authorization test passes if the user is blocked from accessing the admin page. The XSS test passes if the application does not execute the injected script when displaying the submitted content.

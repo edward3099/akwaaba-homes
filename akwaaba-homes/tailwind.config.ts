@@ -7,6 +7,10 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      'xs': '475px',
+      '2xs': '375px', // Extra small mobile devices
+    },
     extend: {
       colors: {
         background: "hsl(var(--background))",

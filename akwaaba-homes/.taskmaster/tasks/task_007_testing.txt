@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Automate Admin Management and Moderation Tests
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Create test scripts for the admin dashboard, focusing on user account management, property listing approval/rejection, and managing featured properties.
+# Details:
+Create `tests/admin/moderation.spec.js`. Log in as an admin. 1. **Approve/Reject Property**: Navigate to the queue of pending property submissions. Find the property created by the agent in Task 5. First, test the 'Approve' flow and assert the property becomes publicly visible. Second, create another property and test the 'Reject' flow, asserting it does not become public. 2. **Manage Users**: Go to the user management panel, search for a test customer account, and perform an action like 'Deactivate'. Assert the user can no longer log in.
+
+# Test Strategy:
+Verify state changes across the application. When an admin approves a property, a subsequent step should check the public website to confirm it's visible. When a user is deactivated, a subsequent step should attempt to log in as that user and assert failure.

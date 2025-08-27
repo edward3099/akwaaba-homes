@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Setup BrowserMCP Test Environment and Configuration
+# Status: in-progress
+# Dependencies: None
+# Priority: high
+# Description: Configure the testing framework using BrowserMCP to run automated tests against the Akwaaba Homes platform. This includes setting up the project structure, environment variables for different user roles, and base test configurations.
+# Details:
+1. Install BrowserMCP CLI: `npm install -g @browsermcp/cli`. 2. Initialize a new project: `bmcp init akwaaba-testing`. 3. Configure `browsermcp.config.js` with the staging `baseUrl` and browser settings. 4. Define environment variables for customer, agent, and admin credentials (e.g., `CUSTOMER_USER`, `CUSTOMER_PASS`). 5. Create a test directory structure: `/tests/customer`, `/tests/agent`, `/tests/admin`, and `/tests/shared`. 6. Implement a reusable login function in `/tests/shared/auth.js` to be used across different test suites.
+
+# Test Strategy:
+Create and run a single test that navigates to the Akwaaba Homes homepage and asserts that the page title is correct. Successful execution of this test validates the entire setup.

@@ -1,0 +1,11 @@
+# Task ID: 25
+# Title: Configure Test Reporting and Analytics
+# Status: pending
+# Dependencies: 24
+# Priority: medium
+# Description: Finalize the configuration of the Playwright HTML reporter and document the process for analyzing test results and failures.
+# Details:
+Ensure the `playwright.config.ts` is configured to always generate the HTML reporter: `reporter: 'html'`. The CI pipeline should be set to archive this report. Document for the team how to access and interpret the report, especially the trace viewer, which provides a detailed, step-by-step debugging experience for failed tests.
+
+# Test Strategy:
+Intentionally cause a test to fail and run the CI pipeline. Download the resulting HTML report artifact. Verify that the report correctly marks the failed test and that the trace file can be opened and inspected to diagnose the failure.

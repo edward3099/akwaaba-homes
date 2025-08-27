@@ -1,0 +1,43 @@
+# Task ID: 24
+# Title: Integrate Tests into CI/CD Pipeline (GitHub Actions)
+# Status: pending
+# Dependencies: 22
+# Priority: high
+# Description: Create a GitHub Actions workflow to automatically run the entire test suite on every push and pull request.
+# Details:
+Create a file at `.github/workflows/playwright.yml`. The workflow should define jobs that: 1. Check out the code. 2. Set up Node.js. 3. Install npm dependencies. 4. Install Playwright browsers. 5. Set up and start the Supabase local environment. 6. Run all tests using `npx playwright test`. 7. Upload the Playwright HTML report as a build artifact using `actions/upload-artifact`.
+
+# Test Strategy:
+Push a commit or open a pull request. Verify that the GitHub Action is triggered, runs through all the steps, and reports a 'success' or 'failure' status. Check that the test report artifact is available for download on a successful run.
+
+# Subtasks:
+## 1. Define Workflow Trigger and Base Job Setup [pending]
+### Dependencies: None
+### Description: Create the `.github/workflows/playwright.yml` file and define the basic structure, including the workflow name, triggers for push and pull requests, and the initial job configuration.
+### Details:
+In the new `playwright.yml` file, set the `name` for the workflow. Configure the `on` key to trigger the workflow for `push` and `pull_request` events on the `main` branch. Define a single job named `test` that `runs-on: ubuntu-latest`.
+
+## 2. Add Steps for Code Checkout, Node Setup, and Caching [pending]
+### Dependencies: 24.1
+### Description: Add the foundational steps to the workflow job for checking out the repository code, setting up the correct Node.js environment, and caching dependencies to speed up subsequent runs.
+### Details:
+Use the `actions/checkout@v3` action to fetch the code. Use `actions/setup-node@v3` to configure the required Node.js version. Implement `actions/cache@v3` to cache the npm directory based on the `package-lock.json` file hash. Finally, add a step to run `npm ci` to install all dependencies.
+
+## 3. Install Supabase CLI and Start Local Environment [pending]
+### Dependencies: 24.2
+### Description: Add steps to the workflow to install the Supabase CLI and start the local development environment. This ensures the database and other services are running before the tests begin.
+### Details:
+Add a `run` step to install the Supabase CLI via npm: `npm install supabase --save-dev`. Follow this with a step to execute `npx supabase start`. Ensure the workflow waits for this command to complete successfully.
+
+## 4. Add Step to Run Playwright Tests [pending]
+### Dependencies: 24.3
+### Description: Incorporate the command to execute the entire Playwright test suite. This step includes installing the necessary browser binaries required by Playwright.
+### Details:
+Add a step to run `npx playwright install --with-deps` to ensure all browsers and system dependencies are installed in the CI runner. Then, add the main test execution step: `npx playwright test`.
+
+## 5. Add Step to Upload Test Report Artifact [pending]
+### Dependencies: 24.4
+### Description: Configure the workflow to upload the generated Playwright HTML report as a build artifact, making it accessible for review after the workflow completes.
+### Details:
+Use the `actions/upload-artifact@v3` action. Set the `if: always()` condition to ensure the report is uploaded even if the test step fails. Configure the artifact `name` as `playwright-report` and the `path` to the `playwright-report/` directory.
+

@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: DB Test: Validate Admin RLS Policies
+# Status: pending
+# Dependencies: 11, 12
+# Priority: medium
+# Description: Write database tests to confirm that admin users have the correct elevated privileges to manage all users and properties as defined by RLS policies.
+# Details:
+Similar to the agent RLS test, use a Node.js script to connect to the database. Authenticate as an admin role. Perform `SELECT`, `UPDATE`, and `DELETE` operations on data owned by various users (agents, customers). Assert that all operations succeed as expected, confirming the admin's override capabilities.
+
+# Test Strategy:
+The test passes if the admin role can successfully perform CRUD operations on records belonging to any user, while non-admin roles are restricted by their respective policies.

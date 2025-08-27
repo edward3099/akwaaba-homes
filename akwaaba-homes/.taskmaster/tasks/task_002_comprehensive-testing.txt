@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Set Up Supabase Local Development Environment
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Install the Supabase CLI and initialize a local Supabase instance to provide a sandboxed environment for database and backend testing.
+# Details:
+Install the Supabase CLI following the official documentation (e.g., via Homebrew, Scoop, or npm). In the project root, run `supabase init` to create the `/supabase` directory. Start the local instance with `supabase start`. This will spin up Docker containers for Postgres, GoTrue, Realtime, Storage, etc., and provide local API keys.
+
+# Test Strategy:
+Confirm that `supabase start` runs without errors and provides a local Studio URL (e.g., http://localhost:54323). Verify that you can connect to the local Postgres database using the provided credentials.

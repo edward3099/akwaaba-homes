@@ -1,0 +1,23 @@
+# Task ID: 10
+# Title: Resolve Infinite Loading in FeaturedProperties Component
+# Status: pending
+# Dependencies: 5, 7
+# Priority: high
+# Description: Investigate and fix the root cause of the infinite loading state in the `FeaturedProperties` component, which is suspected to be related to Supabase connection problems. This fix will ensure that featured properties either display correctly or a proper error state is shown.
+# Details:
+The primary goal is to diagnose and resolve the data fetching issue within the `FeaturedProperties` component. Start by reproducing the issue in a local development environment. Use browser developer tools to inspect the Network tab for any failing or stalled requests to the Supabase API, and check the console for related errors. Review the component's data-fetching logic, likely within a `useEffect` hook, to ensure the Supabase query is correctly formed and that promises are properly handled with async/await. The fix may involve correcting the Supabase query, adjusting Row Level Security (RLS) policies to allow public read access for featured properties, or fixing incorrect environment variables. As part of the fix, implement robust state management to handle loading, error, and empty states gracefully, preventing the UI from getting stuck.
+
+# Test Strategy:
+To verify the fix, first clear the browser cache and navigate to the page containing the `FeaturedProperties` component; confirm that it now loads and displays the properties correctly without getting stuck. Next, test the error handling by simulating a network failure or temporarily using an invalid Supabase API key; verify that a user-friendly error message is displayed instead of an infinite loader. To test the empty state, configure the database to have no properties marked as 'featured' and confirm the component shows an appropriate message like 'No featured properties available.' Finally, perform a brief regression check on other key components that fetch data from Supabase to ensure the fix has not introduced any side effects.
+
+# Subtasks:
+## 1. Implement temporary mock data fix [pending]
+### Dependencies: None
+### Description: Replace failing API call with mock data to resolve infinite loading issue
+### Details:
+- Temporarily replaced useProperties hook with local state management
+- Added mock featured properties data (2 sample properties)
+- Fixed useEffect dependency issue that was causing infinite re-renders
+- Component now loads successfully with mock data
+- Next step: investigate and fix underlying Supabase connection issue
+

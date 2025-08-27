@@ -19,15 +19,15 @@ import {
   ArrowRight,
   Award,
   Globe,
-  Grid3X3,
-  List,
   Bed,
   Bath,
   Square,
   Clock,
-  MessageCircle
+  MessageCircle,
+  Grid3X3,
+  List
 } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
 
 interface Agent {
@@ -64,7 +64,6 @@ interface AgentPageClientProps {
 }
 
 export default function AgentPageClient({ agent, properties }: AgentPageClientProps) {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState<'about' | 'properties'>('properties');
   const [currency] = useState<'GHS'>('GHS');
 
@@ -100,6 +99,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                   src={agent.coverImage} 
                   alt={`${agent.name} cover image`} 
                   fill 
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/40"></div>
@@ -210,22 +210,53 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                         <h3 className="text-lg sm:text-xl font-semibold">Properties by {agent.name}</h3>
                         <p className="text-gray-600 text-sm">{properties.length} properties available</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('grid')}>
-                          <Grid3X3 className="w-4 h-4" />
-                        </Button>
-                        <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('list')}>
-                          <List className="w-4 h-4" />
-                        </Button>
-                      </div>
                     </div>
 
-                    {viewMode === 'grid' ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                        {properties.map((property) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                      {properties.map((property) => {
+                        // Ensure images array exists and has valid URLs
+                        const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
+                          ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '')
+                          : [];
+                        
+                        // Use a fallback image if no valid images are available
+                        const propertyImage = validImages.length > 0 ? validImages[0] : '/placeholder-property.svg';
+                        
+                        return (
                           <div key={property.id} className="bg-gray-50 rounded-lg overflow-hidden border hover:shadow-md transition-shadow">
                             <div className="relative h-24 sm:h-28">
-                              <Image src={property.images[0]} alt={property.title} fill className="object-cover" />
+                              <Image 
+                                src={propertyImage} 
+                                alt={property.title} 
+                                fill 
+                                className="object-cover"
+                                onError={(e) => {
+                                  console.error('Image failed to load:', propertyImage);
+                                  // Fallback to placeholder if image fails
+                                  const target = e.target as HTMLImageElement;
+                                  if (target) {
+                                    // Try to set placeholder, but if that also fails, create a simple fallback
+                                    target.onerror = null; // Prevent infinite loop
+                                    target.src = '/placeholder-property.svg';
+                                    
+                                    // If placeholder also fails, create a simple colored div as fallback
+                                    target.onerror = () => {
+                                      target.style.display = 'none';
+                                      const fallbackDiv = document.createElement('div');
+                                      fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                                      fallbackDiv.innerHTML = `
+                                        <div class="text-center text-slate-600">
+                                          <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                          </svg>
+                                          <p class="text-sm">Image unavailable</p>
+                                        </div>
+                                      `;
+                                      target.parentNode?.insertBefore(fallbackDiv, target);
+                                    };
+                                  }
+                                }}
+                              />
                               <div className="absolute top-1 right-1">
                                 <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">{property.tier}</Badge>
                               </div>
@@ -243,37 +274,9 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                               </Link>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {properties.map((property) => (
-                          <div key={property.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
-                            <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
-                              <Image src={property.images[0]} alt={property.title} fill className="object-cover rounded-lg" />
-                              <div className="absolute top-1 right-1">
-                                <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">{property.tier}</Badge>
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{property.title}</h4>
-                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{property.description}</p>
-                              <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                <span className="flex items-center gap-1"><Bed className="w-4 h-4" />{property.specifications.bedrooms}</span>
-                                <span className="flex items-center gap-1"><Bath className="w-4 h-4" />{property.specifications.bathrooms}</span>
-                                <span className="flex items-center gap-1"><Square className="w-4 h-4" />{property.specifications.size} {property.specifications.sizeUnit}</span>
-                              </div>
-                              <div className="text-lg font-bold text-primary">{formatDiasporaPrice(property.price, currency).primary}</div>
-                            </div>
-                            <div className="flex flex-col justify-center">
-                              <Link href={`/property/${property.id}`}>
-                                <Button variant="outline" size="sm">View Details<ArrowRight className="w-4 h-4 ml-2" /></Button>
-                              </Link>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>

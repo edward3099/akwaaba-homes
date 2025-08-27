@@ -1,0 +1,37 @@
+# Task ID: 11
+# Title: DB Test: Validate Agent Row-Level Security (RLS) Policies
+# Status: pending
+# Dependencies: 3, 10
+# Priority: high
+# Description: Write database-level tests to ensure agents can only view and modify their own property listings.
+# Details:
+Create a test script using a Node.js test runner (like Jest or Vitest) and a Postgres client library (e.g., `pg`). The script will connect to the local Supabase Postgres. It will create two agents and two properties (one for each). Then, it will authenticate as Agent 1 and attempt to `UPDATE` or `DELETE` the property belonging to Agent 2, asserting that the operation fails and returns 0 rows.
+
+# Test Strategy:
+The test passes if the authenticated agent can successfully modify their own data but receives an error or zero-row update when attempting to modify another agent's data.
+
+# Subtasks:
+## 1. Setup Database Test Framework [pending]
+### Dependencies: None
+### Description: Install and configure a Node.js test runner (e.g., Vitest) and the `pg` client library. Establish a reusable connection module or helper function to connect to the local Supabase Postgres instance for testing purposes.
+### Details:
+The setup should include environment variable configuration for database credentials and a base test file that confirms a successful connection can be made before any tests are run.
+
+## 2. Implement Test Data Seeding and Teardown Logic [pending]
+### Dependencies: 11.1
+### Description: Write a script that runs before the tests to create the necessary test data, including two distinct agent users and a property listing for each. Implement a teardown process to clean up the database after tests complete.
+### Details:
+The seeding script should insert records into the `users` and `properties` tables. The user records should be created in a way that allows the test runner to impersonate them (e.g., by knowing their user ID). The teardown should use `TRUNCATE` or `DELETE` with a `CASCADE` option if appropriate.
+
+## 3. Write Test for Agent Successfully Modifying Own Property [pending]
+### Dependencies: 11.2
+### Description: Create a test case that authenticates as the first test agent and executes an `UPDATE` statement on the property they own. The test must assert that the update operation succeeds and reports that exactly one row was affected.
+### Details:
+The test will need to use a database client that is configured to run under the security context of the test agent. This is typically done in Postgres using `SET ROLE` or a similar mechanism provided by the Supabase client library.
+
+## 4. Write Test for Agent Blocked from Modifying Another's Property [pending]
+### Dependencies: 11.2
+### Description: Create a test case that authenticates as the first test agent and attempts to execute an `UPDATE` or `DELETE` statement on the property owned by the second test agent. The test must assert that the operation is blocked by the RLS policy.
+### Details:
+The assertion should check that the database operation returns 0 for the number of rows affected. This confirms the RLS policy correctly prevented the unauthorized modification. The test should not expect a thrown error unless the policy is configured to do so.
+

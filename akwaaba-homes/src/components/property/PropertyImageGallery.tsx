@@ -58,6 +58,7 @@ export function PropertyImageGallery({ images, title, videos, virtualTour }: Pro
           src={media.url}
           alt={`${title} - Image ${index + 1}`}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
           className="object-cover"
           priority={index === 0}
         />
