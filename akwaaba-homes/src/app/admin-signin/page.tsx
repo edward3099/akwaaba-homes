@@ -6,18 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { Loader2, Eye, EyeOff, Mail, Lock, CheckCircle, AlertCircle, Info, Shield, Building2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 function AdminSignInForm() {
-  const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: 'admin@akwaabahomes.com',
+    password: 'adminpassword123'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,10 +56,8 @@ function AdminSignInForm() {
     e.preventDefault();
     
     if (!formData.email || !formData.password) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
+      toast.error('Validation Error', {
+        description: 'Please fill in all fields'
       });
       return;
     }
@@ -67,35 +65,48 @@ function AdminSignInForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/admin-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      // Use client-side Supabase authentication directly
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+      if (!data.user) {
+        throw new Error('Authentication failed');
+      }
+
+      // Check if user has admin role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_role, is_verified')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error('User profile not found. Please contact support.');
+      }
+
+      if (profile.user_role !== 'admin') {
+        // Sign out the user since they're not an admin
+        await supabase.auth.signOut();
+        throw new Error('Access denied. Admin privileges required.');
       }
 
       // Successful admin login
-      toast({
-        title: "Admin Access Granted",
-        description: "Welcome to the Admin Portal!",
+      toast.success('Admin Access Granted', {
+        description: 'Welcome to the Admin Portal!'
       });
 
       // Redirect to admin dashboard
       router.push('/admin');
-
     } catch (error) {
       console.error('Login error:', error);
-      toast({
-        title: "Login Failed",
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
-        variant: "destructive"
+      toast.error('Login Failed', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
     } finally {
       setLoading(false);

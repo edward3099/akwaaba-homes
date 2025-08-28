@@ -194,15 +194,43 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             <div className="bg-white rounded-lg p-4 sm:p-6 border text-center">
               <p className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Interested in this property?</p>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-                <Button className="flex-1 sm:flex-none text-sm sm:text-base" size="sm">
+                <Button 
+                  className="flex-1 sm:flex-none text-sm sm:text-base" 
+                  size="sm"
+                  onClick={() => {
+                    // Open phone dialer
+                    window.open(`tel:${property.seller.phone}`, '_self');
+                  }}
+                >
                   <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Call Now
                 </Button>
-                <Button variant="outline" className="flex-1 sm:flex-none text-sm sm:text-base" size="sm">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 sm:flex-none text-sm sm:text-base" 
+                  size="sm"
+                  onClick={() => {
+                    // Open WhatsApp with pre-filled message
+                    const message = `Hi, I'm interested in ${property.title} at ${property.location.address}, ${property.location.city}. Can you provide more details?`;
+                    const whatsappUrl = `https://wa.me/${property.seller.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                  }}
+                >
                   <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" className="flex-1 sm:flex-none text-sm sm:text-base" size="sm">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 sm:flex-none text-sm sm:text-base" 
+                  size="sm"
+                  onClick={() => {
+                    // Open email client with pre-filled subject and body
+                    const subject = `Inquiry about ${property.title}`;
+                    const body = `Hi,\n\nI'm interested in ${property.title} at ${property.location.address}, ${property.location.city}.\n\nCan you provide more details about this property?\n\nThank you.`;
+                    const mailtoUrl = `mailto:${property.seller.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.open(mailtoUrl, '_self');
+                  }}
+                >
                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Email
                 </Button>

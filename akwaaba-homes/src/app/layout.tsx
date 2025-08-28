@@ -4,6 +4,7 @@ import "./globals.css";
 import "../styles/accessibility.css";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/lib/auth/authContext";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const poppins = Poppins({ 
@@ -24,11 +25,6 @@ export const metadata: Metadata = {
     locale: "en_US",
   },
 };
-
-// Simple Toaster component
-function Toaster() {
-  return null; // Placeholder for now
-}
 
 export default function RootLayout({
   children,
@@ -60,7 +56,30 @@ export default function RootLayout({
           <main id="main-content" role="main" tabIndex={-1}>
             {children}
           </main>
-          <Toaster />
+          
+          {/* Ghana-themed Sonner Toaster */}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{
+              style: {
+                background: 'var(--ghana-gold, #FFD700)',
+                color: 'var(--ghana-red, #C21807)',
+                border: '2px solid var(--ghana-green, #00A86B)',
+              },
+              className: 'ghana-toast',
+              duration: 5000,
+            }}
+            classNames={{
+              toast: "bg-gradient-to-r from-ghana-gold to-ghana-yellow border-2 border-ghana-green shadow-lg",
+              title: "text-ghana-red font-semibold",
+              description: "text-ghana-dark",
+              actionButton: "bg-ghana-green text-white hover:bg-ghana-green-dark",
+              cancelButton: "bg-ghana-red text-white hover:bg-ghana-red-dark",
+              closeButton: "text-ghana-red hover:text-ghana-red-dark",
+            }}
+          />
         </AuthProvider>
         
         {/* Accessibility Scripts */}

@@ -24,6 +24,8 @@ import { PropertySearchFilters, PropertyFilters } from '@/components/properties/
 import { PropertyPagination } from '@/components/properties/PropertyPagination'
 import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
 import { AgentSelector } from '@/components/ui/AgentSelector'
+import { useApiMutation, useDestructiveMutation } from '@/lib/hooks/useApiMutation'
+import { toast } from 'sonner'
 
 interface Property {
   id: string
@@ -62,8 +64,6 @@ interface PropertyListResponse {
 export default function PropertiesPage() {
   const searchParams = useSearchParams()
   const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -76,25 +76,70 @@ export default function PropertiesPage() {
     isOpen: false,
     propertyId: '',
     propertyTitle: '',
-    isLoading: false
   })
 
   const currentPage = parseInt(searchParams.get('page') || '1')
   const currentLimit = parseInt(searchParams.get('limit') || '20')
+
+  // API mutation hooks
+  const fetchPropertiesMutation = useApiMutation({
+    successMessage: 'Properties loaded successfully',
+    errorMessage: 'Failed to load properties',
+    loadingMessage: 'Loading properties...',
+    onSuccess: (data: PropertyListResponse) => {
+      setProperties(data.properties)
+      setPagination({
+        page: currentPage,
+        limit: currentLimit,
+        total: data.count || 0,
+        totalPages: Math.ceil((data.count || 0) / currentLimit)
+      })
+    }
+  });
+
+  const deletePropertyMutation = useDestructiveMutation({
+    successMessage: 'Property archived successfully',
+    errorMessage: 'Failed to archive property',
+    loadingMessage: 'Archiving property...',
+    confirmationMessage: 'Are you sure you want to archive this property? This action cannot be undone.',
+    confirmationTitle: 'Archive Property',
+    onSuccess: () => {
+      // Remove the property from the local state
+      setProperties(prev => prev.filter(p => p.id !== deleteModal.propertyId))
+      
+      // Close the modal
+      setDeleteModal({
+        isOpen: false,
+        propertyId: '',
+        propertyTitle: '',
+      })
+    }
+  });
+
+  const agentAssignmentMutation = useApiMutation({
+    successMessage: 'Agent assignment updated successfully',
+    errorMessage: 'Failed to update agent assignment',
+    loadingMessage: 'Updating agent assignment...',
+    onSuccess: (data: any, propertyId: string, agentId: string | null) => {
+      // Update the property in local state
+      setProperties(prev => prev.map(p => 
+        p.id === propertyId 
+          ? { ...p, agent_id: agentId }
+          : p
+      ))
+    }
+  });
 
   const handleDeleteClick = (propertyId: string, propertyTitle: string) => {
     setDeleteModal({
       isOpen: true,
       propertyId,
       propertyTitle,
-      isLoading: false
     })
   }
 
   const handleDeleteConfirm = async () => {
-    setDeleteModal(prev => ({ ...prev, isLoading: true }))
-    
-    try {
+    await deletePropertyMutation.executeWithConfirmation(async () => {
       const response = await fetch(`/api/admin/properties/${deleteModal.propertyId}`, {
         method: 'DELETE',
         headers: {
@@ -107,26 +152,8 @@ export default function PropertiesPage() {
         throw new Error(errorData.error || 'Failed to archive property')
       }
 
-      // Remove the property from the local state
-      setProperties(prev => prev.filter(p => p.id !== deleteModal.propertyId))
-      
-      // Close the modal
-      setDeleteModal({
-        isOpen: false,
-        propertyId: '',
-        propertyTitle: '',
-        isLoading: false
-      })
-
-      // Show success message
-      console.log('Property archived successfully')
-
-    } catch (error) {
-      console.error('Error archiving property:', error)
-      // Optionally show error message to user
-    } finally {
-      setDeleteModal(prev => ({ ...prev, isLoading: false }))
-    }
+      return await response.json()
+    })
   }
 
   const handleDeleteCancel = () => {
@@ -134,12 +161,11 @@ export default function PropertiesPage() {
       isOpen: false,
       propertyId: '',
       propertyTitle: '',
-      isLoading: false
     })
   }
 
   const handleAgentAssignment = async (propertyId: string, agentId: string | null): Promise<void> => {
-    try {
+    await agentAssignmentMutation.mutate(async () => {
       const method = agentId ? 'PATCH' : 'DELETE'
       const url = `/api/properties/${propertyId}/assign-agent`
       
@@ -156,26 +182,12 @@ export default function PropertiesPage() {
         throw new Error(errorData.error || 'Failed to update agent assignment')
       }
 
-      // Update the property in local state
-      setProperties(prev => prev.map(p => 
-        p.id === propertyId 
-          ? { ...p, agent_id: agentId }
-          : p
-      ))
-
-      console.log('Agent assignment updated successfully')
-
-    } catch (error) {
-      console.error('Error updating agent assignment:', error)
-      // Optionally show error message to user
-    }
+      return await response.json()
+    }, propertyId, agentId)
   }
 
   const fetchProperties = async (filters: PropertyFilters) => {
-    setLoading(true)
-    setError(null)
-    
-    try {
+    await fetchPropertiesMutation.mutate(async () => {
       const params = new URLSearchParams()
       
       // Add pagination params
@@ -195,22 +207,8 @@ export default function PropertiesPage() {
         throw new Error('Failed to fetch properties')
       }
       
-      const data = await response.json()
-      setProperties(data.properties)
-      
-      // Update pagination based on new API structure
-      setPagination({
-        page: currentPage,
-        limit: currentLimit,
-        total: data.count || 0,
-        totalPages: Math.ceil((data.count || 0) / currentLimit)
-      })
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setLoading(false)
-    }
+      return await response.json()
+    })
   }
 
   useEffect(() => {
@@ -267,7 +265,8 @@ export default function PropertiesPage() {
     }
   }
 
-  if (loading && properties.length === 0) {
+  // Loading state
+  if (fetchPropertiesMutation.isLoading && properties.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="px-6 py-6">
@@ -282,7 +281,8 @@ export default function PropertiesPage() {
     )
   }
 
-  if (error) {
+  // Error state
+  if (fetchPropertiesMutation.error && properties.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="px-6 py-6">
@@ -292,10 +292,43 @@ export default function PropertiesPage() {
                 <Search className="h-12 w-12 mx-auto" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Properties</h3>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>
+              <p className="text-gray-600 mb-4">{fetchPropertiesMutation.error.message}</p>
+              <Button 
+                onClick={() => {
+                  fetchPropertiesMutation.reset()
+                  const filters: PropertyFilters = {
+                    search: searchParams.get('search') || '',
+                    property_type: searchParams.get('property_type') || '',
+                    listing_type: searchParams.get('listing_type') || '',
+                    status: searchParams.get('status') || '',
+                    min_price: searchParams.get('min_price') || '',
+                    max_price: searchParams.get('max_price') || '',
+                    min_bedrooms: searchParams.get('min_bedrooms') || '',
+                    min_bathrooms: searchParams.get('min_bathrooms') || '',
+                    city: searchParams.get('city') || '',
+                    region: searchParams.get('region') || ''
+                  }
+                  fetchProperties(filters)
+                }}
+                className="bg-ghana-green hover:bg-ghana-green-dark text-white"
+              >
                 Try Again
               </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (properties.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading properties...</p>
             </div>
           </div>
         </div>
@@ -421,7 +454,7 @@ export default function PropertiesPage() {
                           selectedAgentId={property.agent_id}
                           onAgentSelect={(agentId) => handleAgentAssignment(property.id, agentId)}
                           placeholder="Assign agent..."
-                          disabled={loading}
+                          disabled={fetchPropertiesMutation.isLoading}
                         />
                       </div>
                     </div>
@@ -484,7 +517,7 @@ export default function PropertiesPage() {
         title="Archive Property"
         description="Are you sure you want to archive this property? This action will hide the property from public view but preserve all data. You can restore it later if needed."
         itemName={deleteModal.propertyTitle}
-        isLoading={deleteModal.isLoading}
+        isLoading={deletePropertyMutation.isLoading}
         variant="warning"
       />
     </div>

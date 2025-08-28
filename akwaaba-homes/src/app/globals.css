@@ -144,6 +144,15 @@
   --verified: oklch(0.627 0.150 142);
   --warning: oklch(0.792 0.150 49);
   --error: oklch(0.627 0.200 0);
+  
+  /* Ghana Flag Colors */
+  --ghana-red: #C21807;
+  --ghana-gold: #FFD700;
+  --ghana-green: #00A86B;
+  --ghana-yellow: #F4E4BC;
+  --ghana-dark: #1a1a1a;
+  --ghana-red-dark: #A01506;
+  --ghana-green-dark: #008A5A;
 }
 
 .dark {

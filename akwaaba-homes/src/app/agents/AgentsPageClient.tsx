@@ -99,7 +99,6 @@ export default function AgentsPageClient() {
         }));
         
         setAgents(sanitizedAgents);
-        console.log('Agents loaded:', sanitizedAgents.length);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch agents');
         console.error('Error fetching agents:', err);

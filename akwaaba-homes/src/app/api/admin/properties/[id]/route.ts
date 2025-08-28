@@ -53,34 +53,16 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid property ID' }, { status: 400 });
     }
 
-    // Fetch property with related data
+    // Fetch property with related data - simplified to avoid JOIN issues
     const { data: property, error } = await supabase
       .from('properties')
       .select(`
         *,
-        users!properties_seller_id_fkey (
-          id,
-          full_name,
-          company_name,
-          phone,
-          email,
-          user_type,
-          is_verified
-        ),
         property_images (
           id,
           image_url,
           is_primary,
           caption
-        ),
-        inquiries (
-          id,
-          buyer_name,
-          buyer_email,
-          buyer_phone,
-          message,
-          status,
-          created_at
         )
       `)
       .eq('id', propertyId)
@@ -97,7 +79,46 @@ export async function GET(
       }, { status: 500 });
     }
 
-    return NextResponse.json({ property });
+    // Fetch seller information separately
+    let propertyWithSeller = property;
+    if (property && property.seller_id) {
+      try {
+        const { data: seller, error: sellerError } = await supabase
+          .from('users')
+          .select('id, full_name, company_name, phone, email, user_type, is_verified')
+          .eq('id', property.seller_id)
+          .single();
+
+        if (!sellerError && seller) {
+          propertyWithSeller = {
+            ...property,
+            seller
+          };
+        }
+      } catch (sellerError) {
+        console.warn('Could not fetch seller information:', sellerError);
+      }
+    }
+
+    // Fetch inquiries separately
+    let propertyWithInquiries = propertyWithSeller;
+    try {
+      const { data: inquiries, error: inquiriesError } = await supabase
+        .from('inquiries')
+        .select('id, buyer_name, buyer_email, buyer_phone, message, status, created_at')
+        .eq('property_id', propertyId);
+
+      if (!inquiriesError && inquiries) {
+        propertyWithInquiries = {
+          ...propertyWithSeller,
+          inquiries
+        };
+      }
+    } catch (inquiriesError) {
+      console.warn('Could not fetch inquiries:', inquiriesError);
+    }
+
+    return NextResponse.json({ property: propertyWithInquiries });
 
   } catch (error) {
     console.error('Error in admin property GET:', error);

@@ -230,7 +230,6 @@ export class RealtimeService {
   ): string {
     const filters = propertyId ? { id: `eq.${propertyId}` } : undefined;
     const defaultCallback: RealtimeCallback = (payload) => {
-      console.log('Property update:', payload);
       // Emit custom event for property updates
       window.dispatchEvent(new CustomEvent('property-update', { detail: payload }));
     };
@@ -252,7 +251,7 @@ export class RealtimeService {
   ): string {
     const filters = sellerId ? { seller_id: `eq.${sellerId}` } : undefined;
     const defaultCallback: RealtimeCallback = (payload) => {
-      console.log('New inquiry:', payload);
+      // Emit custom event for new inquiries
       window.dispatchEvent(new CustomEvent('new-inquiry', { detail: payload }));
     };
 
@@ -273,7 +272,7 @@ export class RealtimeService {
   ): string {
     const filters = chatRoomId ? { chat_room_id: `eq.${chatRoomId}` } : undefined;
     const defaultCallback: RealtimeCallback = (payload) => {
-      console.log('New chat message:', payload);
+      // Emit custom event for new chat messages
       window.dispatchEvent(new CustomEvent('new-chat-message', { detail: payload }));
     };
 
@@ -294,7 +293,7 @@ export class RealtimeService {
   ): string {
     const filters = userId ? { user_id: `eq.${userId}` } : undefined;
     const defaultCallback: RealtimeCallback = (payload) => {
-      console.log('New notification:', payload);
+      // Emit custom event for new notifications
       window.dispatchEvent(new CustomEvent('new-notification', { detail: payload }));
     };
 
@@ -965,22 +964,18 @@ export class RealtimeService {
 
   private async deliverPushNotification(notification: EnhancedNotification): Promise<void> {
     // Implementation for push notifications
-    console.log('Delivering push notification:', notification.id);
   }
 
   private async deliverEmailNotification(notification: EnhancedNotification): Promise<void> {
     // Implementation for email notifications
-    console.log('Delivering email notification:', notification.id);
   }
 
   private async deliverSMSNotification(notification: EnhancedNotification): Promise<void> {
     // Implementation for SMS notifications
-    console.log('Delivering SMS notification:', notification.id);
   }
 
   private async deliverInAppNotification(notification: EnhancedNotification): Promise<void> {
     // Implementation for in-app notifications
-    console.log('Delivering in-app notification:', notification.id);
   }
 
   private async aggregateDashboardUpdates(

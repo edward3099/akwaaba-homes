@@ -235,6 +235,13 @@ export function useAdmin() {
     );
   }, [executeCall]);
 
+  const getProperties = useCallback(async (filters?: Record<string, unknown>) => {
+    return executeCall(
+      () => enhancedApiClient.admin.getProperties(filters),
+      { showToast: false }
+    );
+  }, [executeCall]);
+
   const approveProperty = useCallback(async (id: string, approvalData: unknown) => {
     return executeCall(
       () => enhancedApiClient.admin.approveProperty(id, approvalData),
@@ -288,6 +295,7 @@ export function useAdmin() {
     getUserById,
     updateUser,
     bulkUserActions,
+    getProperties,
     getPropertiesForApproval,
     approveProperty,
     bulkPropertyApproval,

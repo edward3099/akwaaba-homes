@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
 // Validation schema for forgot password data
@@ -26,28 +25,7 @@ export async function POST(request: NextRequest) {
 
     const { email } = validationResult.data;
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createApiRouteSupabaseClient();
 
     // Send password reset email with proper redirect configuration
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

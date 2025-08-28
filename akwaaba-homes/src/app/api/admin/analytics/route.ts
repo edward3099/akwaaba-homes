@@ -1,31 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-          }
-        },
-      },
-    }
-  );
+    const supabase = await createApiRouteSupabaseClient();
     
     // Check if user is authenticated and is admin
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -33,15 +11,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin role
+    // Check if user has admin role - fixed to use correct field names
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role')
-      .eq('id', user.id)
+      .select('user_role, is_verified')
+      .eq('user_id', user.id)
       .single();
 
-    if (profileError || profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (profileError || profile?.user_role !== 'admin') {
+      console.error('Profile check failed:', { profileError, profile, userId: user.id });
+      return NextResponse.json({ error: 'Forbidden - Admin role required' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -50,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Get user growth data
     const { data: userGrowth, error: userError } = await supabase
       .from('profiles')
-      .select('created_at, role')
+      .select('created_at, user_role')
       .gte('created_at', getDateFromTimeRange(timeRange));
 
     // Get property metrics
@@ -120,7 +99,7 @@ function generateUserGrowthData(users: any[], timeRange: string) {
       return userDate <= month.date;
     }).length;
 
-    const agents = monthUsers.filter(user => user.role === 'agent').length;
+    const agents = monthUsers.filter(user => user.user_role === 'agent').length;
     
     return {
       date: month.label,
@@ -212,12 +191,12 @@ async function calculatePlatformStats(supabase: any) {
       .from('properties')
       .select('*', { count: 'exact', head: true });
 
-    // Get active agents
+    // Get active agents - fixed to use correct field names
     const { count: activeAgents } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('role', 'agent')
-      .eq('status', 'active');
+      .eq('user_role', 'agent')
+      .eq('verification_status', 'verified');
 
     // Mock data for now (replace with actual calculations)
     return {

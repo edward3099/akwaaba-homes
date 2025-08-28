@@ -162,6 +162,11 @@ export class AdminApiClient extends BaseApiClient {
     });
   }
 
+  async getProperties(filters?: Record<string, unknown>): Promise<ApiResponse> {
+    const queryParams = filters ? `?${new URLSearchParams(filters as Record<string, string>)}` : '';
+    return this.authenticatedRequest(`/admin/properties${queryParams}`);
+  }
+
   async getPropertiesForApproval(filters?: Record<string, unknown>): Promise<ApiResponse> {
     const queryParams = filters ? `?${new URLSearchParams(filters as Record<string, string>)}` : '';
     return this.authenticatedRequest(`/admin/properties/approval${queryParams}`);

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useRouter } from 'next/navigation';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -102,6 +103,7 @@ export default function AdminOverview() {
   const [stats, setStats] = useState<SystemStats>(defaultStats);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>(mockRecentActivity);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     fetchSystemStats();
@@ -201,7 +203,7 @@ export default function AdminOverview() {
                 <p className="text-sm font-medium text-muted-foreground">Pending Verifications</p>
                 <p className="text-2xl font-bold">{stats.pendingVerifications}</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => router.push('/admin/verifications')}>
                 <Eye className="mr-2 h-4 w-4" />
                 Review
               </Button>
@@ -216,7 +218,7 @@ export default function AdminOverview() {
                 <p className="text-sm font-medium text-muted-foreground">Property Approvals</p>
                 <p className="text-2xl font-bold">{stats.pendingApprovals}</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => router.push('/admin/properties/approvals')}>
                 <Eye className="mr-2 h-4 w-4" />
                 Review
               </Button>
@@ -231,7 +233,7 @@ export default function AdminOverview() {
                 <p className="text-sm font-medium text-muted-foreground">Active Users</p>
                 <p className="text-2xl font-bold">{stats.activeUsers}</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => router.push('/admin/users')}>
                 <Users className="mr-2 h-4 w-4" />
                 View
               </Button>
@@ -287,7 +289,7 @@ export default function AdminOverview() {
               <CardTitle>Recent Activity</CardTitle>
               <CardDescription>Latest system activities and updates</CardDescription>
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => router.push('/admin/activity')}>
               View All
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

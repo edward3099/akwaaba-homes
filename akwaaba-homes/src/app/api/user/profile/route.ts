@@ -50,11 +50,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user profile data
+    // Get user profile data - fixed to use user_id instead of id
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (profileError) {
@@ -142,7 +142,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update profile data
+    // Update profile data - fixed to use user_id instead of id
     const updateData: Record<string, string | number | boolean | string[] | null> = {
       ...validationResult.data,
       updated_at: new Date().toISOString()
@@ -156,7 +156,7 @@ export async function PUT(request: NextRequest) {
     const { data: updatedProfile, error: updateError } = await supabase
       .from('profiles')
       .update(updateData)
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .select()
       .single();
 

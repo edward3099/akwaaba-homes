@@ -185,7 +185,6 @@ function SearchResults() {
     setFilters(newFilters);
     setCurrentPage(1);
     // In a real app, this would make an API call
-    console.log('Searching with filters:', newFilters);
   };
 
   const handleClearFilters = () => {
@@ -225,13 +224,11 @@ function SearchResults() {
     if (selectedPropertyType !== 'All Types') newFilters.type = [selectedPropertyType.toLowerCase() as Property['type']];
     if (selectedPriceRange !== 'Any Price') {
       // Parse price range and add to filters
-      console.log('Price range selected:', selectedPriceRange);
     }
     handleSearch(newFilters);
   };
 
   const handleContact = (property: Property) => {
-    console.log('Contact for property:', property.title);
     // In a real app, you would navigate to a contact page or open a chat
   };
 

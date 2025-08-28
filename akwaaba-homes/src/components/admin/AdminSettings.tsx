@@ -1,613 +1,542 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { 
-  Save,
-  RefreshCw,
-  Settings,
+  Settings, 
+  Save, 
+  Globe, 
+  Shield, 
+  Users, 
+  Building2,
+  Phone,
   Mail,
-  Bell,
-  Shield,
-  Globe,
-  Database,
-  Palette,
-  Smartphone
-} from 'lucide-react';
+  MapPin,
+  Clock,
+  AlertTriangle,
+  CheckCircle
+} from 'lucide-react'
+import { useApiMutation } from '@/lib/hooks/useApiMutation'
+import { toast } from 'sonner'
 
 interface PlatformSettings {
-  siteName: string;
-  siteDescription: string;
-  contactEmail: string;
-  supportPhone: string;
-  commissionRate: number;
-  maxImagesPerProperty: number;
-  enableUserRegistration: boolean;
-  enableAgentApplications: boolean;
-  requireEmailVerification: boolean;
-  enableTwoFactorAuth: boolean;
-  maintenanceMode: boolean;
-  debugMode: boolean;
+  platform: {
+    name: string
+    description: string
+    version: string
+    contact_email: string
+    support_phone: string
+    address: string
+    business_hours: string
+  }
+  features: {
+    user_registration: boolean
+    property_listings: boolean
+    agent_verification: boolean
+    payment_processing: boolean
+    analytics_dashboard: boolean
+    mobile_app: boolean
+  }
+  security: {
+    two_factor_auth: boolean
+    session_timeout: number
+    max_login_attempts: number
+    password_min_length: number
+    require_verification: boolean
+  }
+  notifications: {
+    email_notifications: boolean
+    sms_notifications: boolean
+    push_notifications: boolean
+    admin_alerts: boolean
+  }
+  limits: {
+    max_properties_per_user: number
+    max_images_per_property: number
+    max_file_size_mb: number
+    max_users_per_plan: number
+  }
 }
 
-interface EmailTemplates {
-  welcomeEmail: {
-    subject: string;
-    body: string;
-  };
-  propertyApproved: {
-    subject: string;
-    body: string;
-  };
-  propertyRejected: {
-    subject: string;
-    body: string;
-  };
-  agentApproved: {
-    subject: string;
-    body: string;
-  };
-  agentRejected: {
-    subject: string;
-    body: string;
-  };
+const defaultSettings: PlatformSettings = {
+  platform: {
+    name: 'AkwaabaHomes',
+    description: 'Ghana\'s premier real estate marketplace for diaspora buyers',
+    version: '1.0.0',
+    contact_email: 'admin@akwaabahomes.com',
+    support_phone: '+233 20 123 4567',
+    address: 'Accra, Ghana',
+    business_hours: 'Monday - Friday: 8:00 AM - 6:00 PM GMT'
+  },
+  features: {
+    user_registration: true,
+    property_listings: true,
+    agent_verification: true,
+    payment_processing: false,
+    analytics_dashboard: true,
+    mobile_app: false
+  },
+  security: {
+    two_factor_auth: false,
+    session_timeout: 30,
+    max_login_attempts: 5,
+    password_min_length: 8,
+    require_verification: true
+  },
+  notifications: {
+    email_notifications: true,
+    sms_notifications: false,
+    push_notifications: false,
+    admin_alerts: true
+  },
+  limits: {
+    max_properties_per_user: 10,
+    max_images_per_property: 10,
+    max_file_size_mb: 5,
+    max_users_per_plan: 1000
+  }
 }
-
-interface NotificationSettings {
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  smsNotifications: boolean;
-  whatsappNotifications: boolean;
-  notifyOnNewUser: boolean;
-  notifyOnNewProperty: boolean;
-  notifyOnAgentApplication: boolean;
-  notifyOnSystemIssues: boolean;
-}
-
-const defaultPlatformSettings: PlatformSettings = {
-  siteName: 'AkwaabaHomes',
-  siteDescription: 'Your trusted real estate marketplace in Ghana',
-  contactEmail: 'admin@akwaabahomes.com',
-  supportPhone: '+233 20 123 4567',
-  commissionRate: 5.0,
-  maxImagesPerProperty: 10,
-  enableUserRegistration: true,
-  enableAgentApplications: true,
-  requireEmailVerification: true,
-  enableTwoFactorAuth: false,
-  maintenanceMode: false,
-  debugMode: false,
-};
-
-const defaultEmailTemplates: EmailTemplates = {
-  welcomeEmail: {
-    subject: 'Welcome to AkwaabaHomes! 🏠',
-    body: 'Dear {{user_name}},\n\nWelcome to AkwaabaHomes! We\'re excited to have you join our community of real estate professionals and home seekers.\n\nBest regards,\nThe AkwaabaHomes Team',
-  },
-  propertyApproved: {
-    subject: 'Your Property Has Been Approved! ✅',
-    body: 'Dear {{agent_name}},\n\nGreat news! Your property listing "{{property_title}}" has been approved and is now live on our platform.\n\nBest regards,\nThe AkwaabaHomes Team',
-  },
-  propertyRejected: {
-    subject: 'Property Listing Update',
-    body: 'Dear {{agent_name}},\n\nWe regret to inform you that your property listing "{{property_title}}" requires some modifications before it can be approved.\n\nPlease review our guidelines and resubmit.\n\nBest regards,\nThe AkwaabaHomes Team',
-  },
-  agentApproved: {
-    subject: 'Agent Application Approved! 🎉',
-    body: 'Dear {{agent_name}},\n\nCongratulations! Your agent application has been approved. You can now start listing properties on our platform.\n\nBest regards,\nThe AkwaabaHomes Team',
-  },
-  agentRejected: {
-    subject: 'Agent Application Update',
-    body: 'Dear {{applicant_name}},\n\nThank you for your interest in becoming an agent on AkwaabaHomes. Unfortunately, we are unable to approve your application at this time.\n\nBest regards,\nThe AkwaabaHomes Team',
-  },
-};
-
-const defaultNotificationSettings: NotificationSettings = {
-  emailNotifications: true,
-  pushNotifications: true,
-  smsNotifications: false,
-  whatsappNotifications: true,
-  notifyOnNewUser: true,
-  notifyOnNewProperty: true,
-  notifyOnAgentApplication: true,
-  notifyOnSystemIssues: true,
-};
 
 export default function AdminSettings() {
-  const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(defaultPlatformSettings);
-  const [emailTemplates, setEmailTemplates] = useState<EmailTemplates>(defaultEmailTemplates);
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(defaultNotificationSettings);
-  const [loading, setLoading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [settings, setSettings] = useState<PlatformSettings>(defaultSettings)
+  const [hasChanges, setHasChanges] = useState(false)
 
-  const { toast } = useToast();
+  // API mutation hook for saving settings
+  const saveSettingsMutation = useApiMutation({
+    successMessage: 'Settings saved successfully',
+    errorMessage: 'Failed to save settings',
+    loadingMessage: 'Saving settings...',
+    onSuccess: () => {
+      setHasChanges(false)
+    }
+  })
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    fetchSettings()
+  }, [])
 
-  const loadSettings = async () => {
-    setLoading(true);
+  const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings');
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings');
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data.settings || defaultSettings)
+      } else {
+        console.error('Failed to fetch settings')
+        toast.error('Failed to load settings', {
+          description: 'Using default settings. Please try refreshing the page.'
+        })
       }
-      const settings = await response.json();
-      setPlatformSettings(settings.platform);
-      setEmailTemplates(settings.emailTemplates);
-      setNotificationSettings(settings.notifications);
     } catch (error) {
-      console.error('Error loading settings:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load settings. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+      console.error('Error fetching settings:', error)
+      toast.error('Failed to load settings', {
+        description: 'Using default settings. Please try refreshing the page.'
+      })
     }
-  };
+  }
 
-  const handlePlatformSettingChange = (key: keyof PlatformSettings, value: any) => {
-    setPlatformSettings(prev => ({ ...prev, [key]: value }));
-    setHasChanges(true);
-  };
-
-  const handleEmailTemplateChange = (template: keyof EmailTemplates, field: 'subject' | 'body', value: string) => {
-    setEmailTemplates(prev => ({
-      ...prev,
-      [template]: { ...prev[template], [field]: value }
-    }));
-    setHasChanges(true);
-  };
-
-  const handleNotificationSettingChange = (key: keyof NotificationSettings, value: boolean) => {
-    setNotificationSettings(prev => ({ ...prev, [key]: value }));
-    setHasChanges(true);
-  };
+  const handleSettingChange = (path: string, value: any) => {
+    setSettings(prev => {
+      const newSettings = { ...prev }
+      const keys = path.split('.')
+      let current: any = newSettings
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]]
+      }
+      
+      current[keys[keys.length - 1]] = value
+      setHasChanges(true)
+      return newSettings
+    })
+  }
 
   const saveSettings = async () => {
-    setLoading(true);
-    try {
+    await saveSettingsMutation.mutate(async () => {
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          platform: platformSettings,
-          emailTemplates,
-          notifications: notificationSettings,
-        }),
-      });
-      
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ settings })
+      })
+
       if (!response.ok) {
-        throw new Error('Failed to save settings');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save settings')
       }
-      
-      toast({
-        title: "Success",
-        description: "Settings saved successfully!",
-      });
-      setHasChanges(false);
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save settings. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      return await response.json()
+    })
+  }
 
   const resetToDefaults = () => {
-    setPlatformSettings(defaultPlatformSettings);
-    setEmailTemplates(defaultEmailTemplates);
-    setNotificationSettings(defaultNotificationSettings);
-    setHasChanges(true);
-  };
+    setSettings(defaultSettings)
+    setHasChanges(true)
+    toast.info('Settings reset to defaults', {
+      description: 'Click Save to apply the default settings.'
+    })
+  }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-muted-foreground">Loading settings...</div>
-      </div>
-    );
+  const handleReset = () => {
+    toast('Reset Settings', {
+      description: 'Are you sure you want to reset all settings to defaults?',
+      action: {
+        label: 'Reset',
+        onClick: resetToDefaults
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => toast.dismiss()
+      },
+      duration: Infinity
+    })
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Platform Settings</h1>
-          <p className="text-gray-600">Configure platform behavior and appearance</p>
+          <h1 className="text-3xl font-bold text-gray-900">Platform Settings</h1>
+          <p className="text-gray-600 mt-2">
+            Configure platform-wide settings and features
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={resetToDefaults}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div className="flex items-center space-x-3">
+          {hasChanges && (
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+              <AlertTriangle className="w-4 h-4 mr-1" />
+              Unsaved Changes
+            </Badge>
+          )}
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="border-ghana-gold text-ghana-gold hover:bg-ghana-gold hover:text-white"
+          >
             Reset to Defaults
           </Button>
-          <Button onClick={saveSettings} disabled={!hasChanges || loading}>
-            <Save className="mr-2 h-4 w-4" />
-            {loading ? 'Saving...' : 'Save Changes'}
+          <Button
+            onClick={saveSettings}
+            disabled={!hasChanges || saveSettingsMutation.isLoading}
+            className="bg-ghana-green hover:bg-ghana-green-dark text-white"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {saveSettingsMutation.isLoading ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="platform" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="platform" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">Platform</span>
-          </TabsTrigger>
-          <TabsTrigger value="email" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            <span className="hidden sm:inline">Email</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Platform Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Globe className="w-5 h-5 mr-2 text-ghana-green" />
+            Platform Information
+          </CardTitle>
+          <CardDescription>
+            Basic platform details and contact information
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="platform-name">Platform Name</Label>
+              <Input
+                id="platform-name"
+                value={settings.platform.name}
+                onChange={(e) => handleSettingChange('platform.name', e.target.value)}
+                placeholder="Enter platform name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="platform-version">Version</Label>
+              <Input
+                id="platform-version"
+                value={settings.platform.version}
+                onChange={(e) => handleSettingChange('platform.version', e.target.value)}
+                placeholder="Enter version"
+              />
+            </div>
+            <div>
+              <Label htmlFor="platform-email">Contact Email</Label>
+              <Input
+                id="platform-email"
+                type="email"
+                value={settings.platform.contact_email}
+                onChange={(e) => handleSettingChange('platform.contact_email', e.target.value)}
+                placeholder="Enter contact email"
+              />
+            </div>
+            <div>
+              <Label htmlFor="platform-phone">Support Phone</Label>
+              <Input
+                id="platform-phone"
+                value={settings.platform.support_phone}
+                onChange={(e) => handleSettingChange('platform.support_phone', e.target.value)}
+                placeholder="Enter support phone"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="platform-description">Description</Label>
+              <Textarea
+                id="platform-description"
+                value={settings.platform.description}
+                onChange={(e) => handleSettingChange('platform.description', e.target.value)}
+                placeholder="Enter platform description"
+                rows={3}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="platform-address">Address</Label>
+              <Input
+                id="platform-address"
+                value={settings.platform.address}
+                onChange={(e) => handleSettingChange('platform.address', e.target.value)}
+                placeholder="Enter business address"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="platform-hours">Business Hours</Label>
+              <Input
+                id="platform-hours"
+                value={settings.platform.business_hours}
+                onChange={(e) => handleSettingChange('platform.business_hours', e.target.value)}
+                placeholder="Enter business hours"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="platform" className="space-y-6">
-          {/* Basic Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>Configure your platform's basic details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="siteName">Site Name</Label>
-                  <Input
-                    id="siteName"
-                    value={platformSettings.siteName}
-                    onChange={(e) => handlePlatformSettingChange('siteName', e.target.value)}
-                    placeholder="Enter site name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Contact Email</Label>
-                  <Input
-                    id="contactEmail"
-                    type="email"
-                    value={platformSettings.contactEmail}
-                    onChange={(e) => handlePlatformSettingChange('contactEmail', e.target.value)}
-                    placeholder="admin@example.com"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="siteDescription">Site Description</Label>
-                <Textarea
-                  id="siteDescription"
-                  value={platformSettings.siteDescription}
-                  onChange={(e) => handlePlatformSettingChange('siteDescription', e.target.value)}
-                  placeholder="Enter site description"
-                  rows={3}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="supportPhone">Support Phone</Label>
-                  <Input
-                    id="supportPhone"
-                    value={platformSettings.supportPhone}
-                    onChange={(e) => handlePlatformSettingChange('supportPhone', e.target.value)}
-                    placeholder="+233 20 123 4567"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="commissionRate">Commission Rate (%)</Label>
-                  <Input
-                    id="commissionRate"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    value={platformSettings.commissionRate}
-                    onChange={(e) => handlePlatformSettingChange('commissionRate', parseFloat(e.target.value))}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Feature Toggles */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Feature Configuration</CardTitle>
-              <CardDescription>Enable or disable platform features</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>User Registration</Label>
-                    <p className="text-sm text-muted-foreground">Allow new users to register</p>
-                  </div>
-                  <Switch
-                    checked={platformSettings.enableUserRegistration}
-                    onCheckedChange={(checked) => handlePlatformSettingChange('enableUserRegistration', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Agent Applications</Label>
-                    <p className="text-sm text-muted-foreground">Allow users to apply as agents</p>
-                  </div>
-                  <Switch
-                    checked={platformSettings.enableAgentApplications}
-                    onCheckedChange={(checked) => handlePlatformSettingChange('enableAgentApplications', checked)}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Verification</Label>
-                    <p className="text-sm text-muted-foreground">Require email verification for new users</p>
-                  </div>
-                  <Switch
-                    checked={platformSettings.requireEmailVerification}
-                    onCheckedChange={(checked) => handlePlatformSettingChange('requireEmailVerification', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">Enable 2FA for enhanced security</p>
-                  </div>
-                  <Switch
-                    checked={platformSettings.enableTwoFactorAuth}
-                    onCheckedChange={(checked) => handlePlatformSettingChange('enableTwoFactorAuth', checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* System Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>System Configuration</CardTitle>
-              <CardDescription>Advanced system settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="maxImagesPerProperty">Max Images per Property</Label>
-                  <Input
-                    id="maxImagesPerProperty"
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={platformSettings.maxImagesPerProperty}
-                    onChange={(e) => handlePlatformSettingChange('maxImagesPerProperty', parseInt(e.target.value))}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Maintenance Mode</Label>
-                    <p className="text-sm text-muted-foreground">Put platform in maintenance mode</p>
-                  </div>
-                  <Switch
-                    checked={platformSettings.maintenanceMode}
-                    onCheckedChange={(checked) => handlePlatformSettingChange('maintenanceMode', checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="email" className="space-y-6">
-          {/* Email Templates */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Email Templates</CardTitle>
-              <CardDescription>Customize automated email messages</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {Object.entries(emailTemplates).map(([key, template]) => (
-                <div key={key} className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</h3>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`${key}-subject`}>Subject</Label>
-                      <Input
-                        id={`${key}-subject`}
-                        value={template.subject}
-                        onChange={(e) => handleEmailTemplateChange(key as keyof EmailTemplates, 'subject', e.target.value)}
-                        placeholder="Email subject"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`${key}-body`}>Body</Label>
-                      <Textarea
-                        id={`${key}-body`}
-                        value={template.body}
-                        onChange={(e) => handleEmailTemplateChange(key as keyof EmailTemplates, 'body', e.target.value)}
-                        placeholder="Email body content"
-                        rows={6}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          {/* Notification Channels */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Channels</CardTitle>
-              <CardDescription>Configure how notifications are delivered</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Send notifications via email</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.emailNotifications}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('emailNotifications', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Send push notifications to users</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.pushNotifications}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('pushNotifications', checked)}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>SMS Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Send notifications via SMS</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.smsNotifications}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('smsNotifications', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>WhatsApp Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Send notifications via WhatsApp</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.whatsappNotifications}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('whatsappNotifications', checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notification Types */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Types</CardTitle>
-              <CardDescription>Choose which events trigger notifications</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>New User Registration</Label>
-                    <p className="text-sm text-muted-foreground">Notify when new users join</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.notifyOnNewUser}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('notifyOnNewUser', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>New Property Listing</Label>
-                    <p className="text-sm text-muted-foreground">Notify when properties are listed</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.notifyOnNewProperty}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('notifyOnNewProperty', checked)}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Agent Applications</Label>
-                    <p className="text-sm text-muted-foreground">Notify when agents apply</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.notifyOnAgentApplication}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('notifyOnAgentApplication', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>System Issues</Label>
-                    <p className="text-sm text-muted-foreground">Notify about system problems</p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.notifyOnSystemIssues}
-                    onCheckedChange={(checked) => handleNotificationSettingChange('notifyOnSystemIssues', checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="security" className="space-y-6">
-          {/* Security Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Configuration</CardTitle>
-              <CardDescription>Configure security and privacy settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Two-Factor Authentication</Label>
-                  <p className="text-sm text-muted-foreground">Require 2FA for admin accounts</p>
+      {/* Feature Toggles */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Building2 className="w-5 h-5 mr-2 text-ghana-green" />
+            Feature Toggles
+          </CardTitle>
+          <CardDescription>
+            Enable or disable platform features
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(settings.features).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <Label className="text-sm font-medium capitalize">
+                    {key.replace(/_/g, ' ')}
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    {value ? 'Enabled' : 'Disabled'}
+                  </p>
                 </div>
                 <Switch
-                  checked={platformSettings.enableTwoFactorAuth}
-                  onCheckedChange={(checked) => handlePlatformSettingChange('enableTwoFactorAuth', checked)}
+                  checked={value}
+                  onCheckedChange={(checked) => handleSettingChange(`features.${key}`, checked)}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Verification</Label>
-                  <p className="text-sm text-muted-foreground">Require email verification for all users</p>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Security Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Shield className="w-5 h-5 mr-2 text-ghana-green" />
+            Security Settings
+          </CardTitle>
+          <CardDescription>
+            Configure security and authentication settings
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">Two-Factor Authentication</Label>
+                <p className="text-xs text-gray-500">
+                  Require 2FA for admin accounts
+                </p>
+              </div>
+              <Switch
+                checked={settings.security.two_factor_auth}
+                onCheckedChange={(checked) => handleSettingChange('security.two_factor_auth', checked)}
+              />
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">Require Verification</Label>
+                <p className="text-xs text-gray-500">
+                  Require email verification for new users
+                </p>
+              </div>
+              <Switch
+                checked={settings.security.require_verification}
+                onCheckedChange={(checked) => handleSettingChange('security.require_verification', checked)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
+              <Input
+                id="session-timeout"
+                type="number"
+                min="5"
+                max="480"
+                value={settings.security.session_timeout}
+                onChange={(e) => handleSettingChange('security.session_timeout', parseInt(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max-login-attempts">Max Login Attempts</Label>
+              <Input
+                id="max-login-attempts"
+                type="number"
+                min="3"
+                max="10"
+                value={settings.security.max_login_attempts}
+                onChange={(e) => handleSettingChange('security.max_login_attempts', parseInt(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="password-min-length">Minimum Password Length</Label>
+              <Input
+                id="password-min-length"
+                type="number"
+                min="6"
+                max="20"
+                value={settings.security.password_min_length}
+                onChange={(e) => handleSettingChange('security.password_min_length', parseInt(e.target.value))}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notification Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Mail className="w-5 h-5 mr-2 text-ghana-green" />
+            Notification Settings
+          </CardTitle>
+          <CardDescription>
+            Configure notification preferences
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(settings.notifications).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <Label className="text-sm font-medium capitalize">
+                    {key.replace(/_/g, ' ')}
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    {value ? 'Enabled' : 'Disabled'}
+                  </p>
                 </div>
                 <Switch
-                  checked={platformSettings.requireEmailVerification}
-                  onCheckedChange={(checked) => handlePlatformSettingChange('requireEmailVerification', checked)}
+                  checked={value}
+                  onCheckedChange={(checked) => handleSettingChange(`notifications.${key}`, checked)}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Debug Mode</Label>
-                  <p className="text-sm text-muted-foreground">Enable debug logging (development only)</p>
-                </div>
-                <Switch
-                  checked={platformSettings.debugMode}
-                  onCheckedChange={(checked) => handlePlatformSettingChange('debugMode', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* System Limits */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Users className="w-5 h-5 mr-2 text-ghana-green" />
+            System Limits
+          </CardTitle>
+          <CardDescription>
+            Configure system usage limits and constraints
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="max-properties">Max Properties per User</Label>
+              <Input
+                id="max-properties"
+                type="number"
+                min="1"
+                max="100"
+                value={settings.limits.max_properties_per_user}
+                onChange={(e) => handleSettingChange('limits.max_properties_per_user', parseInt(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max-images">Max Images per Property</Label>
+              <Input
+                id="max-images"
+                type="number"
+                min="1"
+                max="20"
+                value={settings.limits.max_images_per_property}
+                onChange={(e) => handleSettingChange('limits.max_images_per_property', parseInt(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max-file-size">Max File Size (MB)</Label>
+              <Input
+                id="max-file-size"
+                type="number"
+                min="1"
+                max="50"
+                value={settings.limits.max_file_size_mb}
+                onChange={(e) => handleSettingChange('limits.max_file_size_mb', parseInt(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max-users">Max Users per Plan</Label>
+              <Input
+                id="max-users"
+                type="number"
+                min="100"
+                max="10000"
+                value={settings.limits.max_users_per_plan}
+                onChange={(e) => handleSettingChange('limits.max_users_per_plan', parseInt(e.target.value))}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Save Button Footer */}
+      {hasChanges && (
+        <div className="fixed bottom-6 right-6 bg-white border-2 border-ghana-green rounded-lg shadow-lg p-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-yellow-600" />
+              <span className="text-sm font-medium text-gray-700">Unsaved Changes</span>
+            </div>
+            <Button
+              onClick={saveSettings}
+              disabled={saveSettingsMutation.isLoading}
+              className="bg-ghana-green hover:bg-ghana-green-dark text-white"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saveSettingsMutation.isLoading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }

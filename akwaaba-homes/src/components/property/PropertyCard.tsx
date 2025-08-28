@@ -52,13 +52,30 @@ export function PropertyCard({
 
   const handleContact = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onContact?.(property);
+    
+    // Check if seller has a phone number
+    if (!property.seller.phone) {
+      // Show a toast or alert that contact information is not available
+      alert('Contact information not available for this property. Please use the inquiry form.');
+      return;
+    }
+    
+    // Open phone dialer
+    window.open(`tel:${property.seller.phone}`, '_self');
   };
 
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Check if seller has a phone number
+    if (!property.seller.phone) {
+      // Show a toast or alert that contact information is not available
+      alert('Contact information not available for this property. Please use the inquiry form.');
+      return;
+    }
+    
     const message = `Hi, I'm interested in this property: ${property.title} - ${formatCurrency(property.price, showCurrency)}`;
-    const whatsappUrl = `https://wa.me/${property.seller.whatsapp || property.seller.phone}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${property.seller.phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
