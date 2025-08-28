@@ -95,20 +95,16 @@ export default function PropertiesPage() {
     setDeleteModal(prev => ({ ...prev, isLoading: true }))
     
     try {
-      const response = await fetch(`/api/properties/${deleteModal.propertyId}/soft-delete`, {
-        method: 'PATCH',
+      const response = await fetch(`/api/admin/properties/${deleteModal.propertyId}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          reason: 'User requested deletion',
-          permanent: false
-        }),
+        }
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to delete property')
+        throw new Error(errorData.error || 'Failed to archive property')
       }
 
       // Remove the property from the local state
@@ -122,11 +118,11 @@ export default function PropertiesPage() {
         isLoading: false
       })
 
-      // Optionally show success message
-      console.log('Property deleted successfully')
+      // Show success message
+      console.log('Property archived successfully')
 
     } catch (error) {
-      console.error('Error deleting property:', error)
+      console.error('Error archiving property:', error)
       // Optionally show error message to user
     } finally {
       setDeleteModal(prev => ({ ...prev, isLoading: false }))
@@ -183,8 +179,8 @@ export default function PropertiesPage() {
       const params = new URLSearchParams()
       
       // Add pagination params
-      params.set('page', currentPage.toString())
       params.set('limit', currentLimit.toString())
+      params.set('offset', ((currentPage - 1) * currentLimit).toString())
       
       // Add filter params
       Object.entries(filters).forEach(([key, value]) => {
@@ -193,15 +189,22 @@ export default function PropertiesPage() {
         }
       })
       
-      const response = await fetch(`/api/properties?${params.toString()}`)
+      const response = await fetch(`/api/admin/properties?${params.toString()}`)
       
       if (!response.ok) {
         throw new Error('Failed to fetch properties')
       }
       
-      const data: PropertyListResponse = await response.json()
+      const data = await response.json()
       setProperties(data.properties)
-      setPagination(data.pagination)
+      
+      // Update pagination based on new API structure
+      setPagination({
+        page: currentPage,
+        limit: currentLimit,
+        total: data.count || 0,
+        totalPages: Math.ceil((data.count || 0) / currentLimit)
+      })
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -478,11 +481,11 @@ export default function PropertiesPage() {
         isOpen={deleteModal.isOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Property"
-        description="Are you sure you want to delete this property? This action will archive the property and it will no longer be visible to users. You can restore it later if needed."
+        title="Archive Property"
+        description="Are you sure you want to archive this property? This action will hide the property from public view but preserve all data. You can restore it later if needed."
         itemName={deleteModal.propertyTitle}
         isLoading={deleteModal.isLoading}
-        variant="danger"
+        variant="warning"
       />
     </div>
   )

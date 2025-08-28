@@ -38,8 +38,8 @@ export async function GET(
     const { id: propertyId } = await params;
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
@@ -152,8 +152,8 @@ export async function PUT(
     const { id: propertyId } = await params;
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
@@ -279,8 +279,8 @@ export async function DELETE(
     const { id: propertyId } = await params;
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
@@ -338,59 +338,22 @@ export async function DELETE(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Start a transaction to delete related data
-    const { error: deleteImagesError } = await supabase
-      .from('property_images')
-      .delete()
-      .eq('property_id', propertyId);
-
-    if (deleteImagesError) {
-      console.error('Error deleting property images:', deleteImagesError);
-      return NextResponse.json({ 
-        error: 'Failed to delete property images', 
-        details: deleteImagesError.message 
-      }, { status: 500 });
-    }
-
-    // Delete property inquiries
-    const { error: deleteInquiriesError } = await supabase
-      .from('inquiries')
-      .delete()
-      .eq('property_id', propertyId);
-
-    if (deleteInquiriesError) {
-      console.error('Error deleting property inquiries:', deleteInquiriesError);
-      return NextResponse.json({ 
-        error: 'Failed to delete property inquiries', 
-        details: deleteInquiriesError.message 
-      }, { status: 500 });
-    }
-
-    // Delete property analytics
-    const { error: deleteAnalyticsError } = await supabase
-      .from('analytics')
-      .delete()
-      .eq('property_id', propertyId);
-
-    if (deleteAnalyticsError) {
-      console.error('Error deleting property analytics:', deleteAnalyticsError);
-      return NextResponse.json({ 
-        error: 'Failed to delete property analytics', 
-        details: deleteAnalyticsError.message 
-      }, { status: 500 });
-    }
-
-    // Delete the property
-    const { error: deleteError } = await supabase
+    // Instead of deleting, mark as archived for safety
+    const { error: archiveError } = await supabase
       .from('properties')
-      .delete()
+      .update({ 
+        status: 'archived',
+        updated_at: new Date().toISOString(),
+        archived_at: new Date().toISOString(),
+        archived_by: user.id
+      })
       .eq('id', propertyId);
 
-    if (deleteError) {
-      console.error('Error deleting property:', deleteError);
+    if (archiveError) {
+      console.error('Error archiving property:', archiveError);
       return NextResponse.json({ 
-        error: 'Failed to delete property', 
-        details: deleteError.message 
+        error: 'Failed to archive property', 
+        details: archiveError.message 
       }, { status: 500 });
     }
 
@@ -399,18 +362,18 @@ export async function DELETE(
       .from('analytics')
       .insert([
         {
-          event_type: 'property_deleted',
+          event_type: 'property_archived',
           user_id: user.id,
           metadata: {
             property_id: propertyId,
             property_type: property.property_type,
-            deleted_by: userProfile.user_type,
+            archived_by: userProfile.user_type,
           },
         }
       ]);
 
     return NextResponse.json({ 
-      message: 'Property deleted successfully' 
+      message: 'Property archived successfully' 
     });
   } catch (error) {
     console.error('Error in property DELETE:', error);

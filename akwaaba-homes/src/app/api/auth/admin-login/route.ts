@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = body;
 
-    console.log('Login attempt for:', email);
+    console.log('Admin login attempt for:', email);
 
     // Validate required fields
     if (!email || !password) {
@@ -26,15 +26,6 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Supabase auth error:', error);
-      
-      // Check if the error is due to unconfirmed email
-      if (error.message.includes('Email not confirmed') || error.message.includes('Invalid login credentials')) {
-        return NextResponse.json({
-          error: 'Please check your email to confirm your account before signing in.',
-          code: 'EMAIL_NOT_CONFIRMED'
-        }, { status: 401 });
-      }
-      
       return NextResponse.json(
         { error: error.message },
         { status: 401 }
@@ -53,7 +44,7 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Get user profile information
+    // Get user profile to verify admin role
     let userProfile = null;
     if (data.user) {
       try {
@@ -66,29 +57,50 @@ export async function POST(request: NextRequest) {
         if (!profileError && profileData) {
           userProfile = profileData;
           console.log('Profile found:', profileData.user_role);
+          
+          // Check if user has admin role
+          if (profileData.user_role !== 'admin') {
+            console.log('User is not admin:', profileData.user_role);
+            return NextResponse.json({
+              error: 'Access denied. Admin privileges required.',
+              code: 'INSUFFICIENT_PRIVILEGES'
+            }, { status: 403 });
+          }
         } else {
           console.log('Profile not found or error:', profileError);
+          return NextResponse.json({
+            error: 'User profile not found. Please contact support.',
+            code: 'PROFILE_NOT_FOUND'
+          }, { status: 404 });
         }
       } catch (profileError) {
         console.error('Profile fetch error:', profileError);
-        // Continue with login even if profile fetch fails
+        return NextResponse.json({
+          error: 'Failed to verify user profile.',
+          code: 'PROFILE_FETCH_ERROR'
+        }, { status: 500 });
       }
     }
 
-    // Success - user is authenticated and confirmed
-    console.log('Login successful for user:', data.user?.id);
+    // Success - user is authenticated, confirmed, and has admin role
+    console.log('Admin login successful for user:', data.user?.id);
     return NextResponse.json({
-      message: 'Login successful',
+      message: 'Admin login successful',
       user: {
         ...data.user,
-        user_role: userProfile?.user_role || 'user',
-        verification_status: userProfile?.verification_status || 'unknown'
+        user_role: userProfile?.user_role,
+        verification_status: userProfile?.verification_status,
+        company_name: userProfile?.company_name,
+        business_type: userProfile?.business_type,
+        license_number: userProfile?.license_number,
+        experience_years: userProfile?.experience_years,
+        bio: userProfile?.bio
       },
       session: data.session
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Login route error:', error);
+    console.error('Admin login route error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

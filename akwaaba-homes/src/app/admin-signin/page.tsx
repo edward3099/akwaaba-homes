@@ -67,7 +67,7 @@ function AdminSignInForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,16 +79,6 @@ function AdminSignInForm() {
 
       if (!response.ok) {
         throw new Error(data.error || 'Login failed');
-      }
-
-      // Check if user is admin
-      if (data.user.user_role !== 'admin') {
-        toast({
-          title: "Access Denied",
-          description: "This portal is for administrators only. Please use the agent signin page.",
-          variant: "destructive"
-        });
-        return;
       }
 
       // Successful admin login
