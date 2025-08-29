@@ -93,28 +93,12 @@ export function FeaturedProperties() {
   // Extract properties from the data structure
   const properties = data?.properties || null;
 
-  // Debug logging
-  console.log('FeaturedProperties Debug:', {
-    loading,
-    error,
-    data,
-    properties,
-    propertiesType: typeof properties,
-    isArray: Array.isArray(properties),
-    length: properties?.length
-  });
-
   useEffect(() => {
     // Load featured properties on component mount
-    console.log('FeaturedProperties: Calling getFeaturedProperties(6)');
-    
     let ignore = false;
     const fetchData = async () => {
       try {
-        const result = await getFeaturedProperties(6);
-        if (!ignore) {
-          console.log('FeaturedProperties: Data fetched successfully', result);
-        }
+        await getFeaturedProperties(6);
       } catch (error) {
         if (!ignore) {
           console.error('FeaturedProperties: Error fetching data', error);
@@ -128,22 +112,6 @@ export function FeaturedProperties() {
       ignore = true; // Cleanup to prevent race conditions
     };
   }, []); // Empty dependency array - run only once on mount
-
-  // Debug logging for useEffect
-  console.log('FeaturedProperties: useEffect triggered');
-
-  // Debug logging
-  useEffect(() => {
-    console.log('FeaturedProperties Debug:', {
-      loading,
-      error,
-      data,
-      properties,
-      propertiesType: typeof properties,
-      isArray: Array.isArray(properties),
-      length: properties?.length
-    });
-  }, [loading, error, data, properties]);
 
 
 
@@ -597,7 +565,11 @@ export function FeaturedProperties() {
               <PropertyCard 
                 property={property} 
                 viewMode="grid"
-                onContact={(property) => console.log('Contact for property:', property.title)}
+                onContact={(property) => {
+                  // Handle contact for property - this will open the contact form
+                  // The PropertyCard component handles the actual contact logic
+                  console.log('Contact initiated for property:', property.title);
+                }}
               />
             </div>
           ))}

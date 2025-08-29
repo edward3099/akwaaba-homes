@@ -364,10 +364,9 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex space-x-4">
-                  <Link href="/agent/dashboard">
-                    <Button>
-                      <Home className="w-4 h-4 mr-2" />
-                      Agent Dashboard
+                  <Link href="/agent-dashboard">
+                    <Button variant="outline" className="w-full">
+                      Go to Agent Dashboard
                     </Button>
                   </Link>
                   <Link href="/agent/profile">

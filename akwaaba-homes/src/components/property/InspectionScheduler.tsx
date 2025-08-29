@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Property } from '@/lib/types/index';
 import { format } from 'date-fns';
+import { toast } from 'sonner'; // Added toast import
 
 interface InspectionSchedulerProps {
   property: Property;
@@ -62,20 +63,51 @@ export function InspectionScheduler({ property, onClose }: InspectionSchedulerPr
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // In a real implementation, this would call the API
+      // const response = await fetch('/api/inspections/schedule', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     property: property.id,
+      //     date: selectedDate,
+      //     ...formData
+      //   })
+      // });
+      
+      // if (!response.ok) {
+      //   throw new Error('Failed to schedule inspection');
+      // }
 
-    console.log('Inspection scheduled:', {
-      property: property.id,
-      date: selectedDate,
-      ...formData
-    });
+      // Simulate API call for now
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setIsSubmitting(false);
-    onClose();
-    
-    // Show success message
-    alert('Inspection request submitted successfully! The seller will confirm the appointment.');
+      // Log inspection scheduling for analytics
+      console.log('Inspection scheduled successfully:', {
+        property: property.id,
+        date: selectedDate,
+        inspectorType: formData.inspectorType,
+        timestamp: new Date().toISOString()
+      });
+
+      setIsSubmitting(false);
+      onClose();
+      
+      // Show success message using toast
+      toast.success('Inspection request submitted successfully! The seller will confirm the appointment.');
+      
+      // Track the inspection event
+      // analytics.track('inspection_scheduled', {
+      //   property_id: property.id,
+      //   inspector_type: formData.inspectorType,
+      //   preferred_date: selectedDate
+      // });
+      
+    } catch (error) {
+      console.error('Error scheduling inspection:', error);
+      setIsSubmitting(false);
+      toast.error('Failed to schedule inspection. Please try again.');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

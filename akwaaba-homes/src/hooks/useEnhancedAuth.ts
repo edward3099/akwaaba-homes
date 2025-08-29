@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { useRouter, usePathname } from 'next/navigation';
 import { validateJWTPayload, extractUserFromJWT, isJWTExpiringSoon } from '@/lib/utils/jwtSecurity';
+import { supabase } from '@/lib/supabase';
 
 interface EnhancedUser extends User {
   verification_status?: string;
@@ -61,11 +61,11 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Create Supabase client
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  // Use the singleton Supabase client instead of creating a new one
+  // const supabase = createBrowserClient(
+  //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // );
 
   // Validate JWT and extract user information
   const validateAndExtractUser = useCallback(async (session: Session | null) => {
@@ -109,7 +109,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       jwtClaims: null,
       jwtValidation: { isValid: false, errors: [], warnings: [] }
     };
-  }, [supabase.auth]);
+  }, []);
 
   // Update auth state
   const updateAuthState = useCallback(async (session: Session | null) => {
@@ -188,7 +188,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
     };
 
     initializeAuth();
-  }, [supabase.auth, updateAuthState, pathname, router]);
+  }, [updateAuthState, pathname, router]);
 
   // Sign in function
   const signIn = async (email: string, password: string) => {
@@ -320,7 +320,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
   const resetPassword = async (email: string) => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
+        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : '/reset-password'
       });
 
       if (error) {

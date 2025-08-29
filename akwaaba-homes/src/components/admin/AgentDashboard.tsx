@@ -1,96 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BuildingOfficeIcon, 
   EyeIcon, 
   HomeIcon,
   CogIcon,
-  StarIcon
+  PlusIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/lib/auth/authContext';
 import PropertyListingForm from './PropertyListingForm';
-
-// Simple mock data for agent dashboard
-const mockAgentStats = [
-  { name: 'Total Listings', value: '12', change: '+2', changeType: 'increase' },
-  { name: 'Premium Listings', value: '5', change: '+1', changeType: 'increase' },
-];
-
-const mockRecentActivity = [
-  { id: 1, type: 'listing', message: 'New property listed: 4-Bedroom Villa in East Legon', time: '2 hours ago', status: 'active' },
-  { id: 2, type: 'inquiry', message: 'Inquiry received for 3-Bedroom Apartment in Cantonments', time: '4 hours ago', status: 'new' },
-  { id: 3, type: 'listing', message: 'Property updated: 2-Bedroom Apartment in Airport Residential', time: '1 day ago', status: 'updated' },
-  { id: 4, type: 'inquiry', message: 'Inquiry received for 5-Bedroom House in Trasacco Valley', time: '2 days ago', status: 'new' },
-];
-
-const mockProperties = [
-  {
-    id: 1,
-    title: 'Luxury 4-Bedroom Villa',
-    location: 'East Legon, Accra',
-    price: 'GHS 2,500,000',
-    type: 'Villa',
-    status: 'active',
-    tier: 'premium',
-    views: 156,
-    inquiries: 8,
-    images: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop'],
-    image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop'
-  },
-  {
-    id: 2,
-    title: 'Modern 3-Bedroom Apartment',
-    location: 'Cantonments, Accra',
-    price: 'GHS 1,800,000',
-    type: 'Apartment',
-    status: 'active',
-    tier: 'premium',
-    views: 89,
-    inquiries: 5,
-    images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop'],
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop'
-  },
-  {
-    id: 3,
-    title: 'Cozy 2-Bedroom Apartment',
-    location: 'Airport Residential, Accra',
-    price: 'GHS 850,000',
-    type: 'Apartment',
-    status: 'active',
-    tier: 'normal',
-    views: 67,
-    inquiries: 3,
-    images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'],
-    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'
-  },
-  {
-    id: 4,
-    title: 'Spacious 5-Bedroom House',
-    location: 'Trasacco Valley, Accra',
-    price: 'GHS 3,200,000',
-    type: 'House',
-    status: 'active',
-    tier: 'premium',
-    views: 234,
-    inquiries: 12,
-    images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop'],
-    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop'
-  },
-  {
-    id: 5,
-    title: 'Studio Apartment',
-    location: 'Osu, Accra',
-    price: 'GHS 450,000',
-    type: 'Studio',
-    status: 'inactive',
-    tier: 'normal',
-    views: 34,
-    inquiries: 1,
-    images: ['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'],
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'
-  }
-];
+import EmptyState from '../dashboard/EmptyState';
+import { toast } from 'sonner';
 
 const tabs = [
   { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
@@ -103,47 +24,173 @@ const tabs = [
 export default function AgentDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [properties, setProperties] = useState([]);
+  const [editingProperty, setEditingProperty] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  
+  // Profile form state
+  const [profileData, setProfileData] = useState({
+    fullName: user?.user_metadata?.full_name || '',
+    professionalTitle: '',
+    yearsOfExperience: 0,
+    company: '',
+    bio: '',
+    specializations: [],
+    languages: ['English'],
+    phone: '',
+    email: user?.email || '',
+    whatsapp: '',
+    officeAddress: '',
+    weekdays: '8:00 AM - 6:00 PM',
+    weekends: '9:00 AM - 3:00 PM'
+  });
+  
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [coverPhoto, setCoverPhoto] = useState(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  
+  // Auto-save and validation state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedData, setLastSavedData] = useState(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string | null>>({});
+  const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  // Upload progress state
+  const [uploadProgress, setUploadProgress] = useState({
+    profile: 0,
+    cover: 0
+  });
+  const [isUploading, setIsUploading] = useState({
+    profile: false,
+    cover: false
+  });
+  
+  // Settings state
+  const [settings, setSettings] = useState({
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+      whatsapp: true
+    },
+    privacy: {
+      profileVisible: true,
+      contactVisible: true,
+      analyticsSharing: false
+    },
+    professional: {
+      autoResponder: true,
+      leadNotifications: true,
+      marketUpdates: true
+    }
+  });
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
 
-  const handleListNewProperty = () => {
-    console.log('List New Property button clicked');
-    console.log('Switching to Add Property tab');
-    setActiveTab('add-property');
+  // Fetch real properties data
+  useEffect(() => {
+    const fetchProperties = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const response = await fetch('/api/properties/my-properties', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setProperties(data.properties || []);
+        } else {
+          console.error('Failed to fetch properties');
+          setProperties([]);
+        }
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, [user]);
+
+  // Filter properties based on search and filters
+  const filteredProperties = properties.filter(property => {
+    const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.location.address.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || property.status === statusFilter;
+    const matchesType = statusFilter === 'all' || property.property_type === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  // Calculate dynamic stats based on real properties
+  const agentStats = [
+    { 
+      name: 'Total Listings', 
+      value: properties.length.toString(), 
+      change: '0', 
+      changeType: 'neutral' 
+    },
+    { 
+      name: 'Active Listings', 
+      value: properties.filter(p => p.status === 'active').length.toString(), 
+      change: '0', 
+      changeType: 'neutral' 
+    },
+  ];
+
+  const recentActivity = properties.slice(0, 4).map(property => ({
+    id: property.id,
+    type: 'listing',
+    message: `Property: ${property.title}`,
+    time: new Date(property.created_at).toLocaleDateString(),
+    status: property.status
+  }));
+
+  // Handle property deletion
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!confirm('Are you sure you want to delete this property?')) return;
+    
+    try {
+      const response = await fetch(`/api/properties/${propertyId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setProperties(properties.filter(p => p.id !== propertyId));
+        toast.success('Property deleted successfully');
+      } else {
+        toast.error('Failed to delete property');
+      }
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast.error('Error deleting property');
+    }
   };
 
+  // Render dashboard content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-6">
-            {/* Page header */}
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user?.user_metadata?.full_name || user?.email}!</h1>
-              <p className="mt-2 text-gray-600">Here&apos;s what&apos;s happening with your properties and clients today</p>
-            </div>
-
-            {/* Stats grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {mockAgentStats.map((stat) => (
-                <div key={stat.name} className="bg-white rounded-lg shadow p-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {agentStats.map((stat, index) => (
+                <div key={index} className="bg-white rounded-lg shadow p-6">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      {stat.name.includes('Listings') && <BuildingOfficeIcon className="h-8 w-8 text-gray-400" />}
-                      {stat.name.includes('Views') && <EyeIcon className="h-8 w-8 text-gray-400" />}
-                      {stat.name.includes('Leads') && <HomeIcon className="h-8 w-8 text-gray-400" />}
-                      {stat.name.includes('Premium') && <BuildingOfficeIcon className="h-8 w-8 text-gray-400" />}
-                    </div>
-                    <div className="ml-4 w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-500 truncate">{stat.name}</p>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-600">{stat.name}</p>
                       <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
                     </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className={`inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium ${
-                      stat.changeType === 'positive' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {stat.change}
-                    </span>
-                    <span className="ml-2 text-sm text-gray-500">from last week</span>
                   </div>
                 </div>
               ))}
@@ -154,31 +201,33 @@ export default function AgentDashboard() {
               <div className="px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
               </div>
-              <div className="divide-y divide-gray-200">
-                {mockRecentActivity.map((activity) => (
-                  <div key={activity.id} className="px-6 py-4">
-                    <div className="flex items-center space-x-3">
+              <div className="p-6">
+                {recentActivity.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <HomeIcon className="w-4 h-4 text-green-600" />
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <BuildingOfficeIcon className="w-4 h-4 text-blue-600" />
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-900">{activity.message}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900">{activity.message}</p>
                         <p className="text-sm text-gray-500">{activity.time}</p>
                       </div>
-                      <div className="ml-auto">
+                        <div className="flex-shrink-0">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          activity.status === 'new' ? 'bg-blue-100 text-blue-800' : 
-                          activity.status === 'active' ? 'bg-green-100 text-green-800' : 
-                          'bg-yellow-100 text-yellow-800'
+                            activity.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {activity.status}
                         </span>
                       </div>
                     </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No recent activity</p>
+                )}
               </div>
             </div>
           </div>
@@ -187,205 +236,98 @@ export default function AgentDashboard() {
       case 'properties':
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">My Properties</h1>
-                <p className="mt-2 text-gray-600">Manage your property listings and view performance</p>
-              </div>
+            {/* Properties Header */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">My Properties</h2>
               <button
                 onClick={() => setActiveTab('add-property')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
               >
-                <BuildingOfficeIcon className="w-4 h-4 mr-2" />
-                List New Property
+                <PlusIcon className="w-4 h-4 mr-2" />
+                Add Property
               </button>
             </div>
 
-            {/* Property Management Tools */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <BuildingOfficeIcon className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Active Listings</h3>
-                    <p className="text-sm text-gray-500">{mockProperties.filter(p => p.status === 'active').length} properties</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setActiveTab('properties')}
-                  className="mt-4 w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  View All
-                </button>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <StarIcon className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Premium Listings</h3>
-                    <p className="text-sm text-gray-500">{mockProperties.filter(p => p.tier === 'premium').length} properties</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setActiveTab('add-property')}
-                  className="mt-4 w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Upgrade to Premium
-                </button>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <CogIcon className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
-                    <p className="text-sm text-gray-500">Manage your listings</p>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <button
-                    onClick={() => setActiveTab('add-property')}
-                    className="w-full px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    + Add Property
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('properties')}
-                    className="w-full px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  >
-                    Edit Listings
-                  </button>
-                </div>
-              </div>
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
             </div>
 
-            {/* Property Listings Table */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Recent Properties</h3>
+            {/* Properties List */}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Loading properties...</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Property
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tier
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Views
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {mockProperties.slice(0, 5).map((property) => (
-                      <tr key={property.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-12 w-16">
-                              <img
-                                className="h-12 w-16 rounded-lg object-cover"
-                                src={property.image}
-                                alt={property.title}
-                              />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {property.title}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {property.location}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {property.type}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+            ) : filteredProperties.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProperties.map((property) => (
+                  <div key={property.id} className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{property.title}</h3>
+                      <p className="text-gray-600 mb-2">{property.location.address}</p>
+                      <p className="text-xl font-bold text-blue-600 mb-4">GHS {property.price.toLocaleString()}</p>
+                      <div className="flex justify-between items-center">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            property.status === 'active' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
+                          property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                           }`}>
                             {property.status}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            property.tier === 'premium' 
-                              ? 'bg-purple-100 text-purple-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {property.tier}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {Math.floor(Math.random() * 100) + 10}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => alert(`Edit property: ${property.title}`)}
-                              className="text-blue-600 hover:text-blue-900"
+                            onClick={() => {
+                              setEditingProperty(property);
+                              setShowEditModal(true);
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                             >
                               Edit
                             </button>
                             <button
-                              onClick={() => {
-                                if (confirm(`Are you sure you want to delete "${property.title}"?`)) {
-                                  alert(`Property "${property.title}" deleted successfully!`);
-                                }
-                              }}
-                              className="text-red-600 hover:text-red-900"
+                            onClick={() => handleDeleteProperty(property.id)}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
                             >
                               Delete
                             </button>
                           </div>
-                        </td>
-                      </tr>
+                      </div>
+                    </div>
+                  </div>
                     ))}
-                  </tbody>
-                </table>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200">
-                <button
-                  onClick={() => setActiveTab('properties')}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-500"
-                >
-                  View All Properties →
-                </button>
-              </div>
-            </div>
+            ) : (
+              <EmptyState userType="agent" />
+            )}
           </div>
         );
 
       case 'add-property':
         return (
           <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Add New Property</h1>
-              <p className="mt-2 text-gray-600">Fill out the form below to add your property to the platform</p>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Add New Property</h2>
+              <button
+                onClick={() => setActiveTab('properties')}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                ← Back to Properties
+              </button>
             </div>
             <PropertyListingForm />
           </div>
@@ -394,243 +336,9 @@ export default function AgentDashboard() {
       case 'profile':
         return (
           <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Agent Profile</h1>
-              <p className="mt-2 text-gray-600">Manage your profile information that appears on your public agent page</p>
-            </div>
-
+            <h2 className="text-2xl font-bold text-gray-900">Profile</h2>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="space-y-6">
-                {/* Profile Photo & Cover Image */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Photos</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Profile Photo
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                        </div>
-                        <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                          Upload Photo
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Cover Image
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-32 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                          Upload Cover
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Basic Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="Kwame Asante"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Professional Title
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="Real Estate Agent"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Real Estate Agent, Property Consultant"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Years of Experience
-                      </label>
-                      <input
-                        type="number"
-                        defaultValue="8"
-                        min="0"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Number of years"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Company/Organization
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="AkwaabaHomes"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Your company name"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* About Section */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">About You</h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Bio/Description *
-                    </label>
-                    <textarea
-                      rows={4}
-                      defaultValue="Kwame Asante is a seasoned real estate professional with over 8 years of experience in the Ghanaian property market. Specializing in residential and commercial properties, Kwame has helped hundreds of families find their dream homes and investors secure profitable real estate opportunities."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tell potential clients about your experience, expertise, and what makes you unique..."
-                    />
-                  </div>
-                </div>
-
-                {/* Specializations */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Specializations</h3>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      {['Residential', 'Commercial', 'Luxury Properties', 'Land', 'Investment Properties', 'Rental Properties'].map((spec) => (
-                        <label key={spec} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            defaultChecked={['Residential', 'Commercial', 'Luxury Properties'].includes(spec)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">{spec}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Languages */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Languages Spoken</h3>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      {['English', 'Twi', 'Ga', 'Ewe', 'Dagbani', 'Hausa'].map((lang) => (
-                        <label key={lang} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            defaultChecked={['English', 'Twi', 'Ga'].includes(lang)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">{lang}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        defaultValue="+233 24 123 4567"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="+233 XX XXX XXXX"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        defaultValue="kwame@akwaabahomes.com"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        WhatsApp Number
-                      </label>
-                      <input
-                        type="tel"
-                        defaultValue="+233 24 123 4567"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="+233 XX XXX XXXX"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Office Address
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="East Legon, Accra"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Your office location"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Working Hours */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Working Hours</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Weekdays
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="8:00 AM - 6:00 PM"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 8:00 AM - 6:00 PM"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Weekends
-                      </label>
-                      <input
-                        type="text"
-                        defaultValue="9:00 AM - 3:00 PM"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 9:00 AM - 3:00 PM"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Save Button */}
-                <div className="pt-4">
-                  <button className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Save Profile Changes
-                  </button>
-                </div>
-              </div>
+              <p className="text-gray-600">Profile management coming soon...</p>
             </div>
           </div>
         );
@@ -638,30 +346,9 @@ export default function AgentDashboard() {
       case 'settings':
         return (
           <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-              <p className="mt-2 text-gray-600">Manage your account and preferences</p>
-            </div>
-
+            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">Account Information</h3>
-                  <p className="text-sm text-gray-500">Update your profile and contact details</p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">Notification Preferences</h3>
-                  <p className="text-sm text-gray-500">Configure how you receive updates</p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">Privacy Settings</h3>
-                  <p className="text-sm text-gray-500">Control your data and privacy</p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">Professional Settings</h3>
-                  <p className="text-sm text-gray-500">Manage your agent profile and credentials</p>
-                </div>
-              </div>
+              <p className="text-gray-600">Settings management coming soon...</p>
             </div>
           </div>
         );
@@ -672,22 +359,31 @@ export default function AgentDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Agent Dashboard</h1>
+          <p className="mt-2 text-gray-600">
+            Welcome back, {user?.user_metadata?.full_name || 'Agent'}! Manage your properties and grow your business.
+          </p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="border-b border-gray-200 mb-8">
+          <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.name}</span>
+                <tab.icon className="w-5 h-5 inline mr-2" />
+                {tab.name}
             </button>
           ))}
         </nav>
@@ -695,6 +391,33 @@ export default function AgentDashboard() {
 
       {/* Tab Content */}
       {renderTabContent()}
+      </div>
+
+      {/* Edit Property Modal */}
+      {showEditModal && editingProperty && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Property</h3>
+              <p className="text-gray-600 mb-4">Property editing coming soon...</p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

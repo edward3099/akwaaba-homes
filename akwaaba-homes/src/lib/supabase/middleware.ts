@@ -91,9 +91,20 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
-    // Redirect authenticated users away from auth pages
+    // Redirect authenticated users away from auth pages based on their role
     const url = request.nextUrl.clone();
-    url.pathname = '/agent/dashboard';
+    
+    // Get user role from metadata or profile
+    const userRole = user.user_metadata?.user_type || 'user';
+    
+    if (userRole === 'admin') {
+      url.pathname = '/admin';
+    } else if (userRole === 'agent') {
+      url.pathname = '/agent-dashboard';
+    } else {
+      url.pathname = '/dashboard';
+    }
+    
     return NextResponse.redirect(url);
   }
 

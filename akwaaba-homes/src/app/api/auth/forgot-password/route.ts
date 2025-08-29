@@ -1,52 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
-import { z } from 'zod';
-
-// Validation schema for forgot password data
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
-});
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Validate input data
-    const validationResult = forgotPasswordSchema.safeParse(body);
-    if (!validationResult.success) {
+    const { email } = await request.json();
+
+    if (!email) {
       return NextResponse.json(
-        { 
-          error: 'Validation failed', 
-          details: validationResult.error.issues 
-        },
+        { error: 'Email is required' },
         { status: 400 }
       );
     }
 
-    const { email } = validationResult.data;
+    const supabase = createRouteHandlerClient({ cookies });
 
-    const supabase = await createApiRouteSupabaseClient();
-
-    // Send password reset email with proper redirect configuration
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${request.nextUrl.origin}/reset-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`
     });
 
     if (error) {
-      console.error('Password reset error:', error);
+      console.error('Forgot password error:', error);
       return NextResponse.json(
-        { error: 'Failed to send password reset email', details: error.message },
-        { status: 500 }
+        { error: error.message || 'Failed to send reset email' },
+        { status: 400 }
       );
     }
 
-    // Always return success to prevent email enumeration attacks
     return NextResponse.json({
-      message: 'If an account with that email exists, a password reset link has been sent.'
-    }, { status: 200 });
+      success: true,
+      message: 'Password reset email sent. Please check your email for further instructions.'
+    });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('Forgot password API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

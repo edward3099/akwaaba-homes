@@ -39,8 +39,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
         <meta name="color-scheme" content="light dark" />
         
-        {/* Preload accessibility CSS */}
-        <link rel="preload" href="/styles/accessibility.css" as="style" />
+        {/* Accessibility CSS is imported in the component */}
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         {/* Skip Links for Accessibility */}

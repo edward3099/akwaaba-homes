@@ -137,7 +137,7 @@ test.describe('Property Search - Unauthenticated User', () => {
     await expect(searchPage.noResultsMessage()).toBeVisible();
   });
 
-  test('should switch between map and list views', async ({ page }) {
+  test('should switch between map and list views', async ({ page }) => {
     // Switch to map view
     await searchPage.switchToMapView();
     

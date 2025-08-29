@@ -1,477 +1,290 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth/authContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { Loader2, Eye, EyeOff, Mail, Lock, User, Building, FileText, CheckCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { PasswordStrengthMeter } from '@/components/ui/PasswordStrengthMeter';
-import { isPasswordAcceptable, DEFAULT_PASSWORD_POLICY } from '@/lib/utils/passwordValidation';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function SignupPage() {
-  const { toast } = useToast();
-  const router = useRouter();
-  const [formData, setFormData] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    companyName: string;
-    businessType: string;
-    licenseNumber: string;
-    experienceYears: string;
-    bio: string;
-    password: string;
-    confirmPassword: string;
-    agreeToTerms: boolean;
-    agreeToMarketing: boolean;
-  }>({
-    firstName: '',
-    lastName: '',
+  const [formData, setFormData] = useState({
     email: '',
-    phone: '',
-    companyName: '',
-    businessType: '',
-    licenseNumber: '',
-    experienceYears: '',
-    bio: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false,
-    agreeToMarketing: false
+    fullName: '',
+    userType: '',
+    phone: '',
+    company: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<{
-    score: number;
-    meetsRequirements: boolean;
-    feedback: string[];
-  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const { signUp, isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  // Redirect if already authenticated
+  if (isAuthenticated && user) {
+    if (user.user_metadata?.user_type === 'agent') {
+      router.push('/agent-dashboard');
+    } else if (user.user_metadata?.user_type === 'admin') {
+      router.push('/admin');
+    } else {
+      router.push('/dashboard');
+    }
+    return null;
+  }
+
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setError(''); // Clear error when user types
   };
 
   const validateForm = () => {
-    const errors: string[] = [];
-
-    if (!formData.firstName.trim()) errors.push('First name is required');
-    if (!formData.lastName.trim()) errors.push('Last name is required');
-    if (!formData.email.trim()) errors.push('Email is required');
-    if (!formData.phone.trim()) errors.push('Phone number is required');
-    if (!formData.companyName.trim()) errors.push('Company name is required');
-    if (!formData.businessType.trim()) errors.push('Business type is required');
-    if (!formData.licenseNumber.trim()) errors.push('License number is required');
-    if (!formData.experienceYears.trim()) errors.push('Years of experience is required');
-    if (!formData.bio.trim()) errors.push('Professional bio is required');
-    if (!formData.password) errors.push('Password is required');
-    if (!formData.confirmPassword) errors.push('Password confirmation is required');
-    if (formData.password !== formData.confirmPassword) errors.push('Passwords do not match');
-    if (!formData.agreeToTerms) errors.push('You must agree to the terms and conditions');
-
-    // Password strength validation
-    if (formData.password && !isPasswordAcceptable(formData.password, DEFAULT_PASSWORD_POLICY)) {
-      errors.push('Password does not meet security requirements');
+    if (!formData.email || !formData.password || !formData.confirmPassword || !formData.fullName || !formData.userType) {
+      setError('All fields are required');
+      return false;
     }
 
-    return errors;
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+
+    if (formData.userType === 'agent' && !formData.company) {
+      setError('Company name is required for agents');
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const errors = validateForm();
-    if (errors.length > 0) {
-      toast({
-        title: 'Validation Error',
-        description: errors.join(', '),
-        variant: 'destructive',
-      });
+    if (!validateForm()) {
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          user_metadata: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            company_name: formData.companyName,
-            business_type: formData.businessType,
-            license_number: formData.licenseNumber,
-            experience_years: parseInt(formData.experienceYears),
-            bio: formData.bio,
-            user_type: 'agent',
-            verification_status: 'pending'
-          }
-        }),
-      });
+      const metadata = {
+        full_name: formData.fullName,
+        user_type: formData.userType,
+        phone: formData.phone,
+        company: formData.company,
+        verification_status: 'pending'
+      };
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setShowSuccess(true);
-        toast({
-          title: 'Application Submitted Successfully!',
-          description: 'Please check your email to verify your account.',
-        });
+      const result = await signUp(formData.email, formData.password, metadata);
+      
+      if (result.success) {
+        setSuccess('Account created successfully! Please check your email to verify your account.');
+        // Don't redirect - user needs to verify email first
       } else {
-        toast({
-          title: 'Signup Failed',
-          description: data.error || 'An error occurred during signup',
-          variant: 'destructive',
-        });
+        setError(result.error || 'Signup failed');
       }
-    } catch (error) {
-      console.error('Signup error:', error);
-      toast({
-        title: 'Signup Failed',
-        description: 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      });
+    } catch (err) {
+      setError('An unexpected error occurred');
+      console.error('Signup error:', err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  if (showSuccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Application Submitted Successfully!
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              Thank you for applying to become an agent with Akwaaba Homes
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-blue-900 mb-2">What happens next?</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Check your email for a verification link</li>
-                <li>• Click the verification link to activate your account</li>
-                <li>• We&apos;ll review your application within 2-3 business days</li>
-                <li>• Our team will verify your license and credentials</li>
-                <li>• You&apos;ll be notified once your account is verified</li>
-              </ul>
-            </div>
-            
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-yellow-900 mb-2">Important: Verify Your Email</h4>
-              <p className="text-sm text-yellow-800">
-                You must verify your email address before you can sign in. Check your inbox and spam folder for the verification email.
-              </p>
-            </div>
-            
-            <div className="flex flex-col space-y-2">
-              <Link href={`/verify-email?email=${encodeURIComponent(formData.email)}`}>
-                <Button className="w-full">
-                  Go to Email Verification
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline" className="w-full">
-                  Go to Login
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-green-50 p-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <Building className="h-8 w-8 text-blue-600" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <span className="text-2xl">🏠</span>
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Apply to Become an Agent
+            Join AkwaabaHomes
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Join our network of trusted real estate professionals
+            Create your account to get started
           </CardDescription>
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <User className="h-5 w-5 mr-2" />
-                Personal Information
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    placeholder="Enter your first name"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    placeholder="Enter your last name"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="Enter your email address"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number *</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Enter your phone number"
-                    required
-                  />
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            {success && (
+              <Alert>
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name *</Label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder="Enter your full name"
+                value={formData.fullName}
+                onChange={(e) => handleInputChange('fullName', e.target.value)}
+                required
+                disabled={isLoading}
+              />
             </div>
 
-            {/* Business Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <Building className="h-5 w-5 mr-2" />
-                Business Information
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name *</Label>
-                  <Input
-                    id="companyName"
-                    value={formData.companyName}
-                    onChange={(e) => handleInputChange('companyName', e.target.value)}
-                    placeholder="Enter your company name"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="businessType">Business Type *</Label>
-                  <Input
-                    id="businessType"
-                    value={formData.businessType}
-                    onChange={(e) => handleInputChange('businessType', e.target.value)}
-                    placeholder="e.g., Real Estate Agency, Independent Agent"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="licenseNumber">License Number *</Label>
-                  <Input
-                    id="licenseNumber"
-                    value={formData.licenseNumber}
-                    onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-                    placeholder="Enter your real estate license number"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="experienceYears">Years of Experience *</Label>
-                  <Input
-                    id="experienceYears"
-                    type="number"
-                    min="0"
-                    value={formData.experienceYears}
-                    onChange={(e) => handleInputChange('experienceYears', e.target.value)}
-                    placeholder="Enter years of experience"
-                    required
-                  />
-                </div>
-              </div>
-              
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="userType">Account Type *</Label>
+              <Select
+                value={formData.userType}
+                onValueChange={(value) => handleInputChange('userType', value)}
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select account type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="buyer">Property Buyer</SelectItem>
+                  <SelectItem value="seller">Property Seller</SelectItem>
+                  <SelectItem value="agent">Real Estate Agent</SelectItem>
+                  <SelectItem value="investor">Property Investor</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.userType === 'agent' && (
               <div className="space-y-2">
-                <Label htmlFor="bio">Professional Bio *</Label>
-                <textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value)}
-                  placeholder="Tell us about your experience and expertise (minimum 10 characters)..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={4}
+                <Label htmlFor="company">Company Name *</Label>
+                <Input
+                  id="company"
+                  type="text"
+                  placeholder="Enter your company name"
+                  value={formData.company}
+                  onChange={(e) => handleInputChange('company', e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
-            {/* Account Security */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <Lock className="h-5 w-5 mr-2" />
-                Account Security
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <PasswordStrengthMeter
-                    password={formData.password}
-                    onPasswordChange={(password) => handleInputChange('password', password)}
-                    onStrengthChange={setPasswordStrength}
-                    policy={DEFAULT_PASSWORD_POLICY}
-                    userData={{ email: formData.email, name: `${formData.firstName} ${formData.lastName}` }}
-                    label="Password *"
-                    placeholder="Create a strong password"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      placeholder="Confirm your password"
-                      required
-                      className="pr-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
-                      title={showConfirmPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-500" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-500" />
-                      )}
-                    </Button>
-                  </div>
-                  
-                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                    <p className="text-sm text-red-600">Passwords do not match</p>
-                  )}
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password *</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Create a password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isLoading}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
-            {/* Terms and Conditions */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
-                Terms and Conditions
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="agreeToTerms"
-                    checked={formData.agreeToTerms}
-                    onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
-                    required
-                  />
-                  <Label htmlFor="agreeToTerms" className="text-sm leading-relaxed">
-                    I agree to the{' '}
-                    <Link href="/terms" className="text-blue-600 hover:underline">
-                      Terms and Conditions
-                    </Link>{' '}
-                    and{' '}
-                    <Link href="/privacy" className="text-blue-600 hover:underline">
-                      Privacy Policy
-                    </Link>
-                    . I confirm that all information provided is accurate and complete. *
-                  </Label>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="agreeToMarketing"
-                    checked={formData.agreeToMarketing}
-                    onChange={(e) => handleInputChange('agreeToMarketing', e.target.checked)}
-                  />
-                  <Label htmlFor="agreeToMarketing" className="text-sm leading-relaxed">
-                    I agree to receive marketing communications and updates about new features and opportunities. 
-                    You can unsubscribe at any time.
-                  </Label>
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password *</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isLoading}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
-            {/* Submit Button */}
             <Button
               type="submit"
-              disabled={(() => {
-                const isBioEmpty = formData.bio.trim().length === 0;
-                const isPasswordWeak = formData.password && !passwordStrength?.meetsRequirements;
-                return loading || !formData.agreeToTerms || isBioEmpty || isPasswordWeak;
-              })()}
-              className="w-full"
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              disabled={isLoading}
             >
-              {loading ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting Application...
+                  Creating Account...
                 </>
               ) : (
-                'Submit Application'
+                'Create Account'
               )}
             </Button>
-
-            {/* Login Link */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link href="/login" className="text-blue-600 hover:underline font-medium">
-                  Sign in here
-                </Link>
-              </p>
-            </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <div className="text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link
+                href="/login"
+                className="text-green-600 hover:text-green-700 hover:underline font-medium"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -5,64 +5,102 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, CheckCircle, XCircle, Clock, Building2, MapPin, Bed, Bath, Square, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminPropertyApprovalsPage() {
-  // Mock data - replace with actual API calls
-  const pendingApprovals = [
-    {
-      id: '1',
-      title: 'Luxury Villa in East Legon',
-      agent: 'Sarah Mensah',
-      company: 'Mensah Properties',
-      location: 'East Legon, Accra',
-      price: 2500000,
-      bedrooms: 5,
-      bathrooms: 4,
-      size: 450,
-      submittedAt: '2024-01-15T10:30:00Z',
-      status: 'pending',
-      images: ['villa1.jpg', 'villa2.jpg', 'villa3.jpg']
-    },
-    {
-      id: '2',
-      title: 'Modern Apartment in Cantonments',
-      agent: 'Kwame Asante',
-      company: 'Asante Real Estate',
-      location: 'Cantonments, Accra',
-      price: 850000,
-      bedrooms: 3,
-      bathrooms: 2,
-      size: 180,
-      submittedAt: '2024-01-15T09:15:00Z',
-      status: 'pending',
-      images: ['apartment1.jpg', 'apartment2.jpg']
-    },
-    {
-      id: '3',
-      title: 'Commercial Space in Osu',
-      agent: 'Michael Osei',
-      company: 'Osei Properties',
-      location: 'Osu, Accra',
-      price: 1200000,
-      bedrooms: 0,
-      bathrooms: 2,
-      size: 300,
-      submittedAt: '2024-01-14T16:45:00Z',
-      status: 'pending',
-      images: ['commercial1.jpg', 'commercial2.jpg']
+  const [properties, setProperties] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch pending properties on component mount
+  React.useEffect(() => {
+    fetchPendingProperties();
+  }, []);
+
+  const fetchPendingProperties = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/admin/properties/approvals', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pending properties: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setProperties(data.properties || []);
+    } catch (error) {
+      console.error('Error fetching pending properties:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch pending properties');
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const handleReview = async (_id: string) => {
-    // TODO: Implement review functionality
   };
 
-  const handleApprove = async (_id: string) => {
-    // TODO: Implement approval functionality
+  const handleReview = async (id: string) => {
+    // TODO: Implement review functionality - could open a modal with details
+    console.log('Review requested for property:', id);
   };
 
-  const handleReject = async (_id: string) => {
-    // TODO: Implement rejection functionality
+  const handleApprove = async (id: string) => {
+    try {
+      const response = await fetch('/api/admin/properties/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          propertyId: id,
+          action: 'approve'
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Property approved successfully!');
+        // Refresh the data
+        fetchPendingProperties();
+      } else {
+        const error = await response.json();
+        toast.error(`Failed to approve: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error approving property:', error);
+      alert(`Failed to approve: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    const reason = prompt('Please provide a reason for rejection:');
+    if (!reason) return;
+
+    try {
+      const response = await fetch('/api/admin/properties/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          propertyId: id,
+          action: 'reject',
+          reason
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Property rejected successfully!');
+        // Refresh the data
+        fetchPendingProperties();
+      } else {
+        const error = await response.json();
+        toast.error(`Failed to reject: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error rejecting property:', error);
+      alert(`Failed to reject: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -97,6 +135,42 @@ export default function AdminPropertyApprovalsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-muted-foreground">Loading pending properties...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Property Approvals</h1>
+          <p className="text-muted-foreground">Review and manage pending property listing approvals</p>
+        </div>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-red-800 mb-2">Failed to Load Properties</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchPendingProperties} variant="outline" size="sm">
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -111,7 +185,7 @@ export default function AdminPropertyApprovalsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Pending</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingApprovals.length}</div>
+            <div className="text-2xl font-bold">{properties.length}</div>
             <p className="text-xs text-muted-foreground">Awaiting approval</p>
           </CardContent>
         </Card>
@@ -121,7 +195,7 @@ export default function AdminPropertyApprovalsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Value</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(pendingApprovals.reduce((sum, p) => sum + p.price, 0))}</div>
+            <div className="text-2xl font-bold">{formatCurrency(properties.reduce((sum, p) => sum + (p.price || 0), 0))}</div>
             <p className="text-xs text-muted-foreground">Combined property value</p>
           </CardContent>
         </Card>
@@ -131,7 +205,7 @@ export default function AdminPropertyApprovalsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Agents</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{new Set(pendingApprovals.map(p => p.agent)).size}</div>
+            <div className="text-2xl font-bold">{new Set(properties.map(p => p.profiles?.full_name || 'Unknown')).size}</div>
             <p className="text-xs text-muted-foreground">Unique agents</p>
           </CardContent>
         </Card>
@@ -145,7 +219,7 @@ export default function AdminPropertyApprovalsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {pendingApprovals.map((property) => (
+            {properties.map((property) => (
               <div key={property.id} className="border rounded-lg p-6 hover:bg-muted/50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -237,7 +311,7 @@ export default function AdminPropertyApprovalsPage() {
               </div>
             ))}
 
-            {pendingApprovals.length === 0 && (
+            {properties.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-600" />
                 <p className="text-lg font-medium">No pending property approvals</p>

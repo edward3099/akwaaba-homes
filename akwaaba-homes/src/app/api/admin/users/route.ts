@@ -47,21 +47,16 @@ export async function GET(request: NextRequest) {
     
     // Build base query
     let query = supabase
-      .from('users')
+      .from('profiles')
       .select(`
         id,
         email,
         full_name,
         phone,
-        user_type,
+        user_role,
         is_verified,
-        is_active,
-        company_name,
-        bio,
-        profile_image_url,
         created_at,
-        updated_at,
-        last_login_at
+        updated_at
       `);
     
     // Apply filters
@@ -70,15 +65,11 @@ export async function GET(request: NextRequest) {
     }
     
     if (user_type) {
-      query = query.eq('user_type', user_type);
+      query = query.eq('user_role', user_type);
     }
     
     if (is_verified !== undefined) {
       query = query.eq('is_verified', is_verified);
-    }
-    
-    if (is_active !== undefined) {
-      query = query.eq('is_active', is_active);
     }
     
     // Apply sorting
@@ -98,12 +89,12 @@ export async function GET(request: NextRequest) {
     
     // Get total count for pagination
     const { count: totalCount } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*', { count: 'exact', head: true });
     
     // Log admin action
-    await logAdminAction(supabase, user.id, 'list_users', 'users', undefined, {
-      filters: { search, user_type, is_verified, is_active },
+    await logAdminAction(supabase, user.id, 'list_users', 'profiles', undefined, {
+      filters: { search, user_type, is_verified },
       pagination: { page, limit },
       sorting: { sort_by, sort_order }
     });
@@ -150,7 +141,7 @@ export async function POST(request: NextRequest) {
     // Check if email already exists
     if (validatedData.email) {
       const { data: existingUser } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id')
         .eq('email', validatedData.email)
         .single();
@@ -162,7 +153,7 @@ export async function POST(request: NextRequest) {
     
     // Create user profile
     const { data: newUser, error: createError } = await supabase
-      .from('users')
+      .from('profiles')
       .insert([{
         ...validatedData,
         created_at: new Date().toISOString(),
@@ -177,7 +168,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Log admin action
-    await logAdminAction(supabase, user.id, 'create_user', 'users', newUser.id, {
+    await logAdminAction(supabase, user.id, 'create_user', 'profiles', newUser.id, {
       user_data: validatedData
     });
     
@@ -227,14 +218,6 @@ export async function PUT(request: NextRequest) {
         updateData = { is_verified: false };
         actionDescription = 'unverify users';
         break;
-      case 'activate':
-        updateData = { is_active: true };
-        actionDescription = 'activate users';
-        break;
-      case 'deactivate':
-        updateData = { is_active: false };
-        actionDescription = 'deactivate users';
-        break;
       case 'delete':
         // For delete action, we'll handle it separately
         break;
@@ -245,11 +228,11 @@ export async function PUT(request: NextRequest) {
     let result;
     
     if (action === 'delete') {
-      // Delete users (soft delete by setting is_active to false)
+      // Delete users (soft delete by setting is_verified to false)
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
-          is_active: false, 
+          is_verified: false, 
           updated_at: new Date().toISOString() 
         })
         .in('id', user_ids)
@@ -265,7 +248,7 @@ export async function PUT(request: NextRequest) {
     } else {
       // Update users
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
           ...updateData, 
           updated_at: new Date().toISOString() 
@@ -282,7 +265,7 @@ export async function PUT(request: NextRequest) {
     }
     
     // Log admin action
-    await logAdminAction(supabase, user.id, actionDescription, 'users', undefined, {
+    await logAdminAction(supabase, user.id, actionDescription, 'profiles', undefined, {
       action,
       user_ids,
       affected_count: result?.length || 0

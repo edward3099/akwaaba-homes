@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { cdnService, CDNMonitoringData } from '@/lib/services/cdnService';
+import { toast } from 'sonner';
 
 interface CDNDashboardProps {
   bucketName: string;
@@ -51,10 +52,10 @@ export default function CDNDashboard({ bucketName, className = '' }: CDNDashboar
     try {
       const result = await cdnService.preloadAssets(preloadAssets);
       console.log('Preload result:', result);
-      alert(`Preloaded ${preloadAssets.length} assets`);
+      toast.success(`Preloaded ${preloadAssets.length} assets successfully`);
     } catch (error) {
       console.error('Failed to preload assets:', error);
-      alert('Failed to preload assets');
+      toast.error('Failed to preload assets. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -68,10 +69,10 @@ export default function CDNDashboard({ bucketName, className = '' }: CDNDashboar
       const filePaths = preloadAssets.map(asset => asset.path);
       const result = await cdnService.warmUpCDNCache(bucketName, filePaths);
       console.log('Cache warmup result:', result);
-      alert(`Warmed up cache for ${filePaths.length} assets`);
+      toast.success(`Warmed up cache for ${filePaths.length} assets successfully`);
     } catch (error) {
       console.error('Failed to warm up cache:', error);
-      alert('Failed to warm up cache');
+      toast.error('Failed to warm up cache. Please try again.');
     } finally {
       setLoading(false);
     }

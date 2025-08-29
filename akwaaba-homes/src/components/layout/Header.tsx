@@ -109,7 +109,7 @@ export function Header() {
                 )}
                 {userProfile.user_type === 'agent' && (
                   <Link
-                    href="/agent/dashboard"
+                    href="/agent-dashboard"
                     className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors relative group"
                   >
                     Agent Dashboard
@@ -146,7 +146,7 @@ export function Header() {
                         </Button>
                       </Link>
                     ) : userProfile?.user_type === 'agent' ? (
-                      <Link href="/agent/dashboard">
+                      <Link href="/agent-dashboard">
                         <Button variant="outline" size="sm">
                           Agent Dashboard
                         </Button>
@@ -160,7 +160,7 @@ export function Header() {
                             </Button>
                           </Link>
                         ) : userProfile?.user_type === 'agent' ? (
-                          <Link href="/agent/dashboard">
+                          <Link href="/agent-dashboard">
                             <Button variant="outline" size="sm">
                               Agent Dashboard
                             </Button>
@@ -269,7 +269,7 @@ export function Header() {
                   )}
                   {userProfile.user_type === 'agent' && (
                     <Link
-                      href="/agent/dashboard"
+                      href="/agent-dashboard"
                       className="block px-3 sm:px-4 py-3 text-sm sm:text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >

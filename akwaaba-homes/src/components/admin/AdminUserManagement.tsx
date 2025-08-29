@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useApiMutation, useFormMutation, useDestructiveMutation } from '@/lib/hooks/useApiMutation';
 import { adminValidationSchema, type AdminFormData } from '@/lib/utils/formValidation';
 import { toast } from 'sonner';
@@ -33,18 +32,13 @@ import {
 interface AdminUser {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  full_name?: string;
   phone: string;
-  company_name: string;
-  business_type: string;
-  license_number: string;
-  experience_years: number;
-  bio: string;
-  user_role: string;
+  company_name?: string;
+  user_type?: string;
   created_at: string;
-  last_sign_in_at?: string;
   is_verified: boolean;
+  is_active: boolean;
 }
 
 export default function AdminUserManagement() {
@@ -55,8 +49,6 @@ export default function AdminUserManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
-  
-  const supabase = createClientComponentClient();
 
   // Form setup with React Hook Form
   const {
@@ -138,24 +130,16 @@ export default function AdminUserManagement() {
   const fetchAdminUsers = async () => {
     try {
       setIsLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) {
-        toast.error('Authentication Error', {
-          description: 'Please log in to access admin features.',
-        });
-        return;
-      }
-
-      const response = await fetch('/api/admin/users', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
+      const response = await fetch('/api/admin/users');
 
       if (response.ok) {
-        const users = await response.json();
-        setAdminUsers(users);
+        const result = await response.json();
+        if (result.success && result.data && result.data.users) {
+          setAdminUsers(result.data.users);
+        } else {
+          setAdminUsers([]);
+        }
       } else {
         throw new Error('Failed to fetch admin users');
       }
@@ -176,18 +160,20 @@ export default function AdminUserManagement() {
   // Handle create admin
   const onSubmitCreate = async (data: AdminFormData) => {
     await createAdminMutation.submitForm(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Please log in to access admin features.');
-      }
-
-      const response = await fetch('/api/admin/create-admin', {
+      const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          email: data.email,
+          full_name: `${data.first_name} ${data.last_name}`,
+          phone: data.phone,
+          company_name: data.company_name,
+          user_type: 'admin',
+          is_verified: true,
+          is_active: true
+        })
       });
 
       if (!response.ok) {
@@ -204,18 +190,16 @@ export default function AdminUserManagement() {
     if (!editingUser) return;
 
     await updateAdminMutation.submitForm(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Please log in to access admin features.');
-      }
-
       const response = await fetch(`/api/admin/users/${editingUser.id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          full_name: `${data.first_name} ${data.last_name}`,
+          phone: data.phone,
+          company_name: data.company_name
+        })
       });
 
       if (!response.ok) {
@@ -230,16 +214,15 @@ export default function AdminUserManagement() {
   // Handle delete admin
   const handleDeleteAdmin = async (userId: string) => {
     await deleteAdminMutation.executeWithConfirmation(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Please log in to access admin features.');
-      }
-
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/admin/users`, {
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          user_ids: [userId]
+        })
       });
 
       if (!response.ok) {
@@ -254,15 +237,15 @@ export default function AdminUserManagement() {
   // Open edit modal
   const openEditModal = (user: AdminUser) => {
     setEditingUser(user);
-    setValue('email', user.email);
-    setValue('first_name', user.first_name);
-    setValue('last_name', user.last_name);
-    setValue('phone', user.phone);
-    setValue('company_name', user.company_name);
-    setValue('business_type', user.business_type);
-    setValue('license_number', user.license_number);
-    setValue('experience_years', user.experience_years);
-    setValue('bio', user.bio);
+    const nameParts = user.full_name?.split(' ') || [];
+    setValue('first_name', nameParts[0] || '');
+    setValue('last_name', nameParts.slice(1).join(' ') || '');
+    setValue('phone', user.phone || '');
+    setValue('company_name', user.company_name || '');
+    setValue('business_type', 'real_estate');
+    setValue('license_number', 'GH123456');
+    setValue('experience_years', 5);
+    setValue('bio', 'Experienced real estate professional');
     setValue('permissions', ['read', 'write']);
     setValue('role', 'admin');
     setIsEditModalOpen(true);
@@ -270,12 +253,11 @@ export default function AdminUserManagement() {
 
   // Filter and search users
   const filteredUsers = adminUsers.filter(user => {
-    const matchesSearch = user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (user.company_name && user.company_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesFilter = filterRole === 'all' || user.user_role === filterRole;
+    const matchesFilter = filterRole === 'all' || (user.user_type && user.user_type === filterRole);
     
     return matchesSearch && matchesFilter;
   });
@@ -363,13 +345,13 @@ export default function AdminUserManagement() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Avatar>
-                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.first_name}+${user.last_name}`} />
+                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.full_name}`} />
                       <AvatarFallback className="bg-ghana-green text-white">
-                        {user.first_name[0]}{user.last_name[0]}
+                        {user.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <CardTitle className="text-lg">{user.first_name} {user.last_name}</CardTitle>
+                      <CardTitle className="text-lg">{user.full_name}</CardTitle>
                       <CardDescription className="flex items-center">
                         <Mail className="w-3 h-3 mr-1" />
                         {user.email}
@@ -377,9 +359,9 @@ export default function AdminUserManagement() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge variant={user.user_role === 'super_admin' ? 'destructive' : 'default'}>
+                    <Badge variant={user.user_type === 'super_admin' ? 'destructive' : 'default'}>
                       <Shield className="w-3 h-3 mr-1" />
-                      {user.user_role.replace('_', ' ')}
+                      {user.user_type?.replace('_', ' ') || 'Unknown'}
                     </Badge>
                     {user.is_verified && (
                       <Badge variant="secondary" className="bg-ghana-gold text-ghana-red">
@@ -392,21 +374,16 @@ export default function AdminUserManagement() {
               <CardContent className="space-y-3">
                 <div className="flex items-center text-sm text-gray-600">
                   <Phone className="w-3 h-3 mr-2" />
-                  {user.phone}
+                  {user.phone || 'No phone'}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Building className="w-3 h-3 mr-2" />
-                  {user.company_name}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Award className="w-3 h-3 mr-2" />
-                  {user.business_type}
+                  {user.company_name || 'No company'}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="w-3 h-3 mr-2" />
-                  {user.experience_years} years experience
+                  Joined {new Date(user.created_at).toLocaleDateString()}
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">{user.bio}</p>
                 
                 <div className="flex justify-end space-x-2 pt-2">
                   <Button

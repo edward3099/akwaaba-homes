@@ -52,8 +52,8 @@ export async function authenticateAdmin(request: NextRequest): Promise<AdminAuth
 
     // Get user profile with role information
     const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('id, email, full_name, user_type, is_verified')
+      .from('profiles')
+      .select('id, email, full_name, user_role, is_verified')
       .eq('id', user.id)
       .single();
 
@@ -62,7 +62,7 @@ export async function authenticateAdmin(request: NextRequest): Promise<AdminAuth
     }
 
     // Check if user is an admin type
-    if (!['admin', 'super_admin', 'moderator'].includes(profile.user_type)) {
+    if (!['admin', 'super_admin', 'moderator'].includes(profile.user_role)) {
       return null;
     }
 
@@ -72,13 +72,13 @@ export async function authenticateAdmin(request: NextRequest): Promise<AdminAuth
     }
 
     // Get user permissions based on role
-    const permissions = await getUserPermissions(profile.user_type, supabase);
+    const permissions = await getUserPermissions(profile.user_role, supabase);
 
     const adminUser: AdminUser = {
       id: profile.id,
       email: profile.email,
       full_name: profile.full_name,
-      user_type: profile.user_type,
+      user_type: profile.user_role,
       is_verified: profile.is_verified,
       permissions
     };

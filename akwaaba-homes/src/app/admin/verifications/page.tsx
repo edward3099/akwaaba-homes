@@ -5,49 +5,104 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, CheckCircle, XCircle, Clock, User, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminVerificationsPage() {
-  // Mock data - replace with actual API calls
-  const pendingVerifications = [
-    {
-      id: '1',
-      type: 'agent',
-      name: 'Kwame Asante',
-      company: 'Asante Real Estate',
-      submittedAt: '2024-01-15T10:30:00Z',
-      status: 'pending',
-      documents: ['license', 'id_card', 'business_registration']
-    },
-    {
-      id: '2',
-      type: 'property',
-      title: 'Luxury Villa in East Legon',
-      agent: 'Sarah Mensah',
-      submittedAt: '2024-01-15T09:15:00Z',
-      status: 'pending',
-      documents: ['property_deed', 'photos', 'specifications']
-    },
-    {
-      id: '3',
-      type: 'agent',
-      name: 'Michael Osei',
-      company: 'Osei Properties',
-      submittedAt: '2024-01-14T16:45:00Z',
-      status: 'pending',
-      documents: ['license', 'id_card', 'references']
+  const [verifications, setVerifications] = React.useState<any>({ agents: [], properties: [] });
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch verifications on component mount
+  React.useEffect(() => {
+    fetchVerifications();
+  }, []);
+
+  const fetchVerifications = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/admin/verifications', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch verifications: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setVerifications(data);
+    } catch (error) {
+      console.error('Error fetching verifications:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch verifications');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const handleReview = async (id: string, type: string) => {
-    // TODO: Implement review functionality
+    // TODO: Implement review functionality - could open a modal with details
+    console.log('Review requested for:', { id, type });
   };
 
   const handleApprove = async (id: string, type: string) => {
-    // TODO: Implement approval functionality
+    try {
+      const response = await fetch('/api/admin/verifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          verificationId: id,
+          verificationType: type,
+          action: 'approve'
+        })
+      });
+
+      if (response.ok) {
+        toast.success(`${type} approved successfully!`);
+        // Refresh the data
+        fetchVerifications();
+      } else {
+        const error = await response.json();
+        toast.error(`Failed to approve: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error approving verification:', error);
+      alert(`Failed to approve: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const handleReject = async (id: string, type: string) => {
-    // TODO: Implement rejection functionality
+    const reason = prompt('Please provide a reason for rejection:');
+    if (!reason) return;
+
+    try {
+      const response = await fetch('/api/admin/verifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          verificationId: id,
+          verificationType: type,
+          action: 'reject',
+          reason
+        })
+      });
+
+      if (response.ok) {
+        toast.success(`${type} rejected successfully!`);
+        // Refresh the data
+        fetchVerifications();
+      } else {
+        const error = await response.json();
+        toast.error(`Failed to reject: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error rejecting verification:', error);
+      alert(`Failed to reject: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -84,6 +139,42 @@ export default function AdminVerificationsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-muted-foreground">Loading verifications...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Verification Management</h1>
+          <p className="text-muted-foreground">Review and manage pending verifications for agents and properties</p>
+        </div>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-red-800 mb-2">Failed to Load Verifications</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchVerifications} variant="outline" size="sm">
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -98,7 +189,7 @@ export default function AdminVerificationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Pending</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingVerifications.length}</div>
+            <div className="text-2xl font-bold">{verifications.agents.length + verifications.properties.length}</div>
             <p className="text-xs text-muted-foreground">Awaiting review</p>
           </CardContent>
         </Card>
@@ -108,7 +199,7 @@ export default function AdminVerificationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Agent Verifications</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingVerifications.filter(v => v.type === 'agent').length}</div>
+            <div className="text-2xl font-bold">{verifications.agents.length}</div>
             <p className="text-xs text-muted-foreground">Pending agent approvals</p>
           </CardContent>
         </Card>
@@ -118,7 +209,7 @@ export default function AdminVerificationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Property Verifications</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingVerifications.filter(v => v.type === 'property').length}</div>
+            <div className="text-2xl font-bold">{verifications.properties.length}</div>
             <p className="text-xs text-muted-foreground">Pending property approvals</p>
           </CardContent>
         </Card>
@@ -132,7 +223,7 @@ export default function AdminVerificationsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {pendingVerifications.map((verification) => (
+            {[...verifications.agents.map(agent => ({ ...agent, type: 'agent' })), ...verifications.properties.map(property => ({ ...property, type: 'property' }))].map((verification) => (
               <div key={verification.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
@@ -195,7 +286,7 @@ export default function AdminVerificationsPage() {
               </div>
             ))}
 
-            {pendingVerifications.length === 0 && (
+            {verifications.agents.length === 0 && verifications.properties.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-600" />
                 <p className="text-lg font-medium">No pending verifications</p>

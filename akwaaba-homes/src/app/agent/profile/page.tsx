@@ -212,9 +212,8 @@ export default function AgentProfilePage() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/agent/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+              <Link href="/agent-dashboard">
+                <Button variant="outline" className="w-full">
                   Back to Dashboard
                 </Button>
               </Link>
@@ -485,7 +484,7 @@ export default function AgentProfilePage() {
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
-            <Link href="/agent/dashboard">
+            <Link href="/agent-dashboard">
               <Button variant="outline">
                 Cancel
               </Button>

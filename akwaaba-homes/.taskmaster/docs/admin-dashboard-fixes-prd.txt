@@ -1,0 +1,84 @@
+# Admin Dashboard Critical Issues Fix - Product Requirements Document
+
+## Project Overview
+Fix all critical issues discovered during comprehensive Playwright MCP testing of the AkwaabaHomes admin dashboard. The admin dashboard is currently 97% functional but has several critical runtime errors and non-functional buttons that prevent proper administration functionality.
+
+## Critical Issues Identified
+
+### 1. Pending Verifications Page Runtime Error
+**Problem**: "Event handlers cannot be passed to Client Component props" error on `/admin/verifications`
+**Impact**: Completely blocks access to verification management
+**Priority**: CRITICAL
+
+### 2. Property Approvals Page Runtime Error  
+**Problem**: Same "Event handlers cannot be passed to Client Component props" error on `/admin/properties/approvals`
+**Impact**: Completely blocks access to property approval management
+**Priority**: CRITICAL
+
+### 3. Analytics Page Runtime Error
+**Problem**: "Cannot destructure property 'activeIndex' of useAppSelector" error on `/admin/analytics`
+**Impact**: Analytics dashboard cannot be used due to client-side JavaScript error
+**Priority**: CRITICAL
+
+### 4. Create Admin Button Non-Functional
+**Problem**: "Create Admin" button in modal doesn't close modal or create admin account
+**Impact**: Prevents creating new admin accounts
+**Priority**: HIGH
+
+### 5. Properties API Authentication Issue
+**Problem**: 500 Internal Server Error when fetching properties due to authentication issues
+**Impact**: Properties page shows "Failed to fetch properties" error
+**Priority**: HIGH
+
+### 6. Settings API Error
+**Problem**: 500 Internal Server Error when fetching settings data
+**Impact**: Settings page loads with mock data instead of real configuration
+**Priority**: MEDIUM
+
+## Technical Requirements
+
+### Frontend Fixes
+- Fix React component prop passing issues in verifications and approvals pages
+- Resolve useAppSelector destructuring error in analytics component
+- Fix form submission logic in admin creation modal
+- Ensure proper error handling and user feedback
+
+### Backend Fixes  
+- Resolve authentication issues in properties API endpoint
+- Fix settings API endpoint errors
+- Ensure proper Supabase RLS policies and authentication flow
+- Implement proper error handling and logging
+
+### Testing Requirements
+- All buttons must produce expected outcomes
+- No runtime errors on any admin pages
+- Proper navigation between all admin sections
+- Form submissions work correctly
+- API endpoints return proper responses
+
+## Success Criteria
+- All admin dashboard buttons functional and produce expected outcomes
+- No runtime errors on any admin pages
+- Properties page loads and displays data correctly
+- Admin creation modal works properly
+- Settings page loads real configuration data
+- All navigation between admin sections works seamlessly
+
+## Technology Stack
+- Frontend: Next.js 15, React, TypeScript, TailwindCSS
+- Backend: Supabase (PostgreSQL, Auth, RLS)
+- Testing: Playwright MCP for end-to-end validation
+- Research: Context7 for best practices and solutions
+
+## Implementation Approach
+1. Research each issue using Context7 to understand best practices
+2. Fix frontend component issues (React props, state management)
+3. Fix backend API authentication and data fetching issues
+4. Test all fixes using Playwright MCP
+5. Validate that all buttons produce expected outcomes
+6. Ensure no runtime errors remain
+
+## Dependencies
+- Supabase MCP for backend operations
+- Context7 for research and best practices
+- Playwright MCP for testing validation

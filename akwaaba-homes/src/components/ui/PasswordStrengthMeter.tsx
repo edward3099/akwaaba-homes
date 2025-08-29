@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   validatePassword, 
   getPasswordStrengthLabel, 
@@ -57,17 +57,27 @@ export function PasswordStrengthMeter({
   const [strength, setStrength] = useState<PasswordStrength | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Validate password whenever it changes
+  // Memoize the strength change callback to prevent infinite loops
+  const handleStrengthChange = useCallback((newStrength: PasswordStrength | null) => {
+    if (onStrengthChange) {
+      onStrengthChange(newStrength);
+    }
+  }, [onStrengthChange]);
+
+  // Validate password whenever it changes - use useCallback to prevent infinite loops
   useEffect(() => {
     if (password) {
       const validation = validatePassword(password, policy, userData);
       setStrength(validation);
-      onStrengthChange?.(validation);
+      // Only call onStrengthChange if it's different from current strength
+      if (!strength || JSON.stringify(validation) !== JSON.stringify(strength)) {
+        handleStrengthChange(validation);
+      }
     } else {
       setStrength(null);
-      onStrengthChange?.(null);
+      handleStrengthChange(null);
     }
-  }, [password, policy, userData, onStrengthChange]);
+  }, [password, policy, userData, handleStrengthChange]);
 
   // Generate secure password
   const handleGeneratePassword = () => {

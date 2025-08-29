@@ -11,6 +11,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 
 interface PropertyFormData {
   // Basic Information
@@ -134,13 +135,13 @@ export default function PropertyListingForm() {
     Array.from(files).forEach((file) => {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert(`File ${file.name} is not an image. Please select only image files.`);
+        toast.error(`File ${file.name} is not an image. Please select only image files.`);
         return;
       }
 
       // Validate file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        toast.error(`File ${file.name} is too large. Maximum size is 10MB.`);
         return;
       }
 
@@ -197,7 +198,7 @@ export default function PropertyListingForm() {
     
     // Validate minimum image requirement
     if (imagePreviewUrls.length < 3) {
-      alert('Please upload at least 3 images before submitting the form.');
+      toast.error('Please upload at least 3 images before submitting the form.');
       return;
     }
     

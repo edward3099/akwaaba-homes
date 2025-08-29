@@ -19,7 +19,7 @@ export default function Dashboard() {
         return;
       }
       if (isAgent) {
-        router.push('/agent/dashboard');
+        router.push('/agent-dashboard');
         return;
       }
       // For regular users (customers), redirect to properties page instead of showing dashboard

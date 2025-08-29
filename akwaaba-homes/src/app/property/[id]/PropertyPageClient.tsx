@@ -224,15 +224,22 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                   className="flex-1 sm:flex-none text-sm sm:text-base" 
                   size="sm"
                   onClick={() => {
-                    // Open email client with pre-filled subject and body
-                    const subject = `Inquiry about ${property.title}`;
-                    const body = `Hi,\n\nI'm interested in ${property.title} at ${property.location.address}, ${property.location.city}.\n\nCan you provide more details about this property?\n\nThank you.`;
-                    const mailtoUrl = `mailto:${property.seller.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                    window.open(mailtoUrl, '_self');
+                    if (!property.seller.email) {
+                      // If no email, open WhatsApp instead
+                      const message = `Hi, I'm interested in ${property.title} at ${property.location.address}, ${property.location.city}. Can you provide more details?`;
+                      const whatsappUrl = `https://wa.me/${property.seller.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                      window.open(whatsappUrl, '_blank');
+                    } else {
+                      // Open email client with pre-filled subject and body
+                      const subject = `Inquiry about ${property.title}`;
+                      const body = `Hi,\n\nI'm interested in ${property.title} at ${property.location.address}, ${property.location.city}.\n\nCan you provide more details about this property?\n\nThank you.`;
+                      const mailtoUrl = `mailto:${property.seller.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                      window.open(mailtoUrl, '_self');
+                    }
                   }}
                 >
                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Email
+                  {property.seller.email ? 'Email' : 'WhatsApp'}
                 </Button>
               </div>
             </div>
@@ -419,8 +426,13 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                       variant="outline" 
                       className="w-full text-sm sm:text-base" 
                       size="sm"
+                      onClick={() => {
+                        // Open report form or redirect to report page
+                        const reportUrl = `/report-property?propertyId=${property.id}&propertyTitle=${encodeURIComponent(property.title)}`;
+                        window.open(reportUrl, '_blank');
+                      }}
                     >
-                      <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <Flag className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Report Property
                     </Button>
                   </div>
@@ -432,15 +444,40 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
             <div className="bg-white rounded-lg p-4 sm:p-6 border text-center">
               <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">Share this property</p>
               <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs sm:text-sm"
+                  onClick={() => {
+                    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(`Check out this property: ${property.title}`)}`;
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                  }}
+                >
                   <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Facebook
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs sm:text-sm"
+                  onClick={() => {
+                    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out this property: ${property.title}`)}&url=${encodeURIComponent(window.location.href)}`;
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                  }}
+                >
                   <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Twitter
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs sm:text-sm"
+                  onClick={() => {
+                    const message = `Check out this property: ${property.title}\n\n${property.location.address}, ${property.location.city}\n\nView it here: ${window.location.href}`;
+                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                  }}
+                >
                   <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   WhatsApp
                 </Button>
@@ -456,7 +493,11 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
                   <button 
-                    onClick={() => window.location.href = `/agent/${property.seller.id}`}
+                    onClick={() => {
+                      // Navigate to agent profile with a smooth transition
+                      const agentUrl = `/agent/${property.seller.id}`;
+                      window.location.href = agentUrl;
+                    }}
                     className="group w-full transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg p-2 -m-2"
                   >
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full mx-auto mb-2 sm:mb-3 flex items-center justify-center group-hover:bg-gray-100 transition-colors">

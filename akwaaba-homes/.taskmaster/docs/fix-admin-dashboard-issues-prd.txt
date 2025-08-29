@@ -1,0 +1,84 @@
+# Fix Admin Dashboard Critical Issues - Product Requirements Document
+
+## Project Overview
+Fix all critical functionality issues identified during comprehensive testing of the AkwaabaHomes admin dashboard. The system currently has 53% broken functionality that prevents effective administration.
+
+## Critical Issues Identified
+
+### 1. API Endpoints Returning 500/403 Errors
+- **Properties Loading Error (500 Internal Server Error)**: `/api/admin/properties` endpoint failing
+- **Analytics Page Error (403 Forbidden)**: `/api/admin/analytics` endpoint failing  
+- **Settings Page Error (500 Internal Server Error)**: Settings API endpoint failing
+- **Forgot Password API Error (500 Internal Server Error)**: Password reset functionality broken
+
+### 2. Admin Authentication System Broken
+- **Authentication Not Persisting**: Admin login redirects to regular login page
+- **Session Management Issues**: Admin dashboard access compromised
+
+### 3. Core Functionality Broken
+- **Property Management System Down**: Cannot view/manage properties
+- **User Management System Broken**: Cannot create/manage admin accounts
+- **Dashboard Overview Data Missing**: System statistics not displaying
+
+### 4. User Experience Issues
+- **Property Action Buttons Non-Functional**: Call/WhatsApp buttons don't work
+- **Placeholder Buttons Leading to 404s**: Verification/approval workflows broken
+- **Password Reset System Broken**: User account recovery compromised
+
+## Technical Requirements
+
+### Backend Fixes Required
+- Fix Supabase API authentication and authorization
+- Resolve database query issues causing 500 errors
+- Implement proper error handling and logging
+- Fix RLS (Row Level Security) policies
+- Ensure proper environment variable configuration
+
+### Frontend Fixes Required
+- Fix admin authentication flow
+- Implement proper error handling for API failures
+- Fix property action button functionality
+- Implement proper loading states and error messages
+- Fix navigation and routing issues
+
+### Database Fixes Required
+- Verify and fix database schema mismatches
+- Ensure proper table relationships
+- Fix foreign key constraints
+- Implement proper indexing
+
+## Success Criteria
+- All API endpoints return proper responses (no 500/403 errors)
+- Admin authentication works consistently
+- Property management system fully functional
+- User management system operational
+- Dashboard overview displays real-time data
+- Property action buttons work correctly
+- Password reset system functional
+- All placeholder buttons lead to working functionality
+
+## Priority Levels
+- **P0 (Critical)**: API endpoints, authentication, property management
+- **P1 (High)**: User management, dashboard overview, password reset
+- **P2 (Medium)**: Property action buttons, placeholder button functionality
+- **P3 (Low)**: UI polish, error message improvements
+
+## Implementation Approach
+1. **Diagnose Root Causes**: Use Supabase MCP to investigate database and API issues
+2. **Research Best Practices**: Use Context7 to research Supabase and Next.js solutions
+3. **Fix Backend Issues**: Resolve API endpoints and database problems
+4. **Fix Frontend Issues**: Implement proper error handling and functionality
+5. **Test All Fixes**: Verify each issue is resolved
+6. **Document Solutions**: Create maintenance documentation
+
+## Timeline
+- **Phase 1 (Immediate)**: Fix critical API endpoints and authentication (2-3 hours)
+- **Phase 2 (Same Day)**: Fix property management and user management (2-3 hours)  
+- **Phase 3 (Same Day)**: Fix remaining functionality issues (2-3 hours)
+- **Phase 4 (Same Day)**: Testing and validation (1-2 hours)
+
+## Dependencies
+- Supabase MCP access for database operations
+- Context7 access for research and best practices
+- Access to current codebase for implementation
+- Development server running for testing

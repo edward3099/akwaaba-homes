@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
+import { toast } from 'sonner';
 
 interface PropertyCardProps {
   property: Property;
@@ -55,8 +56,8 @@ export function PropertyCard({
     
     // Check if seller has a phone number
     if (!property.seller.phone) {
-      // Show a toast or alert that contact information is not available
-      alert('Contact information not available for this property. Please use the inquiry form.');
+      // Show a toast that contact information is not available
+      toast.warning('Contact information not available for this property. Please use the inquiry form.');
       return;
     }
     
@@ -69,8 +70,8 @@ export function PropertyCard({
     
     // Check if seller has a phone number
     if (!property.seller.phone) {
-      // Show a toast or alert that contact information is not available
-      alert('Contact information not available for this property. Please use the inquiry form.');
+      // Show a toast that contact information is not available
+      toast.warning('Contact information not available for this property. Please use the inquiry form.');
       return;
     }
     

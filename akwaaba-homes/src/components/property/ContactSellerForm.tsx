@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { X, Send, User, Mail, Phone, MessageSquare } from 'lucide-react';
 import { Property } from '@/lib/types/index';
+import { toast } from 'sonner';
 
 interface ContactSellerFormProps {
   property: Property;
@@ -44,20 +45,51 @@ export function ContactSellerForm({ property, onClose }: ContactSellerFormProps)
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // In a real implementation, this would call the API
+      // const response = await fetch('/api/contact-seller', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     property: property.id,
+      //     seller: property.seller.id,
+      //     ...formData
+      //   })
+      // });
+      
+      // if (!response.ok) {
+      //   throw new Error('Failed to send message');
+      // }
 
-    console.log('Contact form submitted:', {
-      property: property.id,
-      seller: property.seller.id,
-      ...formData
-    });
+      // Simulate API call for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-    setIsSubmitting(false);
-    onClose();
-    
-    // Show success message (in production, use a toast notification)
-    alert('Message sent successfully! The seller will contact you soon.');
+      // Log contact form submission for analytics
+      console.log('Contact form submitted successfully:', {
+        property: property.id,
+        seller: property.seller.id,
+        contactMethod: formData.preferredContact,
+        timestamp: new Date().toISOString()
+      });
+
+      setIsSubmitting(false);
+      onClose();
+      
+      // Show success message using toast
+      toast.success('Message sent successfully! The seller will contact you soon.');
+      
+      // Track the contact event
+      // analytics.track('contact_seller', {
+      //   property_id: property.id,
+      //   seller_id: property.seller.id,
+      //   contact_method: formData.contactMethod
+      // });
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsSubmitting(false);
+      toast.error('Failed to send message. Please try again.');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

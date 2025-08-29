@@ -14,6 +14,7 @@ import { LocationStep } from './form-steps/LocationStep'
 import { DetailsStep } from './form-steps/DetailsStep'
 import { ImagesStep } from './form-steps/ImagesStep'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner';
 
 type FormStep = 'basic' | 'location' | 'details' | 'images'
 
@@ -113,8 +114,8 @@ export function CreatePropertyForm({ onSuccess }: CreatePropertyFormProps) {
       
     } catch (error) {
       console.error('Error creating property:', error)
-      // TODO: Show error message to user
-      // You can use a toast notification library or display inline
+      // Show error message to user using toast
+      toast.error(error instanceof Error ? error.message : 'Failed to create property. Please try again.');
     } finally {
       setIsSubmitting(false)
     }

@@ -6,7 +6,7 @@ async function checkAdminAccess(supabase: any, userId: string) {
   const { data: userProfile, error: profileError } = await supabase
     .from('profiles')
     .select('user_role, is_verified')
-    .eq('user_id', userId)
+    .eq('id', userId)
     .single();
 
   if (profileError || !userProfile) {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        property_images(id, url, is_featured),
+        property_images(id, image_url, image_type, is_primary),
         inquiries(id)
         `,
         { count: 'exact' }
@@ -102,16 +102,16 @@ export async function GET(request: NextRequest) {
           // Fetch seller information from profiles table instead of users table
           const { data: sellers, error: sellersError } = await supabase
             .from('profiles')
-            .select('user_id, full_name, company_name, phone, email, user_role, is_verified')
-            .in('user_id', sellerIds);
+            .select('id, full_name, company_name, phone, email, user_role, is_verified')
+            .in('id', sellerIds);
 
           if (!sellersError && sellers) {
             propertiesWithSellers = properties.map(property => {
-              const seller = sellers.find(s => s.user_id === property.seller_id);
+              const seller = sellers.find(s => s.id === property.seller_id);
               return {
                 ...property,
                 seller: seller ? {
-                  id: seller.user_id,
+                  id: seller.id,
                   full_name: seller.full_name,
                   company_name: seller.company_name,
                   phone: seller.phone,

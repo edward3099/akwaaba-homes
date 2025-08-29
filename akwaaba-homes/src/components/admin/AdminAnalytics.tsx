@@ -22,7 +22,26 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+// Import Recharts components with error boundary
+import dynamic from 'next/dynamic';
+
+// Dynamically import Recharts components to avoid SSR issues
+const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), { ssr: false });
+const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false });
+const AreaChart = dynamic(() => import('recharts').then(mod => ({ default: mod.AreaChart })), { ssr: false });
+const Area = dynamic(() => import('recharts').then(mod => ({ default: mod.Area })), { ssr: false });
+const BarChart = dynamic(() => import('recharts').then(mod => ({ default: mod.BarChart })), { ssr: false });
+const Bar = dynamic(() => import('recharts').then(mod => ({ default: mod.Bar })), { ssr: false });
+const PieChart = dynamic(() => import('recharts').then(mod => ({ default: mod.PieChart })), { ssr: false });
+const Pie = dynamic(() => import('recharts').then(mod => ({ default: mod.Pie })), { ssr: false });
+const Cell = dynamic(() => import('recharts').then(mod => ({ default: mod.Cell })), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
+const Legend = dynamic(() => import('recharts').then(mod => ({ default: mod.Legend })), { ssr: false });
 
 interface AnalyticsData {
   userGrowth: Array<{ date: string; users: number; agents: number }>;
@@ -92,6 +111,7 @@ export default function AdminAnalytics() {
   const [data, setData] = useState<AnalyticsData>(mockAnalyticsData);
   const [timeRange, setTimeRange] = useState('6m');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -99,15 +119,20 @@ export default function AdminAnalytics() {
 
   const fetchAnalyticsData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`/api/admin/analytics?timeRange=${timeRange}`);
+      const response = await fetch(`/api/admin/analytics?timeRange=${timeRange}`, {
+        credentials: 'include'
+      });
       if (!response.ok) {
-        throw new Error('Failed to fetch analytics data');
+        throw new Error(`Failed to fetch analytics data: ${response.status} ${response.statusText}`);
       }
       const analyticsData = await response.json();
       setData(analyticsData);
     } catch (error) {
       console.error('Error fetching analytics:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch analytics data');
+      // Keep using mock data on error
     } finally {
       setLoading(false);
     }
@@ -140,6 +165,34 @@ export default function AdminAnalytics() {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-muted-foreground">Loading analytics...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+            <p className="text-gray-600">Platform performance and user insights</p>
+          </div>
+        </div>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+                <BarChart3 className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-red-800 mb-2">Failed to Load Analytics</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchAnalyticsData} variant="outline" size="sm">
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
