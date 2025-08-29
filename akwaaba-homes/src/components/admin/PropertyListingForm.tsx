@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   BuildingOfficeIcon, 
   MapPinIcon, 
@@ -12,6 +12,7 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/auth/authContext';
 
 interface PropertyFormData {
   // Basic Information
@@ -58,7 +59,7 @@ const initialFormData: PropertyFormData = {
   address: '',
   city: '',
   region: '',
-  coordinates: { lat: 0, lng: 0 },
+  coordinates: { lat: 5.5600, lng: -0.2057 }, // Default to Accra, Ghana
   bedrooms: 0,
   bathrooms: 0,
   size: 0,
@@ -104,13 +105,20 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
+  const { user, session } = useAuth();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  // File upload state
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [debugMode, setDebugMode] = useState(false); // Debug mode for troubleshooting
+
+  // File input ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const totalSteps = 5;
 
@@ -125,9 +133,11 @@ export default function PropertyListingForm() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+  // Handle file selection
+  const handleFiles = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
 
     const newImages: File[] = [];
     const newPreviewUrls: string[] = [];
@@ -152,14 +162,60 @@ export default function PropertyListingForm() {
       newPreviewUrls.push(previewUrl);
     });
 
+    if (newImages.length > 0) {
     setUploadedImages(prev => [...prev, ...newImages]);
     setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
     
-    // Update form data with image URLs (for now, just store the count)
+      // Update form data with image URLs
     updateFormData('images', [...formData.images, ...newPreviewUrls]);
-  };
+      
+      toast.success(`Successfully uploaded ${newImages.length} image(s)`);
+    }
 
-  const removeImage = (index: number) => {
+    // Clear loading state
+    setTimeout(() => {
+      setIsUploading(false);
+    }, 1000);
+  }, [formData.images, updateFormData]);
+
+  // Handle file input change
+  const handleFileInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    handleFiles(event.target.files);
+    // Reset the input value
+    if (event.target) {
+      event.target.value = '';
+    }
+  }, [handleFiles]);
+
+  // Handle drag and drop
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFiles(e.dataTransfer.files);
+    }
+  }, [handleFiles]);
+
+  // Trigger file input
+  const triggerFileInput = useCallback(() => {
+    if (fileInputRef.current && !isUploading) {
+      fileInputRef.current.click();
+    }
+  }, [isUploading]);
+
+  const removeImage = useCallback((index: number) => {
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
     setImagePreviewUrls(prev => {
       const newUrls = prev.filter((_, i) => i !== index);
@@ -172,14 +228,7 @@ export default function PropertyListingForm() {
     const newImages = [...formData.images];
     newImages.splice(index, 1);
     updateFormData('images', newImages);
-  };
-
-  const triggerFileInput = () => {
-    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-    }
-  };
+  }, [formData.images, updateFormData]);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
@@ -196,28 +245,237 @@ export default function PropertyListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Comprehensive validation following Context7 best practices
+    const validationErrors = [];
+    
     // Validate minimum image requirement
-    if (imagePreviewUrls.length < 3) {
-      toast.error('Please upload at least 3 images before submitting the form.');
+    if (uploadedImages.length < 3) {
+      validationErrors.push('Please upload at least 3 images before submitting the form.');
+    }
+    
+    // Validate required fields with specific error messages
+    if (!formData.title?.trim()) {
+      validationErrors.push('Property title is required.');
+    }
+    if (!formData.description?.trim()) {
+      validationErrors.push('Property description is required.');
+    }
+    if (!formData.price || formData.price <= 0) {
+      validationErrors.push('Property price must be greater than 0.');
+    }
+    if (!formData.address?.trim()) {
+      validationErrors.push('Street address is required.');
+    }
+    if (!formData.city) {
+      validationErrors.push('City selection is required.');
+    }
+    if (!formData.region) {
+      validationErrors.push('Region selection is required.');
+    }
+    if (!formData.coordinates.lat || !formData.coordinates.lng) {
+      validationErrors.push('Property coordinates are required.');
+    } else {
+      // Validate coordinate ranges
+      if (formData.coordinates.lat < -90 || formData.coordinates.lat > 90) {
+        validationErrors.push('Latitude must be between -90 and 90 degrees.');
+      }
+      if (formData.coordinates.lng < -180 || formData.coordinates.lng > 180) {
+        validationErrors.push('Longitude must be between -180 and 180 degrees.');
+      }
+      // Validate Ghana-specific coordinates (rough bounds)
+      if (formData.coordinates.lat < 4 || formData.coordinates.lat > 12) {
+        validationErrors.push('Latitude should be within Ghana bounds (approximately 4° to 12°).');
+      }
+      if (formData.coordinates.lng < -4 || formData.coordinates.lng > 2) {
+        validationErrors.push('Longitude should be within Ghana bounds (approximately -4° to 2°).');
+      }
+    }
+    
+    // Show all validation errors at once
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(error => toast.error(error));
       return;
     }
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Debug logging for troubleshooting
+      console.log('🔍 Form submission debug info:', {
+        formData,
+        imageCount: uploadedImages.length,
+        coordinates: formData.coordinates,
+        features: formData.features
+      });
+      
+      // First, upload all images to Supabase Storage
+      console.log('📤 Starting image uploads...');
+      const uploadedImageUrls = [];
+      
+      for (let i = 0; i < uploadedImages.length; i++) {
+        const file = uploadedImages[i];
+        const isPrimary = i === 0; // First image is primary
+        
+        try {
+          // Create a temporary property ID for image uploads
+          const tempPropertyId = `temp-${Date.now()}-${Math.random().toString(36).substring(2)}`;
+          
+          // Upload image to Supabase Storage
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('caption', file.name);
+          formData.append('is_primary', isPrimary.toString());
+          
+          const uploadResponse = await fetch(`/api/properties/${tempPropertyId}/images/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: formData,
+          });
+          
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            throw new Error(`Failed to upload image ${file.name}: ${errorData.error || 'Unknown error'}`);
+          }
+          
+          const uploadResult = await uploadResponse.json();
+          uploadedImageUrls.push(uploadResult.image_url);
+          
+          console.log(`✅ Image ${i + 1}/${uploadedImages.length} uploaded:`, uploadResult.image_url);
+          
+        } catch (uploadError) {
+          console.error(`❌ Failed to upload image ${file.name}:`, uploadError);
+          throw new Error(`Failed to upload image ${file.name}. Please try again.`);
+        }
+      }
+      
+      console.log('📤 All images uploaded successfully:', uploadedImageUrls);
+      
+      // Prepare the property data for submission with proper type conversion
+      const propertyData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        price: parseFloat(formData.price.toString()),
+        currency: 'GHS',
+        property_type: formData.type || 'house',
+        listing_type: 'sale',
+        bedrooms: parseInt(formData.bedrooms.toString()) || 0,
+        bathrooms: parseInt(formData.bathrooms.toString()) || 0,
+        square_feet: parseFloat(formData.size.toString()) || 0,
+        address: formData.address.trim(),
+        city: formData.city,
+        region: formData.region,
+        latitude: parseFloat(formData.coordinates.lat.toString()),
+        longitude: parseFloat(formData.coordinates.lng.toString()),
+        features: formData.features || [],
+        amenities: [], // Add amenities if needed
+        status: 'pending', // Ensure status is set
+        approval_status: 'pending', // Ensure approval status is set
+        image_urls: uploadedImageUrls, // Use the actual uploaded image URLs
+      };
+      
+      console.log('📤 Submitting property data:', propertyData);
+      
+      // Check authentication before making API call
+      if (!session?.access_token) {
+        throw new Error('Authentication token not found. Please sign in again.');
+      }
+      
+      // Make the API call to create the property
+      const response = await fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(propertyData),
+      });
+      
+      console.log('📥 API response status:', response.status);
+      console.log('📥 API response headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        let errorMessage = 'Failed to create property';
+        let errorDetails = {};
+        
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+          errorDetails = errorData;
+          console.error('❌ API error details:', errorData);
+        } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        // Log detailed error information for debugging
+        console.error('❌ Property creation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage,
+          errorDetails,
+          requestData: propertyData
+        });
+        
+        throw new Error(errorMessage);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Property created successfully:', result);
+      
+      // Show success message
+      toast.success('Property created successfully! It is now pending admin approval.');
+      setShowSuccess(true);
     
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-      setFormData(initialFormData);
-      setUploadedImages([]);
-      setImagePreviewUrls([]);
-      setCurrentStep(1);
-    }, 3000);
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+        setFormData(initialFormData);
+        setUploadedImages([]);
+        setImagePreviewUrls([]);
+        setCurrentStep(1);
+        
+        // Redirect to agent dashboard
+        window.location.href = '/agent-dashboard';
+      }, 3000);
+      
+    } catch (error) {
+      console.error('❌ Error creating property:', error);
+      
+      // Enhanced error handling with specific error types
+      let userErrorMessage = 'Failed to create property. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Authentication token')) {
+          userErrorMessage = 'Session expired. Please sign in again.';
+        } else if (error.message.includes('Failed to create property')) {
+          userErrorMessage = error.message;
+        } else if (error.message.includes('Failed to upload image')) {
+          userErrorMessage = error.message;
+        } else if (error.message.includes('fetch')) {
+          userErrorMessage = 'Network error. Please check your connection and try again.';
+        } else {
+          userErrorMessage = error.message;
+        }
+      }
+      
+      toast.error(userErrorMessage);
+      
+      // Log detailed error information for debugging
+      console.error('🔍 Detailed error information:', {
+        error,
+        errorType: error.constructor.name,
+        errorMessage: error.message,
+        errorStack: error.stack,
+        formData,
+        session: session ? 'exists' : 'missing',
+        hasAccessToken: !!session?.access_token
+      });
+      
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepIndicator = () => (
@@ -239,18 +497,107 @@ export default function PropertyListingForm() {
               )}
             </div>
             {index < totalSteps - 1 && (
-              <div className={`w-16 h-0.5 mx-2 ${
+              <div className={`w-16 h-0.5 ${
                 index + 1 < currentStep ? 'bg-green-500' : 'bg-gray-300'
               }`} />
             )}
           </div>
         ))}
       </div>
-      <div className="mt-4 text-center">
-        <p className="text-sm text-gray-600">
-          Step {currentStep} of {totalSteps}
-        </p>
+      
+      {/* Debug Mode Toggle */}
+      <div className="mt-4 flex items-center justify-end">
+        <button
+          type="button"
+          onClick={() => setDebugMode(!debugMode)}
+          className="text-xs text-gray-500 hover:text-gray-700 underline"
+        >
+          {debugMode ? 'Hide Debug Info' : 'Show Debug Info'}
+        </button>
       </div>
+      
+      {/* Debug Panel */}
+      {debugMode && (
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg text-xs">
+          <h4 className="font-semibold mb-2">🔍 Debug Information</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <strong>Authentication:</strong>
+              <div>Session: {session ? '✅ Active' : '❌ Missing'}</div>
+              <div>Token: {session?.access_token ? '✅ Present' : '❌ Missing'}</div>
+            </div>
+            <div>
+              <strong>Form Validation:</strong>
+              <div>Title: {formData.title?.trim() ? '✅' : '❌'}</div>
+              <div>Description: {formData.description?.trim() ? '✅' : '❌'}</div>
+              <div>Price: {formData.price > 0 ? '✅' : '❌'}</div>
+              <div>Address: {formData.address?.trim() ? '✅' : '❌'}</div>
+              <div>City: {formData.city ? '✅' : '❌'}</div>
+              <div>Region: {formData.region ? '✅' : '❌'}</div>
+                               <div>Coordinates: {formData.coordinates.lat && formData.coordinates.lng ? '✅' : '❌'}</div>
+                 <div>Lat: {formData.coordinates.lat?.toFixed(6)}</div>
+                 <div>Lng: {formData.coordinates.lng?.toFixed(6)}</div>
+              <div>Images: {imagePreviewUrls.length >= 3 ? '✅' : `❌ (${imagePreviewUrls.length}/3)`}</div>
+            </div>
+          </div>
+          <div className="mt-2">
+            <strong>Current Step:</strong> {currentStep} of {totalSteps}
+          </div>
+          <div className="mt-2">
+            <strong>Form Data:</strong>
+            <pre className="mt-1 bg-white p-2 rounded overflow-auto max-h-32">
+              {JSON.stringify(formData, null, 2)}
+            </pre>
+          </div>
+          
+          {/* Test API Button */}
+          <div className="mt-4 pt-4 border-t border-gray-300">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  console.log('🧪 Testing API endpoint...');
+                  const testResponse = await fetch('/api/properties', {
+                    method: 'GET',
+                    headers: {
+                      'Authorization': `Bearer ${session?.access_token || ''}`,
+                    },
+                  });
+                  console.log('🧪 Test response status:', testResponse.status);
+                  console.log('🧪 Test response headers:', Object.fromEntries(testResponse.headers.entries()));
+                  
+                  if (testResponse.ok) {
+                    const testData = await testResponse.json();
+                    console.log('🧪 Test response data:', testData);
+                    toast.success('API endpoint is accessible');
+                  } else {
+                    toast.error(`API test failed: ${testResponse.status}`);
+                  }
+                } catch (error) {
+                  console.error('🧪 API test error:', error);
+                  toast.error('API test failed');
+                }
+              }}
+              className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 mr-2"
+            >
+              Test API Endpoint
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  coordinates: { lat: 5.5600, lng: -0.2057 } // Reset to Accra
+                });
+                toast.success('Coordinates reset to Accra (5.5600, -0.2057)');
+              }}
+              className="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+            >
+              Reset Coordinates
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -420,27 +767,44 @@ export default function PropertyListingForm() {
           <div className="grid grid-cols-2 gap-4">
             <input
               type="number"
-              step="any"
+              step="0.000001"
+              min="-90"
+              max="90"
               value={formData.coordinates.lat}
-              onChange={(e) => updateFormData('coordinates', { 
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (value >= -90 && value <= 90) {
+                  updateFormData('coordinates', { 
                 ...formData.coordinates, 
-                lat: parseFloat(e.target.value) || 0 
-              })}
+                    lat: value 
+                  });
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Latitude"
+              placeholder="Latitude (-90 to 90)"
             />
             <input
               type="number"
-              step="any"
+              step="0.000001"
+              min="-180"
+              max="180"
               value={formData.coordinates.lng}
-              onChange={(e) => updateFormData('coordinates', { 
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (value >= -180 && value <= 180) {
+                  updateFormData('coordinates', { 
                 ...formData.coordinates, 
-                lng: parseFloat(e.target.value) || 0 
-              })}
+                    lng: value 
+                  });
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Longitude"
+              placeholder="Longitude (-180 to 180)"
             />
           </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Enter coordinates in decimal degrees. For Ghana: Latitude ~5-11°, Longitude ~-3 to 2°
+          </p>
         </div>
       </div>
     </div>
@@ -638,19 +1002,30 @@ export default function PropertyListingForm() {
             Property Images *
           </label>
           
-          {/* Hidden file input */}
+          {/* Hidden file input with proper ref */}
           <input
-            id="image-upload"
+            ref={fileInputRef}
             type="file"
             multiple
             accept="image/*"
-            onChange={handleImageUpload}
+            onChange={handleFileInputChange}
             className="hidden"
+            id="property-image-upload"
           />
           
           {/* Upload area */}
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <CameraIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              dragActive 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <CameraIcon className={`mx-auto h-12 w-12 ${dragActive ? 'text-blue-500' : 'text-gray-400'}`} />
             <div className="mt-4">
               <p className="text-sm text-gray-600">
                 Upload at least 3 high-quality images
@@ -658,15 +1033,42 @@ export default function PropertyListingForm() {
               <p className="text-xs text-gray-500 mt-1">
                 PNG, JPG up to 10MB each • Minimum 3 images required
               </p>
+              <p className="text-xs text-blue-600 mt-2">
+                💡 Drag and drop images here or click the button below
+              </p>
             </div>
             <button
               type="button"
               onClick={triggerFileInput}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              disabled={isUploading}
+              className={`mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+                isUploading 
+                  ? 'text-gray-400 bg-gray-100 cursor-not-allowed' 
+                  : 'text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              }`}
             >
+              {isUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
               <CameraIcon className="w-4 h-4 mr-2" />
-              Upload Images
+                  Choose Images
+                </>
+              )}
             </button>
+            
+            {/* Upload progress indicator */}
+            {isUploading && (
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Processing images...</p>
+              </div>
+            )}
           </div>
 
           {/* Image previews */}

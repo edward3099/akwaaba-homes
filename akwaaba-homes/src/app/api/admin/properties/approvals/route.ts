@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
 
-    if (property.status !== 'pending_approval') {
+    if (property.status !== 'pending') {
       return NextResponse.json({ error: 'Property is not pending approval' }, { status: 400 });
     }
 
