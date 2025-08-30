@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import { User, Session, AuthError as SupabaseAuthError } from '@supabase/supabase-js';
 import { useRouter, usePathname } from 'next/navigation';
 import { validateJWTPayload, extractUserFromJWT, isJWTExpiringSoon } from '@/lib/utils/jwtSecurity';
 import { supabase } from '@/lib/supabase';
+import { AuthError, parseAuthError } from '@/lib/utils/authErrorHandler';
 
 interface EnhancedUser extends User {
   verification_status?: string;
@@ -13,15 +14,16 @@ interface EnhancedUser extends User {
 }
 
 interface AuthState {
-  user: EnhancedUser | null;
+  user: User | null;
   session: Session | null;
+  userProfile: any | null;
   loading: boolean;
   error: AuthError | null;
   isAuthenticated: boolean;
   isVerified: boolean;
   isAgent: boolean;
   isAdmin: boolean;
-  jwtClaims: any;
+  jwtClaims: any | null;
   jwtValidation: {
     isValid: boolean;
     errors: string[];
@@ -38,12 +40,18 @@ interface UseEnhancedAuthReturn extends AuthState {
   resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   updatePassword: (password: string) => Promise<{ success: boolean; error?: string }>;
+  isLoading: boolean;
+  userProfile: any | null;
+  refreshUserProfile: () => Promise<void>;
+  validateAndExtractUser: (session: Session | null) => Promise<{ user: EnhancedUser | null; jwtClaims: any | null; jwtValidation: { isValid: boolean; errors: string[]; warnings: string[] } }>;
+  updateAuthState: (session: Session | null) => Promise<void>;
 }
 
 export function useEnhancedAuth(): UseEnhancedAuthReturn {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     session: null,
+    userProfile: null,
     loading: true,
     error: null,
     isAuthenticated: false,
@@ -51,11 +59,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
     isAgent: false,
     isAdmin: false,
     jwtClaims: null,
-    jwtValidation: {
-      isValid: false,
-      errors: [],
-      warnings: []
-    }
+    jwtValidation: { isValid: false, errors: [], warnings: [] }
   });
 
   const router = useRouter();
@@ -113,39 +117,71 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
 
   // Update auth state
   const updateAuthState = useCallback(async (session: Session | null) => {
-    const { user, jwtClaims, jwtValidation } = await validateAndExtractUser(session);
-    
-    if (user) {
-      const isVerified = user.email_verified === true && 
-                        user.user_metadata?.verification_status === 'verified';
-      const isAgent = user.user_metadata?.user_type === 'agent';
-      const isAdmin = user.user_metadata?.user_type === 'admin';
+    try {
+      const { user, jwtClaims, jwtValidation } = await validateAndExtractUser(session);
+      
+      if (user) {
+        // Fetch user profile from the database
+        let userProfile = null;
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_id, user_role, is_verified, full_name, phone')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (!profileError && profile) {
+            userProfile = {
+              id: profile.user_id,
+              user_type: profile.user_role,
+              is_verified: profile.is_verified,
+              is_active: true, // Default to true for profiles
+              full_name: profile.full_name,
+              phone: profile.phone
+            };
+          } else {
+            console.warn('Profile fetch error:', profileError);
+          }
+        } catch (profileError) {
+          console.warn('Failed to fetch user profile:', profileError);
+        }
 
-      setAuthState({
-        user: user,
-        session,
-        loading: false,
-        error: null,
-        isAuthenticated: true,
-        isVerified,
-        isAgent,
-        isAdmin,
-        jwtClaims,
-        jwtValidation
-      });
-    } else {
-      setAuthState({
-        user: null,
-        session: null,
-        loading: false,
-        error: null,
-        isAuthenticated: false,
-        isVerified: false,
-        isAgent: false,
-        isAdmin: false,
-        jwtClaims: null,
-        jwtValidation: { isValid: false, errors: [], warnings: [] }
-      });
+        const isVerified = user.email_verified === true && 
+                          (userProfile?.is_verified || user.user_metadata?.verification_status === 'verified');
+        const isAgent = userProfile?.user_type === 'agent' || user.user_metadata?.user_type === 'agent';
+        const isAdmin = userProfile?.user_type === 'admin' || user.user_metadata?.user_type === 'admin';
+
+        setAuthState({
+          user: user,
+          session,
+          loading: false,
+          error: null,
+          isAuthenticated: true,
+          isVerified,
+          isAgent,
+          isAdmin,
+          jwtClaims,
+          jwtValidation,
+          userProfile: userProfile
+        });
+      } else {
+        setAuthState({
+          user: null,
+          session: null,
+          loading: false,
+          error: null,
+          isAuthenticated: false,
+          isVerified: false,
+          isAgent: false,
+          isAdmin: false,
+          jwtClaims: null,
+          jwtValidation: { isValid: false, errors: [], warnings: [] },
+          userProfile: null
+        });
+      }
+    } catch (error) {
+      console.error('Error updating auth state:', error);
+      setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
     }
   }, [validateAndExtractUser]);
 
@@ -157,7 +193,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          setAuthState(prev => ({ ...prev, error, loading: false }));
+          setAuthState(prev => ({ ...prev, error: parseAuthError(error), loading: false }));
           return;
         }
 
@@ -201,7 +237,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       });
 
       if (error) {
-        setAuthState(prev => ({ ...prev, loading: false, error }));
+        setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
         return { success: false, error: error.message };
       }
 
@@ -213,7 +249,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       return { success: false, error: 'No session created' };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setAuthState(prev => ({ ...prev, loading: false, error: { message: errorMessage } as AuthError }));
+      setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
       return { success: false, error: errorMessage };
     }
   };
@@ -232,7 +268,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       });
 
       if (error) {
-        setAuthState(prev => ({ ...prev, loading: false, error }));
+        setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
         return { success: false, error: error.message };
       }
 
@@ -240,7 +276,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setAuthState(prev => ({ ...prev, loading: false, error: { message: errorMessage } as AuthError }));
+      setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
       return { success: false, error: errorMessage };
     }
   };
@@ -352,8 +388,49 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
     }
   };
 
+  // Refresh user profile
+  const refreshProfile = useCallback(async () => {
+    if (!authState.session) {
+      return;
+    }
+    try {
+      const { user, jwtClaims, jwtValidation } = await validateAndExtractUser(authState.session);
+      if (user) {
+        let userProfile = null;
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_id, user_role, is_verified, full_name, phone')
+            .eq('user_id', user.id)
+            .single();
+          if (!profileError && profile) {
+            userProfile = {
+              id: profile.user_id,
+              user_type: profile.user_role,
+              is_verified: profile.is_verified,
+              is_active: true, // Default to true for profiles
+              full_name: profile.full_name,
+              phone: profile.phone
+            };
+          } else {
+            console.warn('Profile fetch error:', profileError);
+          }
+        } catch (profileError) {
+          console.warn('Failed to fetch user profile:', profileError);
+        }
+        setAuthState(prev => ({ ...prev, userProfile }));
+      }
+    } catch (error) {
+      console.error('Error refreshing user profile:', error);
+    }
+  }, [authState.session, validateAndExtractUser]);
+
   return {
     ...authState,
+    // Add aliases for backward compatibility
+    isLoading: authState.loading,
+    userProfile: authState.userProfile,
+    refreshUserProfile: refreshProfile,
     signIn,
     signUp,
     signOut,
@@ -361,7 +438,9 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
     updateProfile,
     resendVerification,
     resetPassword,
-    updatePassword
+    updatePassword,
+    validateAndExtractUser,
+    updateAuthState
   };
 }
 

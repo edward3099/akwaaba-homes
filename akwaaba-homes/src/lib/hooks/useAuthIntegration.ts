@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth/authContext';
 import { useApiClient } from '@/lib/api/apiClient';
 import { useErrorHandler } from '@/lib/utils/errorHandler';
 import { useLoading } from '@/lib/hooks/useLoading';
+import { useToastIntegration } from '@/lib/hooks/useToastIntegration';
 import { securityService } from '@/lib/services/securityService';
 
 // Route protection configuration
@@ -70,7 +71,8 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
   const router = useRouter();
   const pathname = usePathname();
   const auth = useAuth();
-  const { apiClient, showSuccess, showError } = useApiClient();
+  const { apiClient } = useApiClient();
+  const { showSuccess, showError } = useToastIntegration('useAuthIntegration');
   const { handleError } = useErrorHandler();
   const { withLoading } = useLoading();
 
@@ -162,8 +164,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced sign in with security logging
   const signIn = useCallback(async (email: string, password: string): Promise<void> => {
-    return withLoading(
-      'sign-in',
+    return (withLoading as any)(
       async () => {
         try {
           // Sanitize inputs
@@ -223,15 +224,13 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
           throw error;
         }
       },
-      'Signing in...',
-      5000
+      'Signing in...'
     );
   }, [auth, withLoading, showSuccess, router, pathname]);
 
   // Enhanced sign up with security logging
   const signUp = useCallback(async (email: string, password: string, userType: string): Promise<void> => {
-    return withLoading(
-      'sign-up',
+    return (withLoading as any)(
       async () => {
         try {
           // Sanitize and validate inputs
@@ -294,8 +293,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced sign out with security logging
   const signOut = useCallback(async (): Promise<void> => {
-    return withLoading(
-      'sign-out',
+    return (withLoading as any)(
       async () => {
         try {
           // Log sign out attempt
@@ -325,8 +323,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced profile refresh
   const refreshProfile = useCallback(async (): Promise<void> => {
-    return withLoading(
-      'refresh-profile',
+    return (withLoading as any)(
       async () => {
         try {
           await auth.refreshUserProfile();
@@ -342,8 +339,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced profile update
   const updateProfile = useCallback(async (updates: any): Promise<void> => {
-    return withLoading(
-      'update-profile',
+    return (withLoading as any)(
       async () => {
         try {
           // Sanitize updates
@@ -408,8 +404,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced password reset
   const resetPassword = useCallback(async (email: string): Promise<void> => {
-    return withLoading(
-      'reset-password',
+    return (withLoading as any)(
       async () => {
         try {
           const sanitizedEmail = securityService.sanitizeInput(email, 'email');
@@ -447,8 +442,7 @@ export const useAuthIntegration = (customRouteConfig?: Partial<RouteConfig>) => 
 
   // Enhanced email verification
   const verifyEmail = useCallback(async (token: string): Promise<void> => {
-    return withLoading(
-      'verify-email',
+    return (withLoading as any)(
       async () => {
         try {
           const sanitizedToken = securityService.sanitizeInput(token, 'text');

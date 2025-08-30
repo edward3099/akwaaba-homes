@@ -22,7 +22,7 @@ const tabs = [
 ];
 
 export default function AgentDashboard() {
-  const { user } = useAuth();
+  const { user, session, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [properties, setProperties] = useState([]);
   const [editingProperty, setEditingProperty] = useState(null);
@@ -90,6 +90,15 @@ export default function AgentDashboard() {
   });
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
+  // Check authentication and redirect if not logged in
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      window.location.href = '/login';
+      return;
+    }
+  }, [isAuthenticated]);
+
   // Fetch real properties data
   useEffect(() => {
     const fetchProperties = async () => {
@@ -100,18 +109,36 @@ export default function AgentDashboard() {
         const response = await fetch('/api/properties/my-properties', {
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token || ''}`, // Add explicit auth header
           },
+          credentials: 'include', // Include cookies for authentication
         });
         
         if (response.ok) {
           const data = await response.json();
-          setProperties(data.properties || []);
+          if (data.success) {
+            setProperties(data.properties || []);
+          } else {
+            console.error('API returned error:', data.error);
+            toast.error(data.error || 'Failed to fetch properties');
+            setProperties([]);
+          }
         } else {
-          console.error('Failed to fetch properties');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to fetch properties:', response.status, errorData);
+          
+          if (response.status === 401) {
+            toast.error('Please log in to view your properties');
+          } else if (response.status === 403) {
+            toast.error('Access denied. Please verify your account.');
+          } else {
+            toast.error(errorData.error || 'Failed to fetch properties');
+          }
           setProperties([]);
         }
       } catch (error) {
         console.error('Error fetching properties:', error);
+        toast.error('Network error. Please check your connection.');
         setProperties([]);
       } finally {
         setLoading(false);
@@ -162,17 +189,38 @@ export default function AgentDashboard() {
     try {
       const response = await fetch(`/api/properties/${propertyId}`, {
         method: 'DELETE',
+        credentials: 'include', // Include cookies for authentication
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token || ''}`, // Add explicit auth header
+        },
       });
       
       if (response.ok) {
-        setProperties(properties.filter(p => p.id !== propertyId));
-        toast.success('Property deleted successfully');
+        const data = await response.json();
+        if (data.success) {
+          setProperties(properties.filter(p => p.id !== propertyId));
+          toast.success('Property deleted successfully');
+        } else {
+          toast.error(data.error || 'Failed to delete property');
+        }
       } else {
-        toast.error('Failed to delete property');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to delete property:', response.status, errorData);
+        
+        if (response.status === 401) {
+          toast.error('Please log in to delete properties');
+        } else if (response.status === 403) {
+          toast.error('Access denied. You can only delete your own properties.');
+        } else if (response.status === 404) {
+          toast.error('Property not found');
+        } else {
+          toast.error(errorData.error || 'Failed to delete property');
+        }
       }
     } catch (error) {
       console.error('Error deleting property:', error);
-      toast.error('Error deleting property');
+      toast.error('Network error. Please check your connection.');
     }
   };
 
@@ -336,9 +384,47 @@ export default function AgentDashboard() {
       case 'profile':
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Profile</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Profile Management</h2>
+              <a
+                href="/agent/profile"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Go to Full Profile
+              </a>
+            </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-gray-600">Profile management coming soon...</p>
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                  <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Profile Management</h3>
+                <p className="text-gray-600 mb-4">
+                  Manage your agent profile, update personal information, and maintain your professional credentials.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                    <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Update personal information</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                    <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Manage professional credentials</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                    <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Track verification status</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -346,9 +432,125 @@ export default function AgentDashboard() {
       case 'settings':
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Settings & Preferences</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Account Settings */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Account Settings</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Email Notifications</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">SMS Notifications</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Two-Factor Auth</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Settings */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Business Settings</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Business Hours</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Auto-Reply Messages</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Commission Rates</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Privacy & Security */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Privacy & Security</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Data Export</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Account Deletion</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">API Access</span>
+                    <span className="text-xs text-gray-400">Coming Soon</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Support & Help */}
             <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-gray-600">Settings management coming soon...</p>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Support & Help</h3>
+                </div>
+                <div className="space-y-3">
+                  <a href="/contact" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
+                    <span>Contact Support</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                  <a href="/help" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
+                    <span>Help Center</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                  <a href="/docs" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
+                    <span>Documentation</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         );

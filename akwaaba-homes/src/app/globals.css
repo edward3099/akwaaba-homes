@@ -2,6 +2,51 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Mobile-first responsive design */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Ensure proper viewport behavior on mobile */
+@media screen and (max-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  .container, .max-w-7xl {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Ensure cards don't overflow on small screens */
+  .card, [class*="Card"] {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  /* Optimize text for mobile reading */
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Ensure buttons and interactive elements are touch-friendly */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* Line clamp utilities for text truncation */
 .line-clamp-1 {
   overflow: hidden;

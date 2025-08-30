@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ReturnToSearch } from '@/components/navigation/ReturnToSearch';
 import { 
-  ChevronLeft, 
   MapPin, 
   Bed, 
   Bath, 
@@ -25,7 +25,8 @@ import {
   Map,
   Flag,
   Share2,
-  Mail
+  Mail,
+  ChevronLeft
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
@@ -66,13 +67,9 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <button 
-              onClick={() => window.history.back()}
+            <ReturnToSearch 
               className="flex items-center gap-1 hover:text-primary transition-colors text-xs sm:text-sm"
-            >
-              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-              Back to property list
-            </button>
+            />
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
             {property.title}
@@ -93,7 +90,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                     {property.specifications.bedrooms} bedroom {property.type.toLowerCase()} for {property.status === 'for-sale' ? 'sale' : 'rent'}
                   </h2>
                   <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <MapPin className="w-3 h-3 sm:w-4 sm:w-4 mr-2 flex-shrink-0" />
                     <span>{property.location.address}, {property.location.city}</span>
                   </div>
                 </div>
@@ -138,6 +135,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
                     className="object-cover"
+                    unoptimized
                   />
                   
                   {/* Navigation Arrows */}
@@ -179,6 +177,7 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                           width={64}
                           height={64}
                           className="object-cover w-full h-full"
+                          unoptimized
                         />
                       </button>
                     ))}

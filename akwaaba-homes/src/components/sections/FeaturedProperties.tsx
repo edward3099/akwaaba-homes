@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import PropertyCard from '@/components/properties/PropertyCard';
 import { MapPin, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -278,11 +278,8 @@ export function FeaturedProperties() {
 
   // Main effect to fetch properties when filters change
   useEffect(() => {
-    // Only trigger search if we have debounced values or if filters are explicitly set
-    if (debouncedSearchKeywords !== '' || 
-        debouncedSearchRegion !== '' || 
-        debouncedExpandedKeywords !== '' ||
-        (isInitialized && filters && Object.keys(filters).length > 0)) {
+    // Always fetch on initial load, or when filters/debounced values change
+    if (isInitialized) {
       
       let ignore = false;
       const fetchData = async () => {
@@ -294,13 +291,13 @@ export function FeaturedProperties() {
             status: 'active',
           };
 
-          // Apply property type filter from search state
+          // Apply property type filter from search state, or use default 'sale' if none set
           if (filters.status) {
             // Map frontend status values to database listing_type values
             const statusToListingTypeMap: { [key: string]: string } = {
               'for-sale': 'sale',
               'for-rent': 'rent', 
-              'short-let': 'lease',  // Map short-let to lease (database enum value)
+              'short-let': 'lease',  // Map short-let to database enum value
               'lease': 'lease'       // Also support the new lease value directly
             };
             
@@ -308,6 +305,9 @@ export function FeaturedProperties() {
             if (listingType) {
               apiFilters.listing_type = listingType;
             }
+          } else {
+            // Default to 'sale' if no status filter is set
+            apiFilters.listing_type = 'sale';
           }
 
           // Apply property type filter (tid)
@@ -354,8 +354,6 @@ export function FeaturedProperties() {
           if ((filters as any).addedToSite) {
             apiFilters.addedToSite = (filters as any).addedToSite;
           }
-
-          console.log('API Filters being sent:', apiFilters);
 
           // Make the API call
           const response = await fetch('/api/properties?' + new URLSearchParams(apiFilters));
@@ -408,15 +406,7 @@ export function FeaturedProperties() {
         ignore = true;
       };
     }
-  }, [
-    debouncedSearchKeywords,
-    debouncedSearchRegion,
-    debouncedExpandedKeywords,
-    isInitialized,
-    filters,
-    currentPage,
-    propertiesPerPage
-  ]);
+  }, [isInitialized, filters, currentPage, debouncedSearchKeywords, debouncedSearchRegion, debouncedExpandedKeywords]);
 
   // Transform database properties to frontend format with better safety
   const transformedProperties = useMemo(() => {

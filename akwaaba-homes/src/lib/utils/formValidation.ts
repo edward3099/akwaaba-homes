@@ -180,7 +180,7 @@ export const validateForm = {
       return { success: true, data: validatedData };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map(err => err.message);
+        const errors = error.issues.map(err => err.message);
         return { success: false, errors };
       }
       return { success: false, errors: ['Validation failed'] };
@@ -193,7 +193,7 @@ export const validateForm = {
   withToast: <T>(schema: z.ZodSchema<T>, data: unknown): T | null => {
     const result = validateForm.withSchema(schema, data);
     
-    if (!result.success) {
+    if (!result.success && 'errors' in result) {
       // Show first error as toast
       toast.error('Validation Error', {
         description: result.errors[0],
@@ -269,7 +269,7 @@ export const createValidationResolver = <T>(schema: z.ZodSchema<T>) => {
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.reduce((acc, err) => {
+        const errors = error.issues.reduce((acc, err) => {
           const path = err.path.join('.');
           acc[path] = {
             type: 'manual',

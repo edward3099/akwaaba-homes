@@ -23,7 +23,7 @@ export default function TestAPIsPage() {
     title: 'Test Property',
     description: 'This is a test property for API testing',
     price: 250000,
-    currency: 'GHS',
+    currency: 'GHS' as const,
     property_type: 'house' as const,
     listing_type: 'sale' as const,
     address: '123 Test Street',

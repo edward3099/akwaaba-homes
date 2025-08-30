@@ -27,9 +27,10 @@ export {
 } from './connectionPool'
 
 // Re-export existing services
-export { supabase } from './supabase'
-export { enhancedApiClient } from './enhancedApiClient'
-export { enhancedHooks } from './enhancedHooks'
+export { supabase } from '../supabase'
+export { enhancedApiClient } from '../api/enhancedApiClient'
+// export { enhancedHooks } from '../hooks/enhancedHooks' // No such export exists
+
 
 
 

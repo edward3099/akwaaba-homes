@@ -1,83 +1,97 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth/authContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, LogIn, Home } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
   redirectTo?: string;
+  requireAuth?: boolean;
 }
 
 export default function ProtectedRoute({ 
   children, 
   allowedRoles = [], 
-  redirectTo = '/auth' 
+  redirectTo = '/auth',
+  requireAuth = true 
 }: ProtectedRouteProps) {
-  const { user, isAgent, isAdmin, loading } = useAuth();
+  const { user, loading, isAuthenticated, isAgent, isAdmin } = useAuth();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        // User not authenticated, redirect to login
-        router.push(redirectTo);
+    if (loading) return; // Wait for auth to load
+
+    // If no auth required, allow access
+    if (!requireAuth) return;
+
+    // If not authenticated, redirect to auth page
+    if (!isAuthenticated) {
+      setError('Authentication required');
+      router.push(redirectTo);
+      return;
+    }
+
+    // If roles are specified, check if user has required role
+    if (allowedRoles.length > 0) {
+      let hasRequiredRole = false;
+      
+      if (allowedRoles.includes('agent') && isAgent) {
+        hasRequiredRole = true;
+      } else if (allowedRoles.includes('admin') && isAdmin) {
+        hasRequiredRole = true;
+      } else if (allowedRoles.includes('seller') && user?.user_metadata?.user_type === 'seller') {
+        hasRequiredRole = true;
+      }
+      
+      if (!hasRequiredRole) {
+        setError(`Access denied. Required role: ${allowedRoles.join(' or ')}`);
+        router.push('/unauthorized');
         return;
       }
-
-      if (allowedRoles.length > 0) {
-        // Check if user has required role
-        const hasRequiredRole = allowedRoles.some(role => {
-          const upperRole = role.toUpperCase();
-          if (upperRole === 'ADMIN') return isAdmin;
-          if (upperRole === 'AGENT') return isAgent;
-          if (upperRole === 'SELLER') return !isAdmin && !isAgent; // Assume seller if not admin/agent
-          return false;
-        });
-        
-        if (!hasRequiredRole) {
-          // User doesn't have required role, redirect to unauthorized page
-          router.push('/unauthorized');
-          return;
-        }
-      }
     }
-  }, [user, isAgent, isAdmin, loading, allowedRoles, redirectTo, router]);
 
-  // Show loading while checking authentication
+    // Clear any previous errors
+    setError(null);
+  }, [user, loading, isAuthenticated, isAgent, isAdmin, allowedRoles, requireAuth, redirectTo, router]);
+
+  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <div className="space-x-3">
+            <Button onClick={() => router.push(redirectTo)}>
+              <LogIn className="h-4 w-4 mr-2" />
+              Sign In
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/')}>
+              <Home className="h-4 w-4 mr-2" />
+              Go Home
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // If not authenticated, don't render children (will redirect)
-  if (!user) {
-    return null;
-  }
-
-  // If role check is required and user doesn't have required role, don't render children
-  if (allowedRoles.length > 0) {
-    const hasRequiredRole = allowedRoles.some(role => {
-      const upperRole = role.toUpperCase();
-      if (upperRole === 'ADMIN') return isAdmin;
-      if (upperRole === 'AGENT') return isAgent;
-      if (upperRole === 'SELLER') return !isAdmin && !isAgent; // Assume seller if not admin/agent
-      return false;
-    });
-    
-    if (!hasRequiredRole) {
-      return null;
-    }
-  }
-
-  // User is authenticated and has required role, render children
+  // Show children if authenticated and authorized
   return <>{children}</>;
 }

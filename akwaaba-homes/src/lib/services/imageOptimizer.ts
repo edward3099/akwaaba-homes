@@ -250,7 +250,7 @@ export class ImageOptimizer {
     }
 
     // Fallback image
-    const fallbackUrl = this.generateCDNUrl(imageUrl, { ...options, format: this.cdnConfig.fallbackFormat })
+    const fallbackUrl = this.generateCDNUrl(imageUrl, { ...options, format: this.cdnConfig.fallbackFormat as any })
     pictureHtml += `  <img src="${fallbackUrl}" alt="${alt}" loading="lazy">\n`
     pictureHtml += '</picture>'
 
@@ -537,6 +537,7 @@ export const cdnUtils = {
 
 // Export singleton instance
 export const imageOptimizer = new ImageOptimizer()
+
 
 
 

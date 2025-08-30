@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
           user_type: userType,
           phone: phone || null,
           company: company || null
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?next=/dashboard`
+        }
+        // Removed emailRedirectTo to bypass email verification
       }
     });
 
@@ -69,19 +69,21 @@ export async function POST(request: NextRequest) {
       // The profile can be created later
     }
 
-    // Send verification email
-    const { error: emailError } = await supabase.auth.resend({
-      type: 'signup',
-      email: email
-    });
+    // Manually confirm the email to bypass verification requirement
+    const { error: confirmError } = await supabase.auth.admin.updateUserById(
+      data.user.id,
+      { email_confirm: true }
+    );
 
-    if (emailError) {
-      console.error('Verification email error:', emailError);
+    if (confirmError) {
+      console.error('Email confirmation error:', confirmError);
+      // Continue anyway as the user is created
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully. Please check your email to verify your account.',
+      message: 'Account created successfully. Please complete your profile.',
+      redirectTo: '/agent/profile',
       user: {
         id: data.user.id,
         email: data.user.email,

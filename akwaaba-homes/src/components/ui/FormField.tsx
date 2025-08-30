@@ -65,7 +65,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
           <Input
             ref={ref}
             id={fieldId}
-            aria-invalid={hasError}
+            aria-invalid={hasError ? 'true' : 'false'}
             aria-describedby={
               showError ? `${fieldId}-error` : 
               helperText ? `${fieldId}-helper` : 
@@ -236,9 +236,25 @@ export const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
         
         <select
           ref={ref as any}
-          onChange={(e) => onValueChange?.(e.target.value)}
+          onChange={(e) => {
+            onValueChange?.(e.target.value);
+          }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          {...props}
+          {...(({ 
+            onChange, 
+            onCopy, 
+            onCut, 
+            onPaste, 
+            onCopyCapture,
+            onCutCapture,
+            onPasteCapture,
+            onCompositionEnd,
+            onCompositionStart,
+            onCompositionUpdate,
+            onInput,
+            onInputCapture,
+            ...rest 
+          }) => rest)(props as any)}
         >
           <option value="" disabled>
             {placeholder}

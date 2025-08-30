@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
-import CreatePropertyForm from '@/components/properties/CreatePropertyForm'
+import { CreatePropertyForm } from '@/components/properties/CreatePropertyForm'
 
 // Mock the mock auth context
 jest.mock('@/lib/mock-auth/mockAuthContext', () => ({

@@ -368,7 +368,7 @@ export class InputValidationService {
     try {
       sanitized = DOMPurify.sanitize(sanitized, {
         ALLOWED_TAGS: options.allowedTags,
-        ALLOWED_ATTR: options.allowedAttributes,
+        ALLOWED_ATTR: Object.keys(options.allowedAttributes),
         ALLOWED_URI_REGEXP: new RegExp(`^(${options.allowedSchemes.join('|')}):`, 'i')
       });
     } catch (error) {
@@ -451,30 +451,30 @@ export class InputValidationService {
     // Apply validations
     if (rule.minLength !== undefined && (rule.type === 'string' || rule.type === 'array')) {
       if (rule.type === 'string') {
-        zodField = zodField.min(rule.minLength);
+        zodField = (zodField as any).min(rule.minLength);
       } else {
-        zodField = zodField.min(rule.minLength);
+        zodField = (zodField as any).min(rule.minLength);
       }
     }
 
     if (rule.maxLength !== undefined && (rule.type === 'string' || rule.type === 'array')) {
       if (rule.type === 'string') {
-        zodField = zodField.max(rule.maxLength);
+        zodField = (zodField as any).max(rule.maxLength);
       } else {
-        zodField = zodField.max(rule.maxLength);
+        zodField = (zodField as any).max(rule.maxLength);
       }
     }
 
     if (rule.min !== undefined && rule.type === 'number') {
-      zodField = zodField.min(rule.min);
+      zodField = (zodField as any).min(rule.min);
     }
 
     if (rule.max !== undefined && rule.type === 'number') {
-      zodField = zodField.max(rule.max);
+      zodField = (zodField as any).max(rule.max);
     }
 
     if (rule.pattern && rule.type === 'string') {
-      zodField = zodField.regex(rule.pattern);
+      zodField = (zodField as any).regex(rule.pattern);
     }
 
     if (rule.enum) {
@@ -514,7 +514,7 @@ export class InputValidationService {
       if (error instanceof z.ZodError) {
         return {
           isValid: false,
-          errors: error.errors.map(err => `${err.path.join('.')}: ${err.message}`)
+          errors: error.issues.map(err => `${err.path.join('.')}: ${err.message}`)
         };
       }
       

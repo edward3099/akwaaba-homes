@@ -14,14 +14,14 @@ const mockProperty = {
   title: 'Beautiful 3-Bedroom House in Accra',
   description: 'A stunning modern house with excellent amenities',
   price: 750000,
-  currency: 'GHS',
-  status: 'for-sale',
-  type: 'house',
+  currency: 'GHS' as const,
+  status: 'for-sale' as const,
+  type: 'house' as const,
   location: {
     address: '123 Test Street, East Legon',
     city: 'Accra',
     region: 'Greater Accra',
-    country: 'Ghana',
+    country: 'Ghana' as const,
     coordinates: {
       lat: 5.5600,
       lng: -0.2057,
@@ -31,15 +31,15 @@ const mockProperty = {
     bedrooms: 3,
     bathrooms: 2,
     size: 200,
-    sizeUnit: 'sqm',
+    sizeUnit: 'sqm' as const,
   },
-  images: ['https://example.com/image1.jpg'],
+  images: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg', 'https://example.com/image3.jpg'], // minimum 3 required
   features: ['Modern Kitchen', 'Garden'],
   amenities: ['Swimming Pool', 'Security'],
   seller: {
     id: 'seller-1',
     name: 'John Doe',
-    type: 'agent',
+    type: 'agent' as const,
     phone: '+233 20 123 4567',
     email: 'john@premiumproperties.com',
     whatsapp: '+233 20 123 4567',
@@ -55,7 +55,7 @@ const mockProperty = {
   createdAt: '2024-01-15T10:00:00Z',
   updatedAt: '2024-01-15T10:00:00Z',
   expiresAt: '2024-02-14T10:00:00Z',
-  tier: 'normal',
+  tier: 'normal' as const,
 }
 
 describe('PropertyCard', () => {

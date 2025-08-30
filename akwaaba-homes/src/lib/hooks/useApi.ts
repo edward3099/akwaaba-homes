@@ -6,6 +6,7 @@ export function useApi<T = unknown>() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<T | null>(null);
+  const { apiClient } = useApiClient();
 
   // Generic API call wrapper
   const callApi = useCallback(async <R = T>(
@@ -18,7 +19,7 @@ export function useApi<T = unknown>() {
       const response = await apiCall();
       
       if (response.success) {
-        setData(response.data as T);
+        setData(response.data as unknown as T);
         return response;
       } else {
         setError(response.error || 'API call failed');
@@ -95,13 +96,14 @@ export function useProperties() {
 // Hook for making custom HTTP requests
 export function useHttpRequest() {
   const { loading, error, data, callApi, clearError, reset } = useApi();
+  const { apiClient } = useApiClient();
 
   const request = useCallback(async <T = unknown>(
     url: string,
     options: RequestInit = {}
   ) => {
     return callApi(() => apiClient.request<T>(url, options));
-  }, [callApi]);
+  }, [callApi, apiClient]);
 
   return {
     loading,

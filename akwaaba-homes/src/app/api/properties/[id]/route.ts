@@ -65,11 +65,9 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid property ID' }, { status: 400 });
     }
 
-    // Check authentication
+    // Check authentication (optional for public viewing)
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const isAuthenticated = !authError && user;
 
     // Fetch property with related data
     const { data: property, error } = await supabase
@@ -79,7 +77,6 @@ export async function GET(
         users!properties_seller_id_fkey (
           id,
           full_name,
-          company_name,
           phone,
           email,
           user_type,
@@ -89,7 +86,7 @@ export async function GET(
           id,
           image_url,
           is_primary,
-          caption
+          alt_text
         ),
         inquiries (
           id,
@@ -115,27 +112,34 @@ export async function GET(
       }, { status: 500 });
     }
 
-    // Track property view
-    await supabase
-      .from('analytics')
-      .insert([
-        {
-          event_type: 'property_viewed',
-          user_id: user.id,
-          property_id: propertyId,
-          metadata: {
-            property_type: property.property_type,
-            price: property.price,
-            location: property.city,
-          },
-        }
-      ]);
+    // Track property view (only if authenticated)
+    if (isAuthenticated) {
+      try {
+        await supabase
+          .from('analytics')
+          .insert([
+            {
+              event_type: 'property_viewed',
+              user_id: user.id,
+              property_id: propertyId,
+              metadata: {
+                property_type: property.property_type,
+                price: property.price,
+                location: property.city,
+              },
+            }
+          ]);
 
-    // Increment view count
-    await supabase
-      .from('properties')
-      .update({ views_count: (property.views_count || 0) + 1 })
-      .eq('id', propertyId);
+        // Increment view count
+        await supabase
+          .from('properties')
+          .update({ views_count: (property.views_count || 0) + 1 })
+          .eq('id', propertyId);
+      } catch (analyticsError) {
+        // Don't fail the request if analytics tracking fails
+        console.warn('Analytics tracking failed:', analyticsError);
+      }
+    }
 
     return NextResponse.json({ property });
   } catch (error) {
@@ -267,6 +271,123 @@ export async function PUT(
     }
     
     console.error('Error in property PUT:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: propertyId } = await params;
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
+
+    // Validate property ID
+    if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
+      return NextResponse.json({ error: 'Invalid property ID' }, { status: 400 });
+    }
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user profile to check role
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
+      .select('user_type, is_verified')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !userProfile) {
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
+    }
+
+    // Check if user owns the property or is admin
+    const { data: property, error: propertyError } = await supabase
+      .from('properties')
+      .select('seller_id, property_type, status')
+      .eq('id', propertyId)
+      .single();
+
+    if (propertyError || !property) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+    }
+
+    if (property.seller_id !== user.id && userProfile.user_type !== 'admin') {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
+    // Parse request body
+    const body = await request.json();
+    
+    // For PATCH, we allow partial updates including image_urls
+    const updateData: Record<string, unknown> = {
+      ...body,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Update property
+    const { data: updatedProperty, error: updateError } = await supabase
+      .from('properties')
+      .update(updateData)
+      .eq('id', propertyId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error updating property:', updateError);
+      return NextResponse.json({ 
+        error: 'Failed to update property', 
+        details: updateError.message 
+      }, { status: 500 });
+    }
+
+    // Track analytics
+    await supabase
+      .from('analytics')
+      .insert([
+        {
+          event_type: 'property_updated',
+          user_id: user.id,
+          property_id: propertyId,
+          metadata: {
+            property_type: updatedProperty.property_type,
+            updated_fields: Object.keys(body),
+          },
+        }
+      ]);
+
+    return NextResponse.json({ 
+      message: 'Property updated successfully',
+      property: updatedProperty 
+    });
+  } catch (error) {
+    console.error('Error in property PATCH:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

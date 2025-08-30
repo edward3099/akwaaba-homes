@@ -3,14 +3,18 @@ import { DatabaseProperty, PropertyStatus, PropertyType } from '@/lib/types/data
 export interface PropertyFilters {
   status?: PropertyStatus;
   property_type?: PropertyType;
+  listing_type?: 'sale' | 'rent' | 'lease';
   min_price?: number;
   max_price?: number;
   city?: string;
+  region?: string;
   search?: string;
   page?: number;
   limit?: number;
   sort_by?: 'price' | 'created_at' | 'views' | 'area';
   sort_order?: 'asc' | 'desc';
+  bedrooms?: number;
+  added_to_site?: string;
 }
 
 export interface SearchFilters extends PropertyFilters {
@@ -65,12 +69,21 @@ class PropertyService {
     // Handle both naming conventions (frontend and backend)
     if (filters.status) params.append('status', filters.status);
     if (filters.property_type) params.append('property_type', filters.property_type);
+    if (filters.listing_type) params.append('listing_type', filters.listing_type);
     if (filters.min_price) params.append('min_price', filters.min_price.toString());
     if (filters.max_price) params.append('max_price', filters.max_price.toString());
     if (filters.city) params.append('city', filters.city);
+    if (filters.region) params.append('region', filters.region);
     if (filters.search) params.append('search', filters.search);
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.limit) params.append('limit', filters.limit.toString());
+    if (filters.bedrooms) {
+      params.append('bedrooms', filters.bedrooms.toString());
+    }
+
+    if (filters.added_to_site) {
+      params.append('added_to_site', filters.added_to_site);
+    }
 
     // Also handle frontend naming convention
     if ((filters as any).propertyType) params.append('property_type', (filters as any).propertyType);

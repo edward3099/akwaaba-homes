@@ -106,12 +106,13 @@ export function AuthErrorDisplay({
 
             {/* Technical Details Toggle */}
             {error.technical && (
-              <Collapsible open={showTechnicalDetails} onOpenChange={setShowTechnicalDetails}>
-                <CollapsibleTrigger asChild>
+              <Collapsible>
+                <CollapsibleTrigger>
                   <Button
                     size="sm"
                     variant="ghost"
                     className="text-xs h-8 px-3"
+                    onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                   >
                     <HelpCircle className="h-3 w-3 mr-1" />
                     {showTechnicalDetails ? 'Hide' : 'Show'} Details
@@ -123,12 +124,14 @@ export function AuthErrorDisplay({
                   </Button>
                 </CollapsibleTrigger>
                 
-                <CollapsibleContent className="mt-2">
-                  <div className="bg-white/50 rounded p-2 text-xs font-mono opacity-75">
-                    <div className="font-semibold mb-1">Technical Details:</div>
-                    <div className="break-all">{error.technical}</div>
-                  </div>
-                </CollapsibleContent>
+                {showTechnicalDetails && (
+                  <CollapsibleContent className="mt-2">
+                    <div className="bg-white/50 rounded p-2 text-xs font-mono opacity-75">
+                      <div className="font-semibold mb-1">Technical Details:</div>
+                      <div className="break-all">{error.technical}</div>
+                    </div>
+                  </CollapsibleContent>
+                )}
               </Collapsible>
             )}
           </div>

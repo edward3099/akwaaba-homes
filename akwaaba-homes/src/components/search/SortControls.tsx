@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUpDown } from 'lucide-react';
-import { SortOption } from '@/lib/types';
+import { SortOption } from '../../lib/types';
 
 interface SortControlsProps {
   sortBy: SortOption;

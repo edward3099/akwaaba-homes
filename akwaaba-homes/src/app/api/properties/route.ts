@@ -379,26 +379,32 @@ export async function POST(request: NextRequest) {
 
     // Validate images - handle both 'images' and 'image_urls' field names
     const imageUrls = body.image_urls || body.images;
-    if (!imageUrls || imageUrls.length < 3) {
-      return NextResponse.json(
-        { error: 'At least 3 images are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate that image URLs are actual uploaded URLs (not blob URLs)
-    const invalidImageUrls = imageUrls.filter((url: string) => 
-      !url || 
-      url.startsWith('blob:') || 
-      url.startsWith('data:') ||
-      !url.startsWith('http')
-    );
     
-    if (invalidImageUrls.length > 0) {
-      return NextResponse.json(
-        { error: 'Invalid image URLs detected. Please upload images properly.' },
-        { status: 400 }
+    // Allow property creation without images initially (two-step process)
+    // Images will be uploaded after property creation
+    if (imageUrls && imageUrls.length > 0) {
+      // If images are provided, validate them
+      if (imageUrls.length < 3) {
+        return NextResponse.json(
+          { error: 'If images are provided, at least 3 images are required' },
+          { status: 400 }
+        );
+      }
+
+      // Validate that image URLs are actual uploaded URLs (not blob URLs)
+      const invalidImageUrls = imageUrls.filter((url: string) => 
+        !url || 
+        url.startsWith('blob:') || 
+        url.startsWith('data:') ||
+        !url.startsWith('http')
       );
+      
+      if (invalidImageUrls.length > 0) {
+        return NextResponse.json(
+          { error: 'Invalid image URLs detected. Please upload images properly.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Prepare property data
@@ -420,7 +426,7 @@ export async function POST(request: NextRequest) {
       features: body.features || [],
       amenities: body.amenities || [],
       virtual_tour_url: body.virtual_tour_url || body.virtualTour || null,
-      image_urls: imageUrls, // These should now be actual uploaded URLs
+      image_urls: imageUrls || [], // Use provided images or empty array
       status: 'pending',
       approval_status: 'pending',
       seller_id: user.id,
@@ -448,27 +454,30 @@ export async function POST(request: NextRequest) {
     console.log('Property created successfully:', newProperty);
 
     // Update the property_images table to link the uploaded images to this property
-    // First, get the temporary property ID from the image URLs
-    const tempPropertyIds = [...new Set(imageUrls.map((url: string) => {
-      const match = url.match(/temp-(\d+)-[a-z0-9]+/);
-      return match ? match[1] : null;
-    }).filter(Boolean))];
+    // Only process if there are actual images
+    if (imageUrls && imageUrls.length > 0) {
+      // First, get the temporary property ID from the image URLs
+      const tempPropertyIds = [...new Set(imageUrls.map((url: string) => {
+        const match = url.match(/temp-(\d+)-[a-z0-9]+/);
+        return match ? match[1] : null;
+      }).filter(Boolean))];
 
-    if (tempPropertyIds.length > 0) {
-      console.log('Updating image records for property:', newProperty.id);
-      
-      // Update all image records that were uploaded with temporary property IDs
-      for (const tempId of tempPropertyIds) {
-        const { error: updateError } = await supabase
-          .from('property_images')
-          .update({ 
-            property_id: newProperty.id,
-            updated_at: new Date().toISOString()
-          })
-          .like('property_id', `temp-${tempId}-%`);
+      if (tempPropertyIds.length > 0) {
+        console.log('Updating image records for property:', newProperty.id);
         
-        if (updateError) {
-          console.error('Failed to update image records for temp ID:', tempId, updateError);
+        // Update all image records that were uploaded with temporary property IDs
+        for (const tempId of tempPropertyIds) {
+          const { error: updateError } = await supabase
+            .from('property_images')
+            .update({ 
+              property_id: newProperty.id,
+              updated_at: new Date().toISOString()
+            })
+            .like('property_id', `temp-${tempId}-%`);
+          
+          if (updateError) {
+            console.error('Failed to update image records for temp ID:', tempId, updateError);
+          }
         }
       }
     }

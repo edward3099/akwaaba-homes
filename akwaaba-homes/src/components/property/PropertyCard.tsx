@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,6 +38,7 @@ export function PropertyCard({
   className = ''
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const searchParams = useSearchParams();
 
   // Ensure images array exists and has valid URLs
   const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
@@ -50,6 +52,13 @@ export function PropertyCard({
   
   // Ensure currentImageIndex doesn't exceed valid images length
   const safeImageIndex = Math.min(currentImageIndex, Math.max(0, validImages.length - 1));
+
+  // Create return URL with current search filters
+  const createReturnURL = () => {
+    const currentParams = searchParams.toString();
+    const returnParams = currentParams ? `?return=${encodeURIComponent(`?${currentParams}`)}` : '';
+    return `/property/${property.id}${returnParams}`;
+  };
 
   const handleContact = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -137,7 +146,7 @@ export function PropertyCard({
         property.tier === 'premium' ? 'premium-card-glow' : ''
       }`}>
         <CardContent className="p-0">
-          <Link href={`/property/${property.id}`} className="block">
+          <Link href={createReturnURL()} className="block">
             <div className="flex flex-col md:flex-row">
               {/* Image Section */}
               <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0 overflow-hidden">
@@ -201,11 +210,11 @@ export function PropertyCard({
 
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1">
-                  <Badge className={statusBadge.className}>
+                  <Badge className={`${statusBadge.className} text-xs px-2 py-1`}>
                     {statusBadge.text}
                   </Badge>
                   {tierBadge && (
-                    <Badge className={tierBadge.className}>
+                    <Badge className={`${tierBadge.className} text-xs px-2 py-1`}>
                       <Star className="w-3 h-3 mr-1" />
                       {tierBadge.text}
                     </Badge>
@@ -217,10 +226,9 @@ export function PropertyCard({
 
                 {/* Verification Badge */}
                 {property.verification.isVerified && (
-                  <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2">
-                    <Badge className="verification-badge text-xs px-1.5 py-0.5 sm:px-2 sm:py-1">
-                      <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
-                      Verified
+                  <div className="absolute bottom-2 right-2">
+                    <Badge className="verification-badge">
+                      <Shield className="w-3 h-3" />
                     </Badge>
                   </div>
                 )}
@@ -293,7 +301,7 @@ export function PropertyCard({
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex space-x-2">
                     <Button variant="outline" size="sm" onClick={handleContact}>
                       <Phone className="h-4 w-4 mr-1" />
                       Call
@@ -314,11 +322,11 @@ export function PropertyCard({
 
   // Grid View
   return (
-    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden ${className} ${
+    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden h-full flex flex-col ${className} ${
       property.tier === 'premium' ? 'premium-card-glow' : ''
     }`}>
-      <CardContent className="p-0">
-        <Link href={`/property/${property.id}`} className="block">
+      <CardContent className="p-0 flex flex-col h-full">
+        <Link href={createReturnURL()} className="block flex flex-col h-full">
           {/* Image Section */}
           <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
             <Image
@@ -401,7 +409,7 @@ export function PropertyCard({
           </div>
 
           {/* Content Section */}
-          <div className="p-2 sm:p-3 md:p-4 flex flex-col h-48 sm:h-52 md:h-56">
+          <div className="p-2 sm:p-3 md:p-4 flex flex-col flex-1">
             {/* Price */}
             <div className="mb-1 sm:mb-2">
               <div className="text-lg sm:text-xl font-bold text-primary">
@@ -438,6 +446,13 @@ export function PropertyCard({
               </span>
             </div>
 
+            {/* Description */}
+            <div className="mb-3 flex-1 min-h-[2.5rem]">
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                {property.description}
+              </p>
+            </div>
+
             {/* Property Details */}
             <div className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground mb-3">
               {property.specifications.bedrooms && (
@@ -461,7 +476,7 @@ export function PropertyCard({
             </div>
 
             {/* Actions */}
-            <div className="flex space-x-1 sm:space-x-2">
+            <div className="flex space-x-1 sm:space-x-2 mt-auto">
               <Button variant="outline" size="sm" onClick={handleContact} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
                 <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 <span className="hidden sm:inline">Call</span>
@@ -475,7 +490,7 @@ export function PropertyCard({
             </div>
 
             {/* Seller Info */}
-            <div className="mt-auto pt-2 border-t text-xs sm:text-sm text-muted-foreground">
+            <div className="pt-2 border-t text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <span className="flex-shrink-0">Listed by</span>
                 <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">

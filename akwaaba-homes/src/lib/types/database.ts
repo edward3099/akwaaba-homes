@@ -59,7 +59,7 @@ export interface DatabaseProperty {
   property_type: PropertyType;
   listing_type: ListingType;
   price: number;
-  currency: string;
+  currency: 'GHS'; // Fixed: Use literal type instead of string
   address: string;
   city: string;
   region: string;
@@ -76,6 +76,7 @@ export interface DatabaseProperty {
   status: PropertyStatus;
   is_featured: boolean;
   views_count: number;
+  image_urls?: string[]; // Add missing field for image URLs
   created_at: string;
   updated_at: string;
 }
@@ -210,7 +211,7 @@ export interface CreatePropertyForm {
   property_type: PropertyType;
   listing_type: ListingType;
   price: number;
-  currency: string;
+  currency: 'GHS'; // Fixed: Use literal type instead of string
   address: string;
   city: string;
   region: string;
@@ -241,19 +242,3 @@ export interface UpdateUserForm {
   profile_image_url?: string;
   subscription_tier?: SubscriptionTier;
 }
-
-// Export all types
-export type {
-  UserRole,
-  VerificationStatus,
-  SubscriptionTier,
-  PropertyType,
-  ListingType,
-  PropertyStatus,
-  ImageType,
-  InquiryType,
-  InquiryStatus,
-  VerificationType,
-  DocumentType,
-  AnalyticsEventType
-};

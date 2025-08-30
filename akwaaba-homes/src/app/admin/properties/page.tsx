@@ -91,8 +91,8 @@ export default function PropertiesPage() {
       setPagination({
         page: currentPage,
         limit: currentLimit,
-        total: data.count || 0,
-        totalPages: Math.ceil((data.count || 0) / currentLimit)
+        total: data.pagination.total,
+        totalPages: data.pagination.totalPages
       })
     }
   });
@@ -120,11 +120,11 @@ export default function PropertiesPage() {
     successMessage: 'Agent assignment updated successfully',
     errorMessage: 'Failed to update agent assignment',
     loadingMessage: 'Updating agent assignment...',
-    onSuccess: (data: any, propertyId: string, agentId: string | null) => {
+    onSuccess: (data: any) => {
       // Update the property in local state
       setProperties(prev => prev.map(p => 
-        p.id === propertyId 
-          ? { ...p, agent_id: agentId }
+        p.id === deleteModal.propertyId 
+          ? { ...p, agent_id: data.agent_id }
           : p
       ))
     }
@@ -182,8 +182,17 @@ export default function PropertiesPage() {
         throw new Error(errorData.error || 'Failed to update agent assignment')
       }
 
-      return await response.json()
-    }, propertyId, agentId)
+      const result = await response.json()
+      
+      // Update the property in local state
+      setProperties(prev => prev.map(p => 
+        p.id === propertyId 
+          ? { ...p, agent_id: agentId }
+          : p
+      ))
+      
+      return result
+    })
   }
 
   const fetchProperties = async (filters: PropertyFilters) => {

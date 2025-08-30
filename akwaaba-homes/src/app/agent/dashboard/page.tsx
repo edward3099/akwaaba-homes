@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/lib/auth/authContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -60,66 +60,66 @@ export default function AgentDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
             Agent Dashboard
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-2 text-sm sm:text-base break-words">
             Welcome back, {user.user_metadata?.first_name || user.email}!
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-              <Home className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+          <Card className="min-w-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium min-w-0">Total Properties</CardTitle>
+              <Home className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProperties}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.totalProperties}</div>
               <p className="text-xs text-muted-foreground">
                 All your property listings
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+          <Card className="min-w-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium min-w-0">Pending Approval</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingProperties}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.pendingProperties}</div>
               <p className="text-xs text-muted-foreground">
                 Awaiting admin review
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          <Card className="min-w-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium min-w-0">Active Listings</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.activeProperties}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.activeProperties}</div>
               <p className="text-xs text-muted-foreground">
                 Currently visible to buyers
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Inquiries</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+          <Card className="min-w-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium min-w-0">Total Inquiries</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalInquiries}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.totalInquiries}</div>
               <p className="text-xs text-muted-foreground">
                 Buyer interest in your properties
               </p>
@@ -128,85 +128,85 @@ export default function AgentDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/properties/create">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5 text-blue-600" />
-                  <CardTitle>Add New Property</CardTitle>
+                  <Plus className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">Add New Property</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Create a new property listing
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/agent/properties">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <Home className="h-5 w-5 text-green-600" />
-                  <CardTitle>Manage Properties</CardTitle>
+                  <Home className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">Manage Properties</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   View and edit your property listings
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/agent/inquiries">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <Users className="h-5 w-5 text-purple-600" />
-                  <CardTitle>View Inquiries</CardTitle>
+                  <Users className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">View Inquiries</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Check buyer inquiries and messages
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/agent/profile">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5 text-orange-600" />
-                  <CardTitle>Profile Settings</CardTitle>
+                  <Settings className="h-5 w-5 text-orange-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">Profile Settings</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Update your profile and preferences
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/agent/analytics">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5 text-indigo-600" />
-                  <CardTitle>Performance Analytics</CardTitle>
+                  <BarChart3 className="h-5 w-5 text-indigo-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">Performance Analytics</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   View your property performance metrics
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer min-w-0">
             <Link href="/agent/support">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5 text-red-600" />
-                  <CardTitle>Support & Help</CardTitle>
+                  <FileText className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <CardTitle className="text-sm sm:text-base min-w-0">Support & Help</CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Get help and contact support
                 </CardDescription>
               </CardHeader>
@@ -215,18 +215,18 @@ export default function AgentDashboardPage() {
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
+        <Card className="min-w-0">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Recent Activity</CardTitle>
+            <CardDescription className="text-sm">
               Your latest property updates and inquiries
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No recent activity to display</p>
-              <p className="text-sm">Start by adding your first property!</p>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-center py-6 sm:py-8 text-gray-500">
+              <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-sm sm:text-base">No recent activity to display</p>
+              <p className="text-xs sm:text-sm">Start by adding your first property!</p>
             </div>
           </CardContent>
         </Card>

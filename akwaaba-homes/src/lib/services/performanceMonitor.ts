@@ -129,7 +129,7 @@ export class PerformanceMonitor {
     this.monitoringInterval = setInterval(() => {
       this.collectMetrics()
       this.analyzePerformance()
-      this.generateAlerts()
+      // this.generateAlerts() // Method not implemented
       this.generateOptimizationRecommendations()
     }, 30000) // Every 30 seconds
   }

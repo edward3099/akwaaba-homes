@@ -1,4 +1,4 @@
-import { CurrencyCode, CurrencyRate } from '@/lib/types';
+import { CurrencyCode, CurrencyRate } from '../types';
 
 // Default currency rates (GHS as base currency = 1)
 // In production, these would come from a real-time API

@@ -1,5 +1,8 @@
 import { Property } from '@/lib/types/index';
 import AgentPageClient from './AgentPageClient';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 // Mock agent data - in production, fetch based on id
 const mockAgent = {
@@ -192,10 +195,59 @@ interface AgentPageProps {
 
 export default async function AgentPage({ params }: AgentPageProps) {
   const { id } = await params;
+  const supabase = createServerComponentClient({ cookies });
   
-  // In production, fetch agent data and properties based on id
-  const agent = mockAgent;
-  const properties = mockAgentProperties;
+  // Fetch real agent data from database
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', id)
+    .single();
 
-  return <AgentPageClient agent={agent} properties={properties} agentId={id} />;
+  if (profileError || !profile) {
+    console.error('Error fetching agent profile:', profileError);
+    notFound();
+  }
+
+  // Fetch agent's properties
+  const { data: properties, error: propertiesError } = await supabase
+    .from('properties')
+    .select('*')
+    .eq('seller_id', id)
+    .eq('is_approved', true)
+    .order('created_at', { ascending: false });
+
+  if (propertiesError) {
+    console.error('Error fetching agent properties:', propertiesError);
+  }
+
+  // Transform profile data to match the expected agent interface
+  const agent = {
+    id: profile.id,
+    name: profile.full_name || 'Unnamed Agent',
+    type: profile.user_role || 'agent',
+    phone: profile.phone || '',
+    email: profile.email || '',
+    isVerified: profile.is_verified || false,
+    company: profile.company_name || '',
+    experience: profile.experience_years ? `${profile.experience_years}+ years` : '0+ years',
+    specializations: profile.specializations || [],
+    bio: profile.bio || '',
+    avatar: profile.profile_image || '/placeholder-property.svg',
+    coverImage: '/placeholder-property.jpg', // Default cover image
+    stats: {
+      totalProperties: properties?.length || 0,
+      propertiesSold: 0, // This would need to be calculated from actual sales data
+      propertiesRented: 0, // This would need to be calculated from actual rental data
+      clientSatisfaction: 4.5, // Default rating
+      responseTime: '2 hours' // Default response time
+    },
+    contactInfo: {
+      address: profile.address || '',
+      workingHours: 'Mon-Fri: 8AM-6PM, Sat: 9AM-3PM', // Default working hours
+      languages: ['English'] // Default language
+    }
+  };
+
+  return <AgentPageClient agent={agent} properties={properties || []} agentId={id} />;
 }

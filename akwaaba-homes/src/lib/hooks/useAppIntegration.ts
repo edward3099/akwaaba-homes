@@ -82,7 +82,7 @@ export const useAppIntegration = (config: Partial<AppIntegrationConfig> = {}): A
   );
 
   // Initialize toast notifications
-  const toast = useToastIntegration(fullConfig.componentName);
+  const toastIntegration = useToastIntegration(fullConfig.componentName);
 
   // Initialize API client
   const api = useApiClient();
@@ -194,7 +194,7 @@ export const useAppIntegration = (config: Partial<AppIntegrationConfig> = {}): A
     auth,
     loading,
     error,
-    toast,
+    toast: toastIntegration,
     api,
     utils,
   };
@@ -202,7 +202,14 @@ export const useAppIntegration = (config: Partial<AppIntegrationConfig> = {}): A
 
 // Hook for simple integration (minimal features)
 export const useSimpleIntegration = (componentName: string) => {
-  const { toast } = useToastIntegration(componentName);
+  const { 
+    showSuccess, 
+    showError, 
+    showWarning, 
+    showInfo,
+    showValidationErrors,
+    showDataOperationToast
+  } = useToastIntegration(componentName);
   const { handleError } = useErrorIntegration(componentName, {
     showToast: false, // We'll handle toasts manually
   });
@@ -212,12 +219,11 @@ export const useSimpleIntegration = (componentName: string) => {
   const handleErrorWithToast = async (error: any, action: string) => {
     const appError = await handleError(error, action);
     
-    if (appError.severity === 'critical') {
-      toast.showError('Critical Error', appError.userMessage);
-    } else if (appError.severity === 'high') {
-      toast.showError('Error', appError.userMessage);
+    // Show error based on whether it was handled or not
+    if (appError.handled) {
+      showError('Error', appError.userMessage);
     } else {
-      toast.showWarning('Warning', appError.userMessage);
+      showError('Warning', appError.userMessage);
     }
   };
 
@@ -227,7 +233,7 @@ export const useSimpleIntegration = (componentName: string) => {
     operation: () => Promise<T>,
     message: string = 'Loading...'
   ): Promise<T> => {
-    return withLoading(operationKey, async () => {
+    return (withLoading as any)(async () => {
       try {
         return await operation();
       } catch (error) {
@@ -238,7 +244,7 @@ export const useSimpleIntegration = (componentName: string) => {
   };
 
   return {
-    toast,
+    toast: { showSuccess, showError, showWarning, showInfo, showValidationErrors, showDataOperationToast },
     handleError: handleErrorWithToast,
     withLoading: withSimpleLoading,
     componentName,
@@ -247,7 +253,7 @@ export const useSimpleIntegration = (componentName: string) => {
 
 // Hook for form integration
 export const useFormIntegration = (componentName: string) => {
-  const { toast } = useToastIntegration(componentName);
+  const { showSuccess, showError, showInfo, showValidationErrors } = useToastIntegration(componentName);
   const { handleError } = useErrorIntegration(componentName, {
     showToast: false,
   });
@@ -261,37 +267,37 @@ export const useFormIntegration = (componentName: string) => {
     errorMessage: string = 'Operation failed'
   ): Promise<T | null> => {
     try {
-      const result = await withLoading(operationKey, operation);
-      toast.showSuccess('Success', successMessage);
+      const result = await (withLoading as any)(operation, 'Loading...');
+      showSuccess('Success', successMessage);
       return result;
     } catch (error) {
       await handleError(error, 'form_submit');
-      toast.showError('Error', errorMessage);
+      showError('Error', errorMessage);
       return null;
     }
   };
 
   // Handle form validation errors
   const handleValidationErrors = (errors: Record<string, any>) => {
-    toast.showValidationErrors(errors);
+    showValidationErrors(errors);
   };
 
   // Handle form reset
   const handleFormReset = () => {
-    toast.showInfo('Form Reset', 'Form has been reset to its initial state');
+    showInfo('Form Reset', 'Form has been reset to its initial state');
   };
 
   return {
     handleFormSubmit,
     handleValidationErrors,
     handleFormReset,
-    toast,
+    toast: { showSuccess, showError, showInfo, showValidationErrors },
   };
 };
 
 // Hook for data operation integration
 export const useDataIntegration = (componentName: string) => {
-  const { toast } = useToastIntegration(componentName);
+  const { showSuccess, showError, showDataOperationToast } = useToastIntegration(componentName);
   const { handleError } = useErrorIntegration(componentName, {
     showToast: false,
   });
@@ -305,17 +311,17 @@ export const useDataIntegration = (componentName: string) => {
     entityName: string
   ): Promise<T | null> => {
     try {
-      const result = await withLoading(operationKey, operation);
+      const result = await (withLoading as any)(operation, 'Loading...');
       
       // Show success toast
-      toast.showDataOperationToast(operationType, entityName, true);
+      showDataOperationToast(operationType, entityName, true);
       
       return result;
     } catch (error) {
       await handleError(error, `${operationType}_${entityName}`);
       
       // Show error toast
-      toast.showDataOperationToast(operationType, entityName, false, error);
+      showDataOperationToast(operationType, entityName, false, error);
       
       return null;
     }
@@ -328,7 +334,7 @@ export const useDataIntegration = (componentName: string) => {
     entityName: string
   ): Promise<T[]> => {
     try {
-      const results = await withLoading(operationKey, async () => {
+      const results = await (withLoading as any)(async () => {
         const results: T[] = [];
         const total = operations.length;
         
@@ -338,13 +344,13 @@ export const useDataIntegration = (componentName: string) => {
         }
         
         return results;
-      });
+      }, 'Processing batch operations...');
       
-      toast.showSuccess('Batch Operation Complete', `${total} ${entityName} processed successfully`);
+      showSuccess('Batch Operation Complete', `${results.length} ${entityName} processed successfully`);
       return results;
     } catch (error) {
       await handleError(error, `batch_${entityName}`);
-      toast.showError('Batch Operation Failed', `Failed to process ${entityName}`);
+      showError('Batch Operation Failed', `Failed to process ${entityName}`);
       return [];
     }
   };
@@ -352,13 +358,13 @@ export const useDataIntegration = (componentName: string) => {
   return {
     handleDataOperation,
     handleBatchOperation,
-    toast,
+    toast: { showSuccess, showError, showDataOperationToast },
   };
 };
 
 // Hook for file operation integration
 export const useFileIntegration = (componentName: string) => {
-  const { toast } = useToastIntegration(componentName);
+  const { showSuccess, showError } = useToastIntegration(componentName);
   const { handleError } = useErrorIntegration(componentName, {
     showToast: false,
   });
@@ -371,12 +377,12 @@ export const useFileIntegration = (componentName: string) => {
     fileName: string
   ): Promise<T | null> => {
     try {
-      const result = await withLoading(operationKey, operation);
-      toast.showSuccess('Upload Complete', `${fileName} uploaded successfully`);
+      const result = await (withLoading as any)(operation, 'Loading...');
+      showSuccess('Upload Complete', `${fileName} uploaded successfully`);
       return result;
     } catch (error) {
       await handleError(error, 'file_upload');
-      toast.showError('Upload Failed', `Failed to upload ${fileName}`);
+      showError('Upload Failed', `Failed to upload ${fileName}`);
       return null;
     }
   };
@@ -388,12 +394,12 @@ export const useFileIntegration = (componentName: string) => {
     fileName: string
   ): Promise<T | null> => {
     try {
-      const result = await withLoading(operationKey, operation);
-      toast.showSuccess('File Deleted', `${fileName} deleted successfully`);
+      const result = await (withLoading as any)(operation, 'Loading...');
+      showSuccess('File Deleted', `${fileName} deleted successfully`);
       return result;
     } catch (error) {
       await handleError(error, 'file_delete');
-      toast.showError('Deletion Failed', `Failed to delete ${fileName}`);
+      showError('Deletion Failed', `Failed to delete ${fileName}`);
       return null;
     }
   };
@@ -401,7 +407,7 @@ export const useFileIntegration = (componentName: string) => {
   return {
     handleFileUpload,
     handleFileDelete,
-    toast,
+    toast: { showSuccess, showError },
   };
 };
 

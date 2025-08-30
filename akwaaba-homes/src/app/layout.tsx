@@ -70,14 +70,6 @@ export default function RootLayout({
               className: 'ghana-toast',
               duration: 5000,
             }}
-            classNames={{
-              toast: "bg-gradient-to-r from-ghana-gold to-ghana-yellow border-2 border-ghana-green shadow-lg",
-              title: "text-ghana-red font-semibold",
-              description: "text-ghana-dark",
-              actionButton: "bg-ghana-green text-white hover:bg-ghana-green-dark",
-              cancelButton: "bg-ghana-red text-white hover:bg-ghana-red-dark",
-              closeButton: "text-ghana-red hover:text-ghana-red-dark",
-            }}
           />
         </AuthProvider>
         

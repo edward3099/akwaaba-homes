@@ -134,7 +134,7 @@ export function usePropertyUpdates(
       propertyId ? { id: `eq.${propertyId}` } : undefined
     );
 
-    return () => unsubscribe(subscriptionId);
+    return () => { unsubscribe(subscriptionId); };
   }, [propertyId, subscribe, unsubscribe, options.enabled]);
 
   return {
@@ -166,7 +166,7 @@ export function useNewInquiries(
       sellerId ? { seller_id: `eq.${sellerId}` } : undefined
     );
 
-    return () => unsubscribe(subscriptionId);
+    return () => { unsubscribe(subscriptionId); };
   }, [sellerId, subscribe, unsubscribe, options.enabled]);
 
   return {
@@ -198,7 +198,7 @@ export function useNotifications(
       userId ? { user_id: `eq.${userId}` } : undefined
     );
 
-    return () => unsubscribe(subscriptionId);
+    return () => { unsubscribe(subscriptionId); };
   }, [userId, subscribe, unsubscribe, options.enabled]);
 
   return {
@@ -230,7 +230,7 @@ export function useChatMessages(
       chatRoomId ? { chat_room_id: `eq.${chatRoomId}` } : undefined
     );
 
-    return () => unsubscribe(subscriptionId);
+    return () => { unsubscribe(subscriptionId); };
   }, [chatRoomId, subscribe, unsubscribe, options.enabled]);
 
   return {

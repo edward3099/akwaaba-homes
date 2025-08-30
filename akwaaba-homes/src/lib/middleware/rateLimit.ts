@@ -17,7 +17,7 @@ export function createRateLimit(config: RateLimitConfig) {
     // Generate a unique key for this client
     const key = keyGenerator 
       ? keyGenerator(request) 
-      : request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+      : request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
 
     const now = Date.now();
     const windowStart = now - windowMs;
@@ -74,7 +74,7 @@ export const authRateLimit = createRateLimit({
   maxRequests: 5, // 5 requests per 15 minutes
   keyGenerator: (request) => {
     // Use IP + user agent for auth endpoints to prevent brute force
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
     return `auth:${ip}:${userAgent}`;
   }
@@ -85,7 +85,7 @@ export const formSubmissionRateLimit = createRateLimit({
   maxRequests: 3, // 3 requests per minute
   keyGenerator: (request) => {
     // Use IP for form submissions
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     return `form:${ip}`;
   }
 });
@@ -95,7 +95,7 @@ export const apiRateLimit = createRateLimit({
   maxRequests: 100, // 100 requests per minute
   keyGenerator: (request) => {
     // Use IP for general API endpoints
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     return `api:${ip}`;
   }
 });

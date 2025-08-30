@@ -159,3 +159,22 @@ export interface InputProps extends BaseComponentProps {
   required?: boolean;
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';
 }
+
+// Search and sorting types
+export type SortOption = 
+  | 'newest' 
+  | 'oldest' 
+  | 'price-low-high' 
+  | 'price-high-low' 
+  | 'size-large-small' 
+  | 'size-small-large'
+  | 'relevance';
+
+export type CurrencyCode = 'GHS' | 'USD' | 'GBP' | 'EUR';
+
+export interface CurrencyRate {
+  code: CurrencyCode;
+  rate: number; // Rate relative to GHS
+  symbol: string;
+  name: string;
+}

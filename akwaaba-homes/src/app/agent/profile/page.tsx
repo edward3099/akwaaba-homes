@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft,
   Save,
@@ -21,8 +23,17 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Camera
+  Camera,
+  ArrowRight,
+  Home
 } from 'lucide-react';
+import { markProfileAsCompleted, getFieldDisplayName } from '@/lib/utils/profileCompletion';
+
+interface ProfileCompletionStatus {
+  isComplete: boolean;
+  missingFields: string[];
+  completionPercentage: number;
+}
 
 interface AgentProfile {
   id: string;
@@ -35,6 +46,7 @@ interface AgentProfile {
   experience_years: number;
   bio: string;
   profile_image: string;
+  cover_image: string;
   user_role: string;
   verification_status: 'pending' | 'verified' | 'rejected';
   created_at: string;
@@ -49,14 +61,17 @@ interface ProfileFormData {
   specializations: string[];
   experience_years: number;
   bio: string;
+  cover_image: string;
 }
 
 export default function AgentProfilePage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [profile, setProfile] = useState<AgentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileCompletion, setProfileCompletion] = useState<ProfileCompletionStatus | null>(null);
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
     phone: '',
@@ -64,13 +79,33 @@ export default function AgentProfilePage() {
     license_number: '',
     specializations: [],
     experience_years: 0,
-    bio: ''
+    bio: '',
+    cover_image: ''
   });
   const [newSpecialization, setNewSpecialization] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingCoverImage, setUploadingCoverImage] = useState(false);
+  const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  const checkCompletion = async () => {
+    try {
+      const response = await fetch('/api/user/profile/completion');
+      
+      if (!response.ok) {
+        throw new Error('Failed to check profile completion');
+      }
+
+      const completion: ProfileCompletionStatus = await response.json();
+      setProfileCompletion(completion);
+    } catch (error) {
+      console.error('Error checking profile completion:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -95,8 +130,14 @@ export default function AgentProfilePage() {
         license_number: data.profile.license_number || '',
         specializations: data.profile.specializations || [],
         experience_years: data.profile.experience_years || 0,
-        bio: data.profile.bio || ''
+        bio: data.profile.bio || '',
+        cover_image: data.profile.cover_image || ''
       });
+
+      // Check profile completion after profile is loaded
+      setTimeout(async () => {
+        await checkCompletion();
+      }, 100);
     } catch (error) {
       console.error('Profile fetch error:', error);
       setError('Failed to load profile data');
@@ -128,6 +169,136 @@ export default function AgentProfilePage() {
     handleInputChange('specializations', formData.specializations.filter(s => s !== spec));
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Only JPEG, PNG, and WebP images are allowed.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File Too Large",
+        description: "Maximum file size is 5MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch('/api/user/profile/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload image');
+      }
+
+      const data = await response.json();
+      
+      // Update the profile state with the new image URL
+      setProfile(prev => prev ? { ...prev, profile_image: data.avatarUrl } : null);
+      
+      toast({
+        title: "Success",
+        description: "Profile picture uploaded successfully!",
+      });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload image. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingImage(false);
+      // Reset the file input
+      if (event.target) {
+        event.target.value = '';
+      }
+    }
+  };
+
+  const handleCoverImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Only JPEG, PNG, and WebP images are allowed.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 10MB for cover images)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File Too Large",
+        description: "Cover image size cannot exceed 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingCoverImage(true);
+    const formData = new FormData();
+    formData.append('cover_image', file);
+
+    try {
+      const response = await fetch('/api/user/profile/cover-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload cover image');
+      }
+
+      const result = await response.json();
+      toast({
+        title: "Success",
+        description: "Cover image uploaded successfully!",
+      });
+      handleInputChange('cover_image', result.publicUrl);
+    } catch (error) {
+      console.error('Cover image upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload cover image. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingCoverImage(false);
+      // Reset the file input
+      if (event.target) {
+        event.target.value = '';
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -148,6 +319,9 @@ export default function AgentProfilePage() {
       const data = await response.json();
       setProfile(data.profile);
       
+      // Check completion after saving
+      await checkCompletion();
+      
       toast({
         title: "Success",
         description: "Your profile has been updated successfully",
@@ -161,6 +335,30 @@ export default function AgentProfilePage() {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGoToDashboard = async () => {
+    if (!profile?.id) return;
+
+    try {
+      // Mark profile as completed
+      await markProfileAsCompleted(profile.id);
+      
+      toast({
+        title: "Profile Complete!",
+        description: "Welcome to your agent dashboard!",
+      });
+
+      // Redirect to main dashboard
+      router.push('/agent-dashboard');
+    } catch (error) {
+      console.error('Error marking profile as completed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete profile setup. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -212,15 +410,21 @@ export default function AgentProfilePage() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/agent-dashboard">
-                <Button variant="outline" className="w-full">
-                  Back to Dashboard
-                </Button>
-              </Link>
+              {profileCompletion?.isComplete && (
+                <Link href="/agent-dashboard">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Dashboard
+                  </Button>
+                </Link>
+              )}
               <div>
                 <h1 className="text-3xl font-bold text-slate-900">Profile Settings</h1>
                 <p className="text-slate-600 mt-1">
-                  Manage your agent profile and preferences
+                  {profileCompletion?.isComplete 
+                    ? "Manage your agent profile and preferences"
+                    : "Complete your profile to access the agent dashboard"
+                  }
                 </p>
               </div>
             </div>
@@ -252,6 +456,58 @@ export default function AgentProfilePage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Profile Completion Status */}
+        {profileCompletion && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Profile Completion</span>
+                </span>
+                <Badge variant={profileCompletion.isComplete ? "default" : "secondary"}>
+                  {profileCompletion.completionPercentage}% Complete
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Complete all required fields to access your agent dashboard
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Progress value={profileCompletion.completionPercentage} className="w-full" />
+              
+              {!profileCompletion.isComplete && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-slate-700">Missing required fields:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {profileCompletion.missingFields.map((field) => (
+                      <Badge key={field} variant="outline" className="text-xs">
+                        {getFieldDisplayName(field)}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {profileCompletion.isComplete && (
+                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <span className="text-green-800 font-medium">Profile Complete!</span>
+                  </div>
+                  <Button 
+                    onClick={handleGoToDashboard}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    Go to Dashboard
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Profile Image Section */}
           <Card>
@@ -278,11 +534,90 @@ export default function AgentProfilePage() {
                   )}
                 </div>
                 <div>
-                  <Button variant="outline" disabled>
-                    Upload Photo
+                  <input
+                    ref={profileImageInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={uploadingImage}
+                  />
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    disabled={uploadingImage}
+                    onClick={() => profileImageInputRef.current?.click()}
+                  >
+                    {uploadingImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload Photo'
+                    )}
                   </Button>
                   <p className="text-sm text-slate-500 mt-2">
-                    Photo upload functionality coming soon
+                    {uploadingImage ? 'Uploading your photo...' : 'Click to upload a professional photo (max 5MB)'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cover Image Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Camera className="w-5 h-5" />
+                <span>Cover Image</span>
+              </CardTitle>
+              <CardDescription>
+                Add a cover image that will be displayed on your agent profile page
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300">
+                  {profile.cover_image ? (
+                    <img 
+                      src={profile.cover_image} 
+                      alt="Cover" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-center text-slate-500">
+                      <Camera className="w-12 h-12 mx-auto mb-2" />
+                      <p>No cover image uploaded</p>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <input
+                    ref={coverImageInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleCoverImageUpload}
+                    className="hidden"
+                    disabled={uploadingCoverImage}
+                  />
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    disabled={uploadingCoverImage}
+                    onClick={() => coverImageInputRef.current?.click()}
+                  >
+                    {uploadingCoverImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload Cover Image'
+                    )}
+                  </Button>
+                  <p className="text-sm text-slate-500 mt-2">
+                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Click to upload a cover image (max 10MB)'}
                   </p>
                 </div>
               </div>
@@ -484,11 +819,14 @@ export default function AgentProfilePage() {
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
-            <Link href="/agent-dashboard">
-              <Button variant="outline">
-                Cancel
-              </Button>
-            </Link>
+            {profileCompletion?.isComplete && (
+              <Link href="/agent-dashboard">
+                <Button variant="outline">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+            )}
             <Button type="submit" disabled={saving}>
               {saving ? (
                 <>

@@ -4,7 +4,7 @@ export interface ImageTransformOptions {
   width?: number;
   height?: number;
   quality?: number;
-  format?: 'origin' | 'webp' | 'jpeg' | 'png' | 'avif';
+  format?: 'origin';
   resize?: 'cover' | 'contain' | 'fill';
 }
 
@@ -49,7 +49,7 @@ export class ImageOptimizationService {
         height: 150,
         resize: 'cover',
         quality: 80,
-        format: 'webp'
+        format: 'origin'
       }
     }).data.publicUrl;
 
@@ -60,7 +60,7 @@ export class ImageOptimizationService {
         height: 400,
         resize: 'contain',
         quality: 85,
-        format: 'webp'
+        format: 'origin'
       }
     }).data.publicUrl;
 
@@ -71,7 +71,7 @@ export class ImageOptimizationService {
         height: 800,
         resize: 'contain',
         quality: 90,
-        format: 'webp'
+        format: 'origin'
       }
     }).data.publicUrl;
 
@@ -79,7 +79,7 @@ export class ImageOptimizationService {
     const webpUrl = this.supabase.storage.from(bucketName).getPublicUrl(imagePath, {
       transform: {
         quality: 85,
-        format: 'webp'
+        format: 'origin'
       }
     }).data.publicUrl;
 
@@ -87,7 +87,7 @@ export class ImageOptimizationService {
     const avifUrl = this.supabase.storage.from(bucketName).getPublicUrl(imagePath, {
       transform: {
         quality: 80,
-        format: 'avif'
+        format: 'origin'
       }
     }).data.publicUrl;
 
@@ -180,7 +180,7 @@ export class ImageOptimizationService {
           ...dimensions,
           resize: 'contain',
           quality: 85,
-          format: 'webp'
+          format: 'origin'
         }
       }).data.publicUrl;
     }
@@ -201,7 +201,7 @@ export class ImageOptimizationService {
         height: 200,
         resize: 'cover',
         quality: 80,
-        format: 'webp'
+        format: 'origin'
       }),
       
       // Property card image
@@ -210,7 +210,7 @@ export class ImageOptimizationService {
         height: 300,
         resize: 'cover',
         quality: 85,
-        format: 'webp'
+        format: 'origin'
       }),
       
       // Hero image
@@ -219,7 +219,7 @@ export class ImageOptimizationService {
         height: 600,
         resize: 'cover',
         quality: 90,
-        format: 'webp'
+        format: 'origin'
       }),
       
       // Detail view
@@ -228,7 +228,7 @@ export class ImageOptimizationService {
         height: 600,
         resize: 'contain',
         quality: 90,
-        format: 'webp'
+        format: 'origin'
       }),
       
       // Mobile optimized
@@ -237,7 +237,7 @@ export class ImageOptimizationService {
         height: 480,
         resize: 'contain',
         quality: 85,
-        format: 'webp'
+        format: 'origin'
       })
     };
 
@@ -302,7 +302,7 @@ export class ImageOptimizationService {
           height,
           resize: 'contain',
           quality: 85,
-          format: 'webp'
+          format: 'origin'
         });
         return `${url} ${width}w`;
       })

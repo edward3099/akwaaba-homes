@@ -1,0 +1,161 @@
+<testsuites id="" name="" tests="10" failures="3" skipped="7" errors="0" time="285.468864">
+<testsuite name="customer/property-search.spec.ts" timestamp="2025-08-29T14:39:29.452Z" hostname="chromium" tests="10" failures="3" skipped="7" time="216.653" errors="0">
+<testcase name="Property Search - Unauthenticated User › should display search interface" classname="customer/property-search.spec.ts" time="60.019">
+<failure message="property-search.spec.ts:91:7 should display search interface" type="FAILURE">
+<![CDATA[  [chromium] › customer/property-search.spec.ts:91:7 › Property Search - Unauthenticated User › should display search interface 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      84 |   let searchPage: PropertySearchPage;
+      85 |
+    > 86 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      87 |     searchPage = new PropertySearchPage(page);
+      88 |     await searchPage.navigateToSearch();
+      89 |   });
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:86:8
+
+    Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+    Call log:
+      - navigating to "http://localhost:3000/search", waiting until "load"
+
+
+       at shared/BasePage.ts:14
+
+      12 |    */
+      13 |   async goto(path: string) {
+    > 14 |     await this.page.goto(path);
+         |                     ^
+      15 |   }
+      16 |
+      17 |   /**
+        at PropertySearchPage.goto (/Users/bb/Desktop/ghana/akwaaba-homes/tests/shared/BasePage.ts:14:21)
+        at PropertySearchPage.navigateToSearch (/Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:21:16)
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:88:22
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+]]>
+</failure>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should perform basic location search" classname="customer/property-search.spec.ts" time="60.004">
+<failure message="property-search.spec.ts:102:7 should perform basic location search" type="FAILURE">
+<![CDATA[  [chromium] › customer/property-search.spec.ts:102:7 › Property Search - Unauthenticated User › should perform basic location search 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      84 |   let searchPage: PropertySearchPage;
+      85 |
+    > 86 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      87 |     searchPage = new PropertySearchPage(page);
+      88 |     await searchPage.navigateToSearch();
+      89 |   });
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:86:8
+
+    Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+    Call log:
+      - navigating to "http://localhost:3000/search", waiting until "load"
+
+
+       at shared/BasePage.ts:14
+
+      12 |    */
+      13 |   async goto(path: string) {
+    > 14 |     await this.page.goto(path);
+         |                     ^
+      15 |   }
+      16 |
+      17 |   /**
+        at PropertySearchPage.goto (/Users/bb/Desktop/ghana/akwaaba-homes/tests/shared/BasePage.ts:14:21)
+        at PropertySearchPage.navigateToSearch (/Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:21:16)
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:88:22
+
+    Tearing down "context" exceeded the test timeout of 30000ms.
+]]>
+</failure>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should apply price filters" classname="customer/property-search.spec.ts" time="37.23">
+<failure message="property-search.spec.ts:114:7 should apply price filters" type="FAILURE">
+<![CDATA[  [chromium] › customer/property-search.spec.ts:114:7 › Property Search - Unauthenticated User › should apply price filters 
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      84 |   let searchPage: PropertySearchPage;
+      85 |
+    > 86 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      87 |     searchPage = new PropertySearchPage(page);
+      88 |     await searchPage.navigateToSearch();
+      89 |   });
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:86:8
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/search", waiting until "load"
+
+
+       at shared/BasePage.ts:14
+
+      12 |    */
+      13 |   async goto(path: string) {
+    > 14 |     await this.page.goto(path);
+         |                     ^
+      15 |   }
+      16 |
+      17 |   /**
+        at PropertySearchPage.goto (/Users/bb/Desktop/ghana/akwaaba-homes/tests/shared/BasePage.ts:14:21)
+        at PropertySearchPage.navigateToSearch (/Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:21:16)
+        at /Users/bb/Desktop/ghana/akwaaba-homes/tests/customer/property-search.spec.ts:88:22
+
+    Error: browserContext.close: Test timeout of 30000ms exceeded.
+    Browser logs:
+
+    <launching> /Users/bb/Library/Caches/ms-playwright/chromium-1187/chrome-mac/Chromium.app/Contents/MacOS/Chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --enable-unsafe-swiftshader --no-sandbox --user-data-dir=/var/folders/3s/dfkwfkb16wx8nd3tcj59p9tm0000gn/T/playwright_chromiumdev_profile-R6bB47 --remote-debugging-pipe --no-startup-window
+    <launched> pid=37330
+    [pid=37330][err] [37330:559619:0829/154228.617088:ERROR:base/process/process_mac.cc:53] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=37330][err] [37330:559619:0829/154228.617170:ERROR:base/process/process_mac.cc:98] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=37330] <gracefully close start>
+    [pid=37330][err] [37339:559626:0829/154237.953796:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+    [pid=37330][err] [37339:559626:0829/154237.975854:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:389] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+    [pid=37330] <kill>
+    [pid=37330] <will force kill>
+
+    Error Context: ../test-results/customer-property-search-P-a9f24--should-apply-price-filters-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|customer-property-search-P-a9f24--should-apply-price-filters-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should apply bedrooms filter" classname="customer/property-search.spec.ts" time="59.4">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should handle no search results" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should switch between map and list views" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should maintain search state in URL" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should be responsive on mobile devices" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should handle search with special characters" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Property Search - Unauthenticated User › should clear search filters" classname="customer/property-search.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>

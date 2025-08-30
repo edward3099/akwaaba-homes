@@ -71,7 +71,7 @@ export default function OptimizedImage({
           width,
           height,
           quality: 85,
-          format: 'webp',
+          format: 'origin',
           resize: 'contain'
         }
       );
@@ -276,7 +276,7 @@ export function ResponsiveImage({
 
   return (
     <img
-      src={imageOptimizationService.getOptimizedUrl(bucketName, imagePath, { quality: 85, format: 'webp' })}
+      src={imageOptimizationService.getOptimizedUrl(bucketName, imagePath, { quality: 85, format: 'origin' })}
       srcSet={srcset}
       sizes={imageOptimizationService.generateSizesAttribute()}
       alt={alt}

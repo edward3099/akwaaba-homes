@@ -1,0 +1,101 @@
+# AkwaabaHomes Critical Error Resolution PRD
+
+## Project Overview
+AkwaabaHomes is a real estate marketplace for Ghana with a focus on diaspora buyers. The project has 35+ critical errors that must be resolved to make it production-ready.
+
+## Critical Issues Identified
+
+### 1. TypeScript Compilation Errors (86 Total)
+- Property access errors in PropertyDetail component
+- Missing type exports (SortOption, CurrencyCode, CurrencyRate)
+- UI component type mismatches in AuthErrorDisplay and FormField
+- Authentication state type conflicts
+- Form validation errors with ZodError
+- API client type issues with spread operations
+- Hook integration errors across multiple files
+- Service and utility type mismatches
+
+### 2. Missing Configuration
+- No .env.local file despite extensive environment variable usage
+- Missing API route files (deleted propertyId routes)
+- Inconsistent port configuration
+
+### 3. Security Vulnerabilities
+- Missing admin role checks in API routes
+- Rate limiting middleware errors
+- Authentication flow type conflicts
+
+### 4. Performance & Code Quality Issues
+- 101+ console.log statements in production code
+- 67+ uses of any/unknown types
+- Missing error boundaries
+- Incomplete TODO items in production code
+
+## Technical Requirements
+
+### Environment Setup
+- Create .env.local with proper Supabase configuration
+- Fix port consistency issues
+- Resolve webpack cache errors
+
+### TypeScript Resolution
+- Fix all 86 TypeScript compilation errors
+- Implement proper type definitions
+- Remove any/unknown type usage where possible
+- Add missing type exports
+
+### Authentication System
+- Fix AuthState type conflicts
+- Resolve authentication hook errors
+- Implement proper error handling
+- Fix admin role verification
+
+### API & Services
+- Restore deleted API route files
+- Fix API client type issues
+- Resolve service export problems
+- Fix image optimization service types
+
+### UI Components
+- Fix component type mismatches
+- Resolve form field validation issues
+- Implement proper error boundaries
+- Fix toast integration errors
+
+### Performance & Security
+- Remove console.log statements from production
+- Implement proper rate limiting
+- Add missing admin role checks
+- Fix middleware type issues
+
+## Success Criteria
+- All TypeScript errors resolved (0 compilation errors)
+- Application builds successfully
+- All API routes functional
+- Authentication system working
+- No console errors in production
+- All security vulnerabilities addressed
+- Performance optimized
+
+## Implementation Approach
+- Use Context7 for each error resolution
+- Fix errors in order of criticality (build-breaking first)
+- Test each fix before proceeding
+- Maintain existing functionality while fixing errors
+- Document all changes made
+
+## Priority Order
+1. Critical build-breaking errors (TypeScript compilation)
+2. Missing configuration files
+3. Authentication system fixes
+4. API route restoration
+5. Security vulnerability fixes
+6. Performance and code quality improvements
+
+## Tools & Technologies
+- Context7 for error resolution guidance
+- TypeScript for type safety
+- Next.js 15 for framework
+- Supabase for backend
+- TailwindCSS for styling
+- ShadCN UI for components

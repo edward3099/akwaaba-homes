@@ -175,7 +175,7 @@ export class AdminApiClient extends BaseApiClient {
   async approveProperty(id: string, approvalData: unknown): Promise<ApiResponse> {
     return this.authenticatedRequest(`/admin/properties/approval`, {
       method: 'POST',
-      body: JSON.stringify({ propertyId: id, ...approvalData }),
+      body: JSON.stringify({ propertyId: id, ...(approvalData as Record<string, any>) }),
     });
   }
 
@@ -279,7 +279,7 @@ export class CDNApiClient extends BaseApiClient {
   async uploadFile(uploadData: unknown): Promise<ApiResponse> {
     return this.authenticatedRequest('/cdn/manage', {
       method: 'POST',
-      body: JSON.stringify({ action: 'upload', ...uploadData }),
+      body: JSON.stringify({ action: 'upload', ...(uploadData as Record<string, any>) }),
     });
   }
 
@@ -293,7 +293,7 @@ export class CDNApiClient extends BaseApiClient {
   async warmUpCache(warmupData: unknown): Promise<ApiResponse> {
     return this.authenticatedRequest('/cdn/manage', {
       method: 'POST',
-      body: JSON.stringify({ action: 'warmup', ...warmupData }),
+      body: JSON.stringify({ action: 'warmup', ...(warmupData as Record<string, any>) }),
     });
   }
 

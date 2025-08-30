@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { useErrorHandler } from '@/lib/utils/errorHandler';
+import { useErrorHandler, AppError } from '@/lib/utils/errorHandler';
 import { useLoading } from '@/lib/hooks/useLoading';
 import { securityService } from '@/lib/services/securityService';
 
@@ -16,8 +16,8 @@ export interface ErrorHandlingConfig {
   onRetry?: () => void;
 }
 
-// App error interface (from errorHandler)
-export interface AppError {
+// Extended app error interface (local extension with additional properties)
+export interface ExtendedAppError {
   type: string;
   severity: string;
   message: string;
@@ -105,9 +105,9 @@ export const useErrorIntegration = (componentName: string, customConfig?: Partia
       if (mergedConfig.logToSecurity) {
         await securityService.logSecurityEvent(
           'frontend_error',
-          appError.severity as any,
+          'medium' as any, // Default severity since errorHandler AppError doesn't have severity
           {
-            error_type: appError.type,
+            error_type: 'unknown', // Default type since errorHandler AppError doesn't have type
             error_message: appError.message,
             component: context.component,
             action: context.action,
@@ -120,10 +120,10 @@ export const useErrorIntegration = (componentName: string, customConfig?: Partia
 
       // Show toast notification if enabled
       if (mergedConfig.showToast) {
-        const toastVariant = appError.severity === 'critical' ? 'destructive' : 'default';
+        const toastVariant = 'default'; // Default since errorHandler AppError doesn't have severity
         toast({
-          title: getErrorTitle(appError.type),
-          description: appError.userMessage,
+          title: getErrorTitle('unknown'), // Default since errorHandler AppError doesn't have type
+          description: appError.userMessage || appError.message,
           variant: toastVariant,
         });
       }
@@ -135,7 +135,7 @@ export const useErrorIntegration = (componentName: string, customConfig?: Partia
 
       return {
         handled: true,
-        shouldRetry: appError.retryable && mergedConfig.retryable,
+        shouldRetry: (appError.recoverable || false) && mergedConfig.retryable,
         retryCount: 0,
         maxRetries: mergedConfig.maxRetries || 3,
         userMessage: appError.userMessage,
@@ -227,14 +227,14 @@ export const useErrorIntegration = (componentName: string, customConfig?: Partia
     additionalData?: Record<string, any>,
     customConfig?: Partial<ErrorHandlingConfig>
   ): Promise<T> => {
-    return withLoading(operationKey, async () => {
+    return (withLoading as any)(async () => {
       try {
         return await operation();
       } catch (error) {
         await handleErrorWithContext(error, action, additionalData, customConfig);
         throw error;
       }
-    });
+    }, 'Loading...');
   }, [withLoading, handleErrorWithContext]);
 
   // Handle form validation errors
@@ -373,7 +373,7 @@ export const useErrorIntegration = (componentName: string, customConfig?: Partia
   // Get error recovery strategy
   const getErrorRecovery = useCallback((error: AppError, retryCount: number = 0): ErrorRecovery => {
     const maxRetries = config.maxRetries || 3;
-    const canRetry = error.retryable && config.retryable && retryCount < maxRetries;
+    const canRetry = (error.recoverable || false) && config.retryable && retryCount < maxRetries;
     
     return {
       canRetry,

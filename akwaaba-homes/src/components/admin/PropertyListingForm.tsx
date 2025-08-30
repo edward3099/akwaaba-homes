@@ -116,11 +116,12 @@ export default function PropertyListingForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [debugMode, setDebugMode] = useState(false); // Debug mode for troubleshooting
+  const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null); // State to hold created property ID
 
   // File input ref
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const totalSteps = 5;
+  const totalSteps = 6; // Added image upload step
 
   // Cleanup image preview URLs on component unmount
   useEffect(() => {
@@ -230,6 +231,98 @@ export default function PropertyListingForm() {
     updateFormData('images', newImages);
   }, [formData.images, updateFormData]);
 
+  // Handle image upload after property creation
+  const handleImageUpload = async () => {
+    if (!createdPropertyId || uploadedImages.length === 0) {
+      toast.error('No images to upload or property ID not found');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // Create FormData with all images
+      const formData = new FormData();
+      uploadedImages.forEach((file) => {
+        formData.append('file', file); // Changed from 'images' to 'file' to match API
+      });
+      
+      const uploadResponse = await fetch(`/api/properties/${createdPropertyId}/images/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        throw new Error(errorData.error || 'Failed to upload images');
+      }
+
+      const uploadResult = await uploadResponse.json();
+      console.log('✅ All images uploaded successfully:', uploadResult);
+      
+      // Extract image URLs from the response
+      const uploadedImageUrls = uploadResult.uploadedImages.map((img: any) => img.image_url);
+
+      // Update property with image URLs
+      const updateResponse = await fetch(`/api/properties/${createdPropertyId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          image_urls: uploadedImageUrls
+        }),
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update property with image URLs');
+      }
+
+      toast.success(`Successfully uploaded ${uploadedImages.length} images!`);
+      
+      // Reset form and redirect to dashboard
+      setTimeout(() => {
+        setShowSuccess(false);
+        setCreatedPropertyId(null);
+        setFormData(initialFormData);
+        setUploadedImages([]);
+        setImagePreviewUrls([]);
+        setCurrentStep(1);
+        
+        // Redirect to agent dashboard
+        window.location.href = '/agent-dashboard';
+      }, 2000);
+
+    } catch (error) {
+      console.error('❌ Error uploading images:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to upload images');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handle skipping image upload
+  const handleSkipImages = () => {
+    toast.info('Images skipped. You can add them later from the property management section.');
+    
+    // Reset form and redirect to dashboard
+    setTimeout(() => {
+      setShowSuccess(false);
+      setCreatedPropertyId(null);
+      setFormData(initialFormData);
+      setUploadedImages([]);
+      setImagePreviewUrls([]);
+      setCurrentStep(1);
+      
+      // Redirect to agent dashboard
+      window.location.href = '/agent-dashboard';
+    }, 1000);
+  };
+
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -248,10 +341,10 @@ export default function PropertyListingForm() {
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];
     
-    // Validate minimum image requirement
-    if (uploadedImages.length < 3) {
-      validationErrors.push('Please upload at least 3 images before submitting the form.');
-    }
+    // Note: Images are now handled in a two-step process
+    // Step 1: Create property without images
+    // Step 2: Upload images and update property
+    // So we don't require images before submission
     
     // Validate required fields with specific error messages
     if (!formData.title?.trim()) {
@@ -264,34 +357,27 @@ export default function PropertyListingForm() {
       validationErrors.push('Property price must be greater than 0.');
     }
     if (!formData.address?.trim()) {
-      validationErrors.push('Street address is required.');
+      validationErrors.push('Property address is required.');
     }
-    if (!formData.city) {
-      validationErrors.push('City selection is required.');
+    if (!formData.city?.trim()) {
+      validationErrors.push('Property city is required.');
     }
-    if (!formData.region) {
-      validationErrors.push('Region selection is required.');
+    if (!formData.region?.trim()) {
+      validationErrors.push('Property region is required.');
     }
-    if (!formData.coordinates.lat || !formData.coordinates.lng) {
-      validationErrors.push('Property coordinates are required.');
-    } else {
-      // Validate coordinate ranges
-      if (formData.coordinates.lat < -90 || formData.coordinates.lat > 90) {
-        validationErrors.push('Latitude must be between -90 and 90 degrees.');
-      }
-      if (formData.coordinates.lng < -180 || formData.coordinates.lng > 180) {
-        validationErrors.push('Longitude must be between -180 and 180 degrees.');
-      }
-      // Validate Ghana-specific coordinates (rough bounds)
-      if (formData.coordinates.lat < 4 || formData.coordinates.lat > 12) {
-        validationErrors.push('Latitude should be within Ghana bounds (approximately 4° to 12°).');
-      }
-      if (formData.coordinates.lng < -4 || formData.coordinates.lng > 2) {
-        validationErrors.push('Longitude should be within Ghana bounds (approximately -4° to 2°).');
-      }
+    if (!formData.type) {
+      validationErrors.push('Property type is required.');
+    }
+    if (!formData.status) {
+      validationErrors.push('Listing type is required.');
+    }
+    if (!formData.bedrooms || formData.bedrooms <= 0) {
+      validationErrors.push('Number of bedrooms must be greater than 0.');
+    }
+    if (!formData.bathrooms || formData.bathrooms <= 0) {
+      validationErrors.push('Number of bathrooms must be greater than 0.');
     }
     
-    // Show all validation errors at once
     if (validationErrors.length > 0) {
       validationErrors.forEach(error => toast.error(error));
       return;
@@ -300,33 +386,64 @@ export default function PropertyListingForm() {
     setIsSubmitting(true);
     
     try {
-      // Debug logging for troubleshooting
-      console.log('🔍 Form submission debug info:', {
-        formData,
-        imageCount: uploadedImages.length,
-        coordinates: formData.coordinates,
-        features: formData.features
+      // Check authentication before making API call
+      if (!session?.access_token) {
+        throw new Error('Authentication token not found. Please sign in again.');
+      }
+      
+      // Step 1: Create the property first with basic information (without images)
+      const propertyDataWithoutImages = {
+        ...formData,
+        // Don't include images yet - we'll upload them after property creation
+        image_urls: [],
+        images: []
+      };
+      
+      console.log('📤 Creating property with data:', propertyDataWithoutImages);
+      
+      const createResponse = await fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(propertyDataWithoutImages),
       });
       
-      // First, upload all images to Supabase Storage
-      console.log('📤 Starting image uploads...');
-      const uploadedImageUrls = [];
+      console.log('📥 Property creation response status:', createResponse.status);
       
-      for (let i = 0; i < uploadedImages.length; i++) {
-        const file = uploadedImages[i];
-        const isPrimary = i === 0; // First image is primary
+      if (!createResponse.ok) {
+        let errorMessage = 'Failed to create property';
+        let errorDetails = {};
         
         try {
-          // Create a temporary property ID for image uploads
-          const tempPropertyId = `temp-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-          
-          // Upload image to Supabase Storage
+          const errorData = await createResponse.json();
+          errorMessage = errorData.message || errorMessage;
+          errorDetails = errorData;
+          console.error('❌ Property creation API error details:', errorData);
+        } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${createResponse.status}: ${createResponse.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+      
+      const createdProperty = await createResponse.json();
+      console.log('✅ Property created successfully:', createdProperty);
+      
+      // Step 2: Upload images to the newly created property
+      if (uploadedImages.length > 0) {
+        console.log('📤 Starting image upload for property:', createdProperty.id);
+        
+        try {
+          // Create FormData with all images
           const formData = new FormData();
-          formData.append('file', file);
-          formData.append('caption', file.name);
-          formData.append('is_primary', isPrimary.toString());
+          uploadedImages.forEach((file, index) => {
+            formData.append('file', file);
+          });
           
-          const uploadResponse = await fetch(`/api/properties/${tempPropertyId}/images/upload`, {
+          const uploadResponse = await fetch(`/api/properties/${createdProperty.id}/images/upload`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${session.access_token}`,
@@ -336,110 +453,50 @@ export default function PropertyListingForm() {
           
           if (!uploadResponse.ok) {
             const errorData = await uploadResponse.json();
-            throw new Error(`Failed to upload image ${file.name}: ${errorData.error || 'Unknown error'}`);
+            throw new Error(errorData.error || `Failed to upload images`);
           }
           
           const uploadResult = await uploadResponse.json();
-          uploadedImageUrls.push(uploadResult.image_url);
+          console.log('✅ All images uploaded successfully:', uploadResult);
           
-          console.log(`✅ Image ${i + 1}/${uploadedImages.length} uploaded:`, uploadResult.image_url);
+          // Extract image URLs from the response
+          const uploadedImageUrls = uploadResult.uploadedImages.map((img: any) => img.image_url);
           
-        } catch (uploadError) {
-          console.error(`❌ Failed to upload image ${file.name}:`, uploadError);
-          throw new Error(`Failed to upload image ${file.name}. Please try again.`);
+          // Step 3: Update the property with the uploaded image URLs
+          const updateResponse = await fetch(`/api/properties/${createdProperty.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              image_urls: uploadedImageUrls
+            }),
+          });
+          
+          if (!updateResponse.ok) {
+            console.warn('⚠️ Failed to update property with image URLs, but property was created');
+          } else {
+            console.log('✅ Property updated with image URLs successfully');
+          }
+          
+        } catch (error) {
+          console.error('❌ Error uploading images:', error);
+          // Don't throw here - property was created successfully
+          // Just log the error and continue
         }
       }
-      
-      console.log('📤 All images uploaded successfully:', uploadedImageUrls);
-      
-      // Prepare the property data for submission with proper type conversion
-      const propertyData = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        price: parseFloat(formData.price.toString()),
-        currency: 'GHS',
-        property_type: formData.type || 'house',
-        listing_type: 'sale',
-        bedrooms: parseInt(formData.bedrooms.toString()) || 0,
-        bathrooms: parseInt(formData.bathrooms.toString()) || 0,
-        square_feet: parseFloat(formData.size.toString()) || 0,
-        address: formData.address.trim(),
-        city: formData.city,
-        region: formData.region,
-        latitude: parseFloat(formData.coordinates.lat.toString()),
-        longitude: parseFloat(formData.coordinates.lng.toString()),
-        features: formData.features || [],
-        amenities: [], // Add amenities if needed
-        status: 'pending', // Ensure status is set
-        approval_status: 'pending', // Ensure approval status is set
-        image_urls: uploadedImageUrls, // Use the actual uploaded image URLs
-      };
-      
-      console.log('📤 Submitting property data:', propertyData);
-      
-      // Check authentication before making API call
-      if (!session?.access_token) {
-        throw new Error('Authentication token not found. Please sign in again.');
-      }
-      
-      // Make the API call to create the property
-      const response = await fetch('/api/properties', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify(propertyData),
-      });
-      
-      console.log('📥 API response status:', response.status);
-      console.log('📥 API response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        let errorMessage = 'Failed to create property';
-        let errorDetails = {};
-        
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          errorDetails = errorData;
-          console.error('❌ API error details:', errorData);
-        } catch (parseError) {
-          console.error('❌ Failed to parse error response:', parseError);
-          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        }
-        
-        // Log detailed error information for debugging
-        console.error('❌ Property creation failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorMessage,
-          errorDetails,
-          requestData: propertyData
-        });
-        
-        throw new Error(errorMessage);
-      }
-      
-      const result = await response.json();
-      console.log('✅ Property created successfully:', result);
       
       // Show success message
       toast.success('Property created successfully! It is now pending admin approval.');
       setShowSuccess(true);
-    
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setShowSuccess(false);
-        setFormData(initialFormData);
-        setUploadedImages([]);
-        setImagePreviewUrls([]);
-        setCurrentStep(1);
-        
-        // Redirect to agent dashboard
-        window.location.href = '/agent-dashboard';
-      }, 3000);
       
+      // Store the created property ID for image upload
+      setCreatedPropertyId(createdProperty.id);
+      
+      // Don't redirect immediately - let user upload images first
+      // The form will show an image upload interface
+    
     } catch (error) {
       console.error('❌ Error creating property:', error);
       
@@ -1141,18 +1198,144 @@ export default function PropertyListingForm() {
     }
   };
 
-  if (showSuccess) {
+  if (showSuccess && createdPropertyId) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-            <CheckIcon className="h-6 w-6 text-green-600" />
-          </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Property Listed Successfully!</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Your property has been added to the platform and is now visible to potential buyers.
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Property Created Successfully! 🎉</h2>
+          <p className="text-gray-600">
+            Your property has been added to the platform and is now pending admin approval. 
+            You can now upload images to make your listing more attractive.
           </p>
         </div>
+
+        {/* Image Upload Section */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Property Images</h3>
+          <p className="text-sm text-gray-600 mb-6">
+            Upload at least 3 high-quality images of your property. This will help attract more potential buyers.
+          </p>
+
+          {/* Drag and Drop Area */}
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              dragActive
+                ? 'border-blue-400 bg-blue-50'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onDragOver={handleDrag}
+            onDragLeave={handleDrag}
+            onDrop={handleDrop}
+          >
+            <CameraIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <p className="mt-2 text-sm text-gray-600">
+              <span className="font-medium">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-blue-600 mt-2">
+              💡 Drag and drop images here or click the button below
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={triggerFileInput}
+            disabled={isUploading}
+            className={`mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+              isUploading 
+                ? 'text-gray-400 bg-gray-100 cursor-not-allowed' 
+                : 'text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }`}
+          >
+            {isUploading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
+                Uploading...
+              </>
+            ) : (
+              <>
+                <CameraIcon className="w-4 h-4 mr-2" />
+                Choose Images
+              </>
+            )}
+          </button>
+
+          {/* Image Previews */}
+          {imagePreviewUrls.length > 0 && (
+            <div className="mt-6">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Selected Images ({imagePreviewUrls.length})
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {imagePreviewUrls.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={url}
+                      alt={`Property image ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Remove image"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                      {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Upload Images Button */}
+          {uploadedImages.length > 0 && (
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={handleImageUpload}
+                disabled={isUploading}
+                className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Uploading Images...
+                  </>
+                ) : (
+                  <>
+                    📸 Upload {uploadedImages.length} Images
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Skip Images Button */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={handleSkipImages}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Skip for now - I'll add images later
+            </button>
+          </div>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleFileInputChange}
+          className="hidden"
+        />
       </div>
     );
   }

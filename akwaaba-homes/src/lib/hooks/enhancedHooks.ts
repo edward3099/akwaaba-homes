@@ -60,7 +60,7 @@ function useApiCall<T = unknown>() {
       const response = await apiCall();
 
       if (response.success) {
-        state.setDataState(response.data as T);
+        state.setDataState(response.data as unknown as T);
         
         if (options?.showToast && options.successMessage) {
           toast({

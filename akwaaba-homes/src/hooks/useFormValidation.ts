@@ -118,7 +118,7 @@ export function useFormValidation<T extends Record<string, any>>(
       return [];
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
+        return error.issues.map(err => `${err.path.join('.')}: ${err.message}`);
       }
       return ['Validation failed'];
     }

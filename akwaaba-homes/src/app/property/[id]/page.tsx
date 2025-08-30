@@ -1,64 +1,8 @@
 import { Property } from '@/lib/types/index';
 import PropertyPageClient from './PropertyPageClient';
-
-// Mock property data - in production, fetch based on id
-const mockProperty: Property = {
-  id: '1',
-  title: 'Modern 4-Bedroom Villa in East Legon',
-  description: 'Stunning contemporary villa featuring spacious living areas, modern kitchen, beautiful garden, and premium finishes throughout. Perfect for families seeking luxury living in one of Accra\'s most prestigious neighborhoods.',
-  price: 850000,
-  currency: 'GHS',
-  status: 'for-sale',
-  type: 'house',
-  location: {
-    address: 'East Legon',
-    city: 'Accra',
-    region: 'Greater Accra',
-    country: 'Ghana',
-    coordinates: {
-      lat: 5.6465,
-      lng: -0.1414
-    }
-  },
-  specifications: {
-    bedrooms: 4,
-    bathrooms: 3,
-    size: 3200,
-    sizeUnit: 'sqft',
-    yearBuilt: 2018
-  },
-  images: [
-    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-  ],
-  features: ['Modern Kitchen', 'Garden', 'Parking'],
-  amenities: ['Air Conditioning', 'Swimming Pool', 'Garden', 'Parking', 'WiFi', 'Security'],
-  seller: {
-    id: 'seller1',
-    name: 'Kwame Asante',
-    type: 'agent',
-    phone: '+233 24 123 4567',
-    email: 'kwame@akwaabahomes.com',
-    isVerified: true
-  },
-  verification: {
-    isVerified: true,
-    documentsUploaded: true,
-    verificationDate: '2024-01-15'
-  },
-  createdAt: '2024-01-15',
-  updatedAt: '2024-01-15',
-  expiresAt: '2024-02-14',
-  tier: 'premium',
-  diasporaFeatures: {
-    multiCurrencyDisplay: true,
-    inspectionScheduling: true,
-    virtualTourAvailable: true,
-    familyRepresentativeContact: '+233244987654'
-  }
-};
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 interface PropertyPageProps {
   params: Promise<{ id: string }>;
@@ -67,8 +11,105 @@ interface PropertyPageProps {
 export default async function PropertyPage({ params }: PropertyPageProps) {
   const { id } = await params;
   
-  // In production, fetch property data based on id
-  const property = mockProperty;
+  // Create Supabase client
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  );
+
+  // Fetch property data
+  const { data: propertyData, error } = await supabase
+    .from('properties')
+    .select(`
+      *,
+      users!properties_seller_id_fkey (
+        id,
+        full_name,
+        phone,
+        email,
+        user_type,
+        is_verified
+      )
+    `)
+    .eq('id', id)
+    .single();
+
+  if (error || !propertyData) {
+    notFound();
+  }
+
+  // Transform the data to match the Property interface
+  const property: Property = {
+    id: propertyData.id,
+    title: propertyData.title,
+    description: propertyData.description,
+    price: propertyData.price,
+    currency: propertyData.currency || 'GHS',
+    status: propertyData.status,
+    type: propertyData.property_type,
+    location: {
+      address: propertyData.address,
+      city: propertyData.city,
+      region: propertyData.state,
+      country: propertyData.country || 'Ghana',
+      coordinates: {
+        lat: propertyData.latitude || 0,
+        lng: propertyData.longitude || 0
+      }
+    },
+    specifications: {
+      bedrooms: propertyData.bedrooms,
+      bathrooms: propertyData.bathrooms,
+      size: propertyData.square_feet,
+      sizeUnit: 'sqft',
+      yearBuilt: propertyData.year_built
+    },
+    images: propertyData.image_urls || [],
+    features: propertyData.features || [],
+    amenities: propertyData.amenities || [],
+    seller: {
+      id: propertyData.users?.id || '',
+      name: propertyData.users?.full_name || 'Unknown',
+      type: propertyData.users?.user_type || 'agent',
+      phone: propertyData.users?.phone || '',
+      email: propertyData.users?.email || '',
+      isVerified: propertyData.users?.is_verified || false
+    },
+    verification: {
+      isVerified: true,
+      documentsUploaded: true,
+      verificationDate: propertyData.created_at
+    },
+    createdAt: propertyData.created_at,
+    updatedAt: propertyData.updated_at,
+    expiresAt: propertyData.expires_at,
+    tier: 'premium',
+    diasporaFeatures: {
+      multiCurrencyDisplay: true,
+      inspectionScheduling: true,
+      virtualTourAvailable: true,
+      familyRepresentativeContact: propertyData.users?.phone || ''
+    }
+  };
 
   return <PropertyPageClient property={property} propertyId={id} />;
 }
