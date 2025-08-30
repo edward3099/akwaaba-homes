@@ -5,14 +5,15 @@ import { z } from 'zod';
 
 // Validation schema for profile update data
 const profileUpdateSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
+  full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
   phone: z.string().min(10, 'Phone number must be at least 10 characters').optional(),
-  companyName: z.string().min(2, 'Company name must be at least 2 characters').optional(),
-  licenseNumber: z.string().min(5, 'License number must be at least 5 characters').optional(),
+  company_name: z.string().min(2, 'Company name must be at least 2 characters').optional(),
+  license_number: z.string().min(5, 'License number must be at least 5 characters').optional(),
   specializations: z.array(z.string()).min(1, 'At least one specialization is required').optional(),
-  experienceYears: z.number().min(0, 'Experience years must be 0 or more').max(50, 'Experience years cannot exceed 50').optional(),
+  experience_years: z.number().min(0, 'Experience years must be 0 or more').max(50, 'Experience years cannot exceed 50').optional(),
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
-  profileImage: z.string().url('Invalid profile image URL').optional(),
+  profile_image: z.string().url('Invalid profile image URL').optional(),
+  cover_image: z.string().url('Invalid cover image URL').optional(),
 });
 
 export async function GET(request: NextRequest) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/authContext';
 import { Button } from '@/components/ui/button';
@@ -22,16 +22,31 @@ export default function LoginPage() {
   const { signIn, isAuthenticated, user } = useAuth();
   const router = useRouter();
 
-  // Redirect if already authenticated
-  if (isAuthenticated && user) {
-    if (user.user_metadata?.user_type === 'agent') {
-      router.push('/agent-dashboard');
-    } else if (user.user_metadata?.user_type === 'admin') {
-      router.push('/admin');
-    } else {
-      router.push('/dashboard');
+  // Redirect if already authenticated - moved to useEffect to avoid setState during render
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.user_metadata?.user_type === 'agent') {
+        router.push('/agent-dashboard');
+      } else if (user.user_metadata?.user_type === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
-    return null;
+  }, [isAuthenticated, user, router]);
+
+  // Show loading state while checking authentication
+  if (isAuthenticated && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-green-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="text-center py-8">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-red-600 mb-4" />
+            <p className="text-gray-600">Redirecting...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

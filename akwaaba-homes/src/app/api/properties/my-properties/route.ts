@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
 
     // Get user profile to check user type
     const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('id, user_type, is_verified, is_active')
-      .eq('id', user.id)
+      .from('profiles')
+      .select('id, user_role, verification_status')
+      .eq('user_id', user.id)
       .single();
 
     if (profileError || !profile) {
@@ -55,11 +55,11 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Check if user is verified and active
-    if (!profile.is_verified || !profile.is_active) {
+    // Check if user is verified (for agents, we'll allow access even if pending)
+    if (profile.verification_status === 'rejected') {
       return NextResponse.json({ 
-        error: 'Account not verified or inactive',
-        details: 'Please verify your account or contact support'
+        error: 'Account verification rejected',
+        details: 'Please contact support for assistance'
       }, { status: 403 });
     }
 
@@ -139,9 +139,8 @@ export async function GET(request: NextRequest) {
       user: {
         id: user.id,
         email: user.email,
-        userType: profile.user_type,
-        isVerified: profile.is_verified,
-        isActive: profile.is_active
+        userRole: profile.user_role,
+        verificationStatus: profile.verification_status
       }
     });
 

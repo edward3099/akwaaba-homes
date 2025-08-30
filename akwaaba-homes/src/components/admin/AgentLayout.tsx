@@ -4,6 +4,7 @@ import {
   BellIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/lib/auth/authContext';
+import { useState, useEffect } from 'react';
 
 interface AgentLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,32 @@ interface AgentLayoutProps {
 
 export default function AgentLayout({ children }: AgentLayoutProps) {
   const { user, signOut } = useAuth();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Profile data fetched:', data);
+          console.log('Profile image URL:', data.profile?.profile_image);
+          setProfileImage(data.profile?.profile_image);
+        } else {
+          console.error('Failed to fetch profile:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile image:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileImage();
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +55,7 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <img
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
-                src={user?.user_metadata?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80'}
+                src={profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80'}
                 alt="Agent"
               />
               <div className="hidden sm:block text-sm">

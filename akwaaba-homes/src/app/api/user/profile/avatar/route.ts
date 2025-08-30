@@ -66,9 +66,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique filename
+    // Generate unique filename with user ID as folder
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
     // Upload file to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         profile_image: publicUrl,
         updated_at: new Date().toISOString()
       })
-      .eq('id', user.id);
+      .eq('user_id', user.id);
 
     if (updateError) {
       console.error('Profile update error:', updateError);

@@ -1,10 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -37,7 +59,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Generate unique filename
+    // Generate unique filename with user ID as folder
     const fileExt = coverImage.name.split('.').pop();
     const fileName = `${user.id}/cover-image-${Date.now()}.${fileExt}`;
 
@@ -64,8 +86,11 @@ export async function POST(request: NextRequest) {
     // Update user profile with cover image URL
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ cover_image: publicUrl })
-      .eq('user_id', user.id);
+      .update({ 
+        cover_image: publicUrl,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id);
 
     if (updateError) {
       console.error('Profile update error:', updateError);

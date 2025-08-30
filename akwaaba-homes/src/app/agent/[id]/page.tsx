@@ -214,7 +214,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
     .from('properties')
     .select('*')
     .eq('seller_id', id)
-    .eq('is_approved', true)
+    .eq('approval_status', 'approved')
     .order('created_at', { ascending: false });
 
   if (propertiesError) {
@@ -223,18 +223,18 @@ export default async function AgentPage({ params }: AgentPageProps) {
 
   // Transform profile data to match the expected agent interface
   const agent = {
-    id: profile.id,
+    id: profile.user_id,
     name: profile.full_name || 'Unnamed Agent',
     type: profile.user_role || 'agent',
     phone: profile.phone || '',
     email: profile.email || '',
-    isVerified: profile.is_verified || false,
+    isVerified: profile.verification_status === 'verified',
     company: profile.company_name || '',
     experience: profile.experience_years ? `${profile.experience_years}+ years` : '0+ years',
     specializations: profile.specializations || [],
     bio: profile.bio || '',
     avatar: profile.profile_image || '/placeholder-property.svg',
-    coverImage: '/placeholder-property.jpg', // Default cover image
+    coverImage: profile.cover_image || '/placeholder-property.jpg',
     stats: {
       totalProperties: properties?.length || 0,
       propertiesSold: 0, // This would need to be calculated from actual sales data
