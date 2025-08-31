@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Button Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .modal {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            background-color: #00A86B;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .button:hover {
+            background-color: #008f5a;
+        }
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .cancel-button {
+            background-color: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        .cancel-button:hover {
+            background-color: #f5f5f5;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <h2>Mobile Money Payment</h2>
+        <p>Upgrade your property to premium listing for GHS 50</p>
+        
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <h3>Payment Summary</h3>
+            <p><strong>Property:</strong> test property</p>
+            <p><strong>Listing Tier:</strong> Premium</p>
+            <p><strong>Amount:</strong> GHS 50</p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label><strong>Phone Number</strong></label><br>
+            <input type="tel" value="0241981029" style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+            <small style="color: #666;">Enter the phone number registered with your mobile money account</small>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label><strong>Mobile Money Provider</strong></label><br>
+            <select style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px;">
+                <option>MTN Mobile Money</option>
+                <option>Vodafone Cash</option>
+                <option>AirtelTigo Money</option>
+            </select>
+        </div>
+        
+        <div class="actions">
+            <button class="button" onclick="alert('Pay button clicked!')">
+                💳 Pay GHS 50
+            </button>
+            <button class="button cancel-button" onclick="alert('Cancel clicked!')">
+                Cancel
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Payment button test loaded');
+        console.log('Pay button should be visible and clickable');
+    </script>
+</body>
+</html>

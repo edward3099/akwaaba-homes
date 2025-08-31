@@ -68,8 +68,6 @@ interface PlatformSettings {
   payments: {
     mobile_money_merchant_number: string
     premium_listing_price: number
-    featured_listing_price: number
-    urgent_listing_price: number
   }
 }
 
@@ -112,9 +110,7 @@ const defaultSettings: PlatformSettings = {
   },
   payments: {
     mobile_money_merchant_number: '',
-    premium_listing_price: 50,
-    featured_listing_price: 30,
-    urgent_listing_price: 20
+    premium_listing_price: 50
   }
 }
 
@@ -186,9 +182,7 @@ export default function AdminSettings() {
             },
             payments: {
               mobile_money_merchant_number: backendSettings.platform?.mobile_money_merchant_number ?? defaultSettings.payments.mobile_money_merchant_number,
-              premium_listing_price: backendSettings.platform?.premium_listing_price ?? defaultSettings.payments.premium_listing_price,
-              featured_listing_price: backendSettings.platform?.featured_listing_price ?? defaultSettings.payments.featured_listing_price,
-              urgent_listing_price: backendSettings.platform?.urgent_listing_price ?? defaultSettings.payments.urgent_listing_price
+              premium_listing_price: backendSettings.platform?.premium_listing_price ?? defaultSettings.payments.premium_listing_price
             }
           }
           setSettings(mappedSettings)
@@ -253,9 +247,7 @@ export default function AdminSettings() {
           max_file_size_mb: settings.limits.max_file_size_mb,
           max_users_per_plan: settings.limits.max_users_per_plan,
           mobile_money_merchant_number: settings.payments.mobile_money_merchant_number,
-          premium_listing_price: settings.payments.premium_listing_price,
-          featured_listing_price: settings.payments.featured_listing_price,
-          urgent_listing_price: settings.payments.urgent_listing_price
+          premium_listing_price: settings.payments.premium_listing_price
         },
         notification_settings: {
           email_notifications_enabled: settings.notifications.email_notifications,
@@ -664,30 +656,9 @@ export default function AdminSettings() {
                 onChange={(e) => handleSettingChange('payments.premium_listing_price', parseFloat(e.target.value))}
                 placeholder="50.00"
               />
-            </div>
-            <div>
-              <Label htmlFor="featured-price">Featured Listing Price (GHS)</Label>
-              <Input
-                id="featured-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={settings.payments.featured_listing_price}
-                onChange={(e) => handleSettingChange('payments.featured_listing_price', parseFloat(e.target.value))}
-                placeholder="30.00"
-              />
-            </div>
-            <div>
-              <Label htmlFor="urgent-price">Urgent Listing Price (GHS)</Label>
-              <Input
-                id="urgent-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={settings.payments.urgent_listing_price}
-                onChange={(e) => handleSettingChange('payments.urgent_listing_price', parseFloat(e.target.value))}
-                placeholder="20.00"
-              />
+              <p className="text-xs text-gray-500 mt-1">
+                This is the price agents pay for premium property listings
+              </p>
             </div>
           </div>
           {!settings.payments.mobile_money_merchant_number && (

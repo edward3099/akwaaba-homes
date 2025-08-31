@@ -5,11 +5,52 @@ import { requireAdmin } from '@/lib/middleware/adminAuth';
 
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate admin
-    const authResult = await requireAdmin(['read:system_config'])(request);
-    if (authResult instanceof NextResponse) return authResult;
-    
-    const { supabase } = authResult;
+    // Create Supabase client with proper cookie handling
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+            }
+          },
+        },
+      }
+    );
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Please log in' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('user_role, verification_status')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || !profile || !['admin', 'super_admin', 'moderator'].includes(profile.user_role)) {
+      return NextResponse.json(
+        { error: 'Forbidden - Admin access required' },
+        { status: 403 }
+      );
+    }
 
     // Get platform settings
     const { data: settings, error: settingsError } = await supabase
@@ -56,11 +97,52 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // Authenticate admin
-    const authResult = await requireAdmin(['write:system_config'])(request);
-    if (authResult instanceof NextResponse) return authResult;
-    
-    const { user, supabase } = authResult;
+    // Create Supabase client with proper cookie handling
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+            }
+          },
+        },
+      }
+    );
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Please log in' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('user_role, verification_status')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || !profile || !['admin', 'super_admin', 'moderator'].includes(profile.user_role)) {
+      return NextResponse.json(
+        { error: 'Forbidden - Admin access required' },
+        { status: 403 }
+      );
+    }
 
     // Parse request body
     const body = await request.json();
