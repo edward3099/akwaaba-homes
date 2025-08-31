@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
@@ -13,7 +13,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
 
     // Check if user already exists - we'll handle this during signup
     // Supabase will return an error if the email is already in use
@@ -52,12 +74,12 @@ export async function POST(request: NextRequest) {
     const { error: profileError } = await supabase
       .from('profiles')
       .insert({
-        id: data.user.id,
+        user_id: data.user.id,
         email: data.user.email,
         full_name: fullName,
-        user_type: userType,
+        user_role: userType,
         phone: phone || null,
-        company: company || null,
+        company_name: company || null,
         verification_status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -69,16 +91,8 @@ export async function POST(request: NextRequest) {
       // The profile can be created later
     }
 
-    // Manually confirm the email to bypass verification requirement
-    const { error: confirmError } = await supabase.auth.admin.updateUserById(
-      data.user.id,
-      { email_confirm: true }
-    );
-
-    if (confirmError) {
-      console.error('Email confirmation error:', confirmError);
-      // Continue anyway as the user is created
-    }
+    // Note: Email confirmation is handled by Supabase automatically
+    // Users will need to verify their email before they can sign in
 
     return NextResponse.json({
       success: true,

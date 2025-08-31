@@ -131,7 +131,9 @@ export default function AdminUserManagement() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('/api/admin/users');
+      const response = await fetch('/api/admin/users', {
+        credentials: 'include', // Include cookies for authentication
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -165,6 +167,7 @@ export default function AdminUserManagement() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           email: data.email,
           full_name: `${data.first_name} ${data.last_name}`,
@@ -195,6 +198,7 @@ export default function AdminUserManagement() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           full_name: `${data.first_name} ${data.last_name}`,
           phone: data.phone,
@@ -219,6 +223,7 @@ export default function AdminUserManagement() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           action: 'delete',
           user_ids: [userId]
@@ -259,7 +264,10 @@ export default function AdminUserManagement() {
     
     const matchesFilter = filterRole === 'all' || (user.user_type && user.user_type === filterRole);
     
-    return matchesSearch && matchesFilter;
+    // Only show verified users (non-deleted users)
+    const isVerified = user.is_verified === true;
+    
+    return matchesSearch && matchesFilter && isVerified;
   });
 
   // Reset form when modal closes

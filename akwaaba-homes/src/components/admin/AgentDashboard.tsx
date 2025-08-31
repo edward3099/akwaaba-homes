@@ -109,7 +109,6 @@ export default function AgentDashboard() {
         const response = await fetch('/api/properties/my-properties', {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token || ''}`, // Add explicit auth header
           },
           credentials: 'include', // Include cookies for authentication
         });
@@ -192,7 +191,6 @@ export default function AgentDashboard() {
         credentials: 'include', // Include cookies for authentication
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`, // Add explicit auth header
         },
       });
       

@@ -25,7 +25,8 @@ import {
   Loader2,
   Camera,
   ArrowRight,
-  Home
+  Home,
+  Upload
 } from 'lucide-react';
 import { markProfileAsCompleted, getFieldDisplayName } from '@/lib/utils/profileCompletion';
 
@@ -62,6 +63,10 @@ interface ProfileFormData {
   experience_years: number;
   bio: string;
   cover_image: string;
+  address?: string;
+  city?: string;
+  region?: string;
+  postal_code?: string;
 }
 
 export default function AgentProfilePage() {
@@ -80,7 +85,11 @@ export default function AgentProfilePage() {
     specializations: [],
     experience_years: 0,
     bio: '',
-    cover_image: ''
+    cover_image: '',
+    address: '',
+    city: '',
+    region: '',
+    postal_code: ''
   });
   const [newSpecialization, setNewSpecialization] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -131,7 +140,11 @@ export default function AgentProfilePage() {
         specializations: data.profile.specializations || [],
         experience_years: data.profile.experience_years || 0,
         bio: data.profile.bio || '',
-        cover_image: data.profile.cover_image || ''
+        cover_image: data.profile.cover_image || '',
+        address: data.profile.address || '',
+        city: data.profile.city || '',
+        region: data.profile.region || '',
+        postal_code: data.profile.postal_code || ''
       });
 
       // Check profile completion after profile is loaded
@@ -278,6 +291,13 @@ export default function AgentProfilePage() {
       }
 
       const result = await response.json();
+      
+      // Update the profile state with the new cover image URL
+      setProfile(prev => prev ? { ...prev, cover_image: result.publicUrl } : null);
+      
+      // Also refresh the profile data to ensure UI is updated
+      await fetchProfile();
+      
       toast({
         title: "Success",
         description: "Cover image uploaded successfully!",
@@ -539,26 +559,12 @@ export default function AgentProfilePage() {
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
                     onChange={handleImageUpload}
-                    className="hidden"
+                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed border border-dashed border-slate-300 rounded-lg p-4"
                     disabled={uploadingImage}
+                    id="profile-photo-upload"
                   />
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    disabled={uploadingImage}
-                    onClick={() => profileImageInputRef.current?.click()}
-                  >
-                    {uploadingImage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      'Upload Photo'
-                    )}
-                  </Button>
                   <p className="text-sm text-slate-500 mt-2">
-                    {uploadingImage ? 'Uploading your photo...' : 'Click to upload a professional photo (max 5MB)'}
+                    {uploadingImage ? 'Uploading your photo...' : 'Click "Choose File" above or drag and drop a professional photo (max 5MB)'}
                   </p>
                 </div>
               </div>
@@ -578,13 +584,19 @@ export default function AgentProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300">
+                <div className="w-full h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
                   {profile.cover_image ? (
-                    <img 
-                      src={profile.cover_image} 
-                      alt="Cover" 
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="w-full h-full relative">
+                      <img 
+                        src={profile.cover_image} 
+                        alt="Cover" 
+                        className="max-w-full max-h-full object-contain object-center"
+                        style={{
+                          width: 'auto',
+                          height: 'auto'
+                        }}
+                      />
+                    </div>
                   ) : (
                     <div className="text-center text-slate-500">
                       <Camera className="w-12 h-12 mx-auto mb-2" />
@@ -598,26 +610,12 @@ export default function AgentProfilePage() {
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
                     onChange={handleCoverImageUpload}
-                    className="hidden"
+                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed border border-dashed border-slate-300 rounded-lg p-4"
                     disabled={uploadingCoverImage}
+                    id="cover-image-upload"
                   />
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    disabled={uploadingCoverImage}
-                    onClick={() => coverImageInputRef.current?.click()}
-                  >
-                    {uploadingCoverImage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      'Upload Cover Image'
-                    )}
-                  </Button>
                   <p className="text-sm text-slate-500 mt-2">
-                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Click to upload a cover image (max 10MB)'}
+                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Click "Choose File" above or drag and drop a cover image (max 10MB)'}
                   </p>
                 </div>
               </div>
@@ -669,6 +667,51 @@ export default function AgentProfilePage() {
                     placeholder="Enter your phone number"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Address Information */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-slate-700">Address Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      value={formData.address || ''}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      placeholder="Enter your business address"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={formData.city || ''}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      placeholder="Enter your city"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="region">Region</Label>
+                    <Input
+                      id="region"
+                      value={formData.region || ''}
+                      onChange={(e) => handleInputChange('region', e.target.value)}
+                      placeholder="Enter your region"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="postal_code">Postal Code</Label>
+                    <Input
+                      id="postal_code"
+                      value={formData.postal_code || ''}
+                      onChange={(e) => handleInputChange('postal_code', e.target.value)}
+                      placeholder="Enter your postal code"
+                    />
+                  </div>
                 </div>
               </div>
             </CardContent>

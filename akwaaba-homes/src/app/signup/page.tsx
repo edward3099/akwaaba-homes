@@ -18,7 +18,7 @@ export default function SignupPage() {
     password: '',
     confirmPassword: '',
     fullName: '',
-    userType: '',
+    userType: 'agent',
     phone: '',
     company: ''
   });
@@ -49,7 +49,7 @@ export default function SignupPage() {
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.password || !formData.confirmPassword || !formData.fullName || !formData.userType) {
+    if (!formData.email || !formData.password || !formData.confirmPassword || !formData.fullName) {
       setError('All fields are required');
       return false;
     }
@@ -64,8 +64,8 @@ export default function SignupPage() {
       return false;
     }
 
-    if (formData.userType === 'agent' && !formData.company) {
-      setError('Company name is required for agents');
+    if (!formData.company) {
+      setError('Company name is required');
       return false;
     }
 
@@ -86,7 +86,7 @@ export default function SignupPage() {
     try {
       const metadata = {
         full_name: formData.fullName,
-        user_type: formData.userType,
+        user_type: 'agent',
         phone: formData.phone,
         company: formData.company,
         verification_status: 'pending'
@@ -96,7 +96,20 @@ export default function SignupPage() {
       
       if (result.success) {
         setSuccess('Account created successfully! Please check your email to verify your account.');
-        // Don't redirect - user needs to verify email first
+        
+        // For all user types, redirect to onboarding page to complete setup
+        // Store the signup data in localStorage for the onboarding process
+        localStorage.setItem('agentOnboarding', JSON.stringify({
+          email: formData.email,
+          fullName: formData.fullName,
+          company: formData.company,
+          phone: formData.phone,
+          userType: 'agent'
+        }));
+        
+        setTimeout(() => {
+          router.push('/agent/onboarding');
+        }, 2000); // Wait 2 seconds to show success message
       } else {
         setError(result.error || 'Signup failed');
       }
@@ -169,34 +182,29 @@ export default function SignupPage() {
               <Select
                 value={formData.userType}
                 onValueChange={(value) => handleInputChange('userType', value)}
-                disabled={isLoading}
+                disabled={true}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select account type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="buyer">Property Buyer</SelectItem>
-                  <SelectItem value="seller">Property Seller</SelectItem>
                   <SelectItem value="agent">Real Estate Agent</SelectItem>
-                  <SelectItem value="investor">Property Investor</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {formData.userType === 'agent' && (
-              <div className="space-y-2">
-                <Label htmlFor="company">Company Name *</Label>
-                <Input
-                  id="company"
-                  type="text"
-                  placeholder="Enter your company name"
-                  value={formData.company}
-                  onChange={(e) => handleInputChange('company', e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="company">Company Name *</Label>
+              <Input
+                id="company"
+                type="text"
+                placeholder="Enter your company name"
+                value={formData.company}
+                onChange={(e) => handleInputChange('company', e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>

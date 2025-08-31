@@ -44,7 +44,7 @@ const transformDatabaseProperty = (dbProperty: DatabaseProperty): Property => {
     },
 
     // Media
-    images: [], // We'll need to fetch images separately
+    images: dbProperty.image_urls || [], // Use the image_urls from database
     videos: undefined,
     virtualTour: undefined,
     

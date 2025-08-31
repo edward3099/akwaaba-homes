@@ -26,6 +26,7 @@ import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal
 import { AgentSelector } from '@/components/ui/AgentSelector'
 import { useApiMutation, useDestructiveMutation } from '@/lib/hooks/useApiMutation'
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 interface Property {
   id: string
@@ -76,6 +77,12 @@ export default function PropertiesPage() {
     isOpen: false,
     propertyId: '',
     propertyTitle: '',
+  })
+
+  // View property modal state
+  const [viewModal, setViewModal] = useState({
+    isOpen: false,
+    property: null as Property | null,
   })
 
   const currentPage = parseInt(searchParams.get('page') || '1')
@@ -138,6 +145,13 @@ export default function PropertiesPage() {
     })
   }
 
+  const handleViewClick = (property: Property) => {
+    setViewModal({
+      isOpen: true,
+      property,
+    })
+  }
+
   const handleDeleteConfirm = async () => {
     await deletePropertyMutation.executeWithConfirmation(async () => {
       const response = await fetch(`/api/admin/properties/${deleteModal.propertyId}`, {
@@ -161,6 +175,13 @@ export default function PropertiesPage() {
       isOpen: false,
       propertyId: '',
       propertyTitle: '',
+    })
+  }
+
+  const handleViewClose = () => {
+    setViewModal({
+      isOpen: false,
+      property: null,
     })
   }
 
@@ -477,7 +498,12 @@ export default function PropertiesPage() {
                         </span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleViewClick(property)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Link href={`/admin/properties/${property.id}/edit`}>
@@ -529,6 +555,143 @@ export default function PropertiesPage() {
         isLoading={deletePropertyMutation.isLoading}
         variant="warning"
       />
+
+      {/* Property View Modal */}
+      <Dialog open={viewModal.isOpen} onOpenChange={handleViewClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Property Details</DialogTitle>
+            <DialogDescription>
+              View detailed information about this property including location, pricing, and specifications.
+            </DialogDescription>
+          </DialogHeader>
+          {viewModal.property && (
+            <div className="space-y-6">
+              {/* Property Image */}
+              <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
+                {viewModal.property.images && viewModal.property.images.length > 0 ? (
+                  <img
+                    src={viewModal.property.images.find(img => img.is_primary)?.url || viewModal.property.images[0].url}
+                    alt={viewModal.property.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Building2 className="h-16 w-16 text-gray-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Property Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {viewModal.property.title}
+                  </h2>
+                  <div className="flex items-center text-gray-600 mb-2">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span>{viewModal.property.address}, {viewModal.property.city}, {viewModal.property.region}</span>
+                  </div>
+                  <Badge className={getStatusColor(viewModal.property.status)}>
+                    {viewModal.property.status}
+                  </Badge>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatPrice(viewModal.property.price, viewModal.property.currency)}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {viewModal.property.listing_type}
+                  </div>
+                </div>
+              </div>
+
+              {/* Property Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <Building2 className="h-4 w-4 text-gray-500 mr-2" />
+                      <span className="text-sm text-gray-600">Type:</span>
+                      <span className="ml-2 text-sm font-medium">{viewModal.property.property_type}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Bed className="h-4 w-4 text-gray-500 mr-2" />
+                      <span className="text-sm text-gray-600">Bedrooms:</span>
+                      <span className="ml-2 text-sm font-medium">{viewModal.property.bedrooms || 0}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Bath className="h-4 w-4 text-gray-500 mr-2" />
+                      <span className="text-sm text-gray-600">Bathrooms:</span>
+                      <span className="ml-2 text-sm font-medium">{viewModal.property.bathrooms || 0}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Square className="h-4 w-4 text-gray-500 mr-2" />
+                      <span className="text-sm text-gray-600">Square Feet:</span>
+                      <span className="ml-2 text-sm font-medium">{viewModal.property.square_feet || 0}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <span className="text-sm text-gray-600">Property ID:</span>
+                      <span className="ml-2 text-sm font-mono text-gray-500">{viewModal.property.id}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-sm text-gray-600">Listed:</span>
+                      <span className="ml-2 text-sm font-medium">{formatDate(viewModal.property.created_at)}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-sm text-gray-600">Views:</span>
+                      <span className="ml-2 text-sm font-medium">{viewModal.property.views_count}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-sm text-gray-600">Agent ID:</span>
+                      <span className="ml-2 text-sm font-mono text-gray-500">
+                        {viewModal.property.agent_id || 'Not assigned'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Description</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {viewModal.property.description}
+                </p>
+              </div>
+
+              {/* Images Gallery */}
+              {viewModal.property.images && viewModal.property.images.length > 1 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Additional Images</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {viewModal.property.images
+                      .filter(img => !img.is_primary)
+                      .map((image, index) => (
+                        <div key={index} className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
+                          <img
+                            src={image.url}
+                            alt={`${viewModal.property.title} - Image ${index + 2}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

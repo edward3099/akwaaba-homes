@@ -20,7 +20,9 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
       if (!user?.id) return;
       
       try {
-        const response = await fetch('/api/user/profile');
+        const response = await fetch('/api/user/profile', {
+          credentials: 'include', // Include cookies for authentication
+        });
         if (response.ok) {
           const data = await response.json();
           console.log('Profile data fetched:', data);

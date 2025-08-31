@@ -45,10 +45,10 @@ export default function PropertyCard({
     ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '')
     : [];
   
-  // Use a fallback image if no valid images are available
+  // Use the first valid image or null if no images available
   const currentImage = validImages.length > 0 && validImages[currentImageIndex] 
     ? validImages[currentImageIndex] 
-    : '/placeholder-property.svg';
+    : null;
   
   // Ensure currentImageIndex doesn't exceed valid images length
   const safeImageIndex = Math.min(currentImageIndex, Math.max(0, validImages.length - 1));
@@ -150,28 +150,24 @@ export default function PropertyCard({
             <div className="flex flex-col md:flex-row">
               {/* Image Section */}
               <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0 overflow-hidden">
-                <Image
-                  src={currentImage}
-                  alt={property.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
-                  style={{ objectFit: 'cover' }}
-                  unoptimized
-                  onError={(e) => {
-                    console.error('Image failed to load:', currentImage);
-                    // Fallback to placeholder if image fails
-                    const target = e.target as HTMLImageElement;
-                    if (target) {
-                      // Try to set placeholder, but if that also fails, create a simple fallback
-                      target.onerror = null; // Prevent infinite loop
-                      target.src = '/placeholder-property.svg';
-                      
-                      // If placeholder also fails, create a simple colored div as fallback
-                      target.onerror = () => {
+                {currentImage ? (
+                  <Image
+                    src={currentImage}
+                    alt={property.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
+                    style={{ objectFit: 'cover' }}
+                    priority={currentImageIndex === 0}
+                    unoptimized
+                    onError={(e) => {
+                      console.error('Image failed to load:', currentImage);
+                      // Hide the image and show fallback
+                      const target = e.target as HTMLImageElement;
+                      if (target) {
                         target.style.display = 'none';
                         const fallbackDiv = document.createElement('div');
-                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none';
                         fallbackDiv.innerHTML = `
                           <div class="text-center text-slate-600">
                             <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
@@ -181,10 +177,19 @@ export default function PropertyCard({
                           </div>
                         `;
                         target.parentNode?.insertBefore(fallbackDiv, target);
-                      };
-                    }
-                  }}
-                />
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                    <div className="text-center text-slate-600">
+                      <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                      </svg>
+                      <p className="text-sm">No image available</p>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Image Navigation - Only show if there are multiple valid images */}
                 {validImages.length > 1 && (
@@ -330,28 +335,23 @@ export default function PropertyCard({
         <CardContent className="p-0 flex flex-col h-full">
           {/* Image Section */}
           <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden flex-shrink-0">
-            <Image
-              src={currentImage}
-              alt={property.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-              className="property-image rounded-t-lg object-cover group-hover:scale-105 transition-transform duration-300"
-              style={{ objectFit: 'cover' }}
-              unoptimized
-              onError={(e) => {
-                console.error('Image failed to load:', currentImage);
-                // Fallback to placeholder if image fails
-                const target = e.target as HTMLImageElement;
-                if (target) {
-                  // Try to set placeholder, but if that also fails, create a simple fallback
-                  target.onerror = null; // Prevent infinite loop
-                  target.src = '/placeholder-property.svg';
-                  
-                  // If placeholder also fails, create a simple colored div as fallback
-                  target.onerror = () => {
+            {currentImage ? (
+              <Image
+                src={currentImage}
+                alt={property.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                className="property-image rounded-t-lg object-cover group-hover:scale-105 transition-transform duration-300"
+                style={{ objectFit: 'cover' }}
+                unoptimized
+                onError={(e) => {
+                  console.error('Image failed to load:', currentImage);
+                  // Hide the image and show fallback
+                  const target = e.target as HTMLImageElement;
+                  if (target) {
                     target.style.display = 'none';
                     const fallbackDiv = document.createElement('div');
-                    fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                    fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg';
                     fallbackDiv.innerHTML = `
                       <div class="text-center text-slate-600">
                         <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
@@ -361,10 +361,19 @@ export default function PropertyCard({
                       </div>
                     `;
                     target.parentNode?.insertBefore(fallbackDiv, target);
-                  };
-                }
-              }}
-            />
+                  }
+                }}
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg">
+                <div className="text-center text-slate-600">
+                  <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                  </svg>
+                  <p className="text-sm">No image available</p>
+                </div>
+              </div>
+            )}
             
             {/* Image Navigation - Only show if there are multiple valid images */}
             {validImages.length > 1 && (

@@ -113,6 +113,9 @@ export async function GET(request: NextRequest) {
       bio: agent.bio || 'No bio available',
       avatar: agent.profile_image || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
       coverImage: agent.cover_image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', // Use real cover image or default
+      address: agent.address || '',
+      city: agent.city || '',
+      region: agent.region || '',
       stats: {
         totalProperties: 0, // Will need to query properties table
         propertiesSold: 0, // Will need to query properties table

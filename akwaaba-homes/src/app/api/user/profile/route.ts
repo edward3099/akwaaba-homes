@@ -14,6 +14,10 @@ const profileUpdateSchema = z.object({
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   profile_image: z.string().url('Invalid profile image URL').optional(),
   cover_image: z.string().url('Invalid cover image URL').optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  region: z.string().optional(),
+  postal_code: z.string().optional(),
 });
 
 export async function GET(request: NextRequest) {

@@ -259,17 +259,27 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata
-        }
+      // Use our API route instead of calling Supabase directly
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName: metadata.full_name,
+          userType: metadata.user_type,
+          phone: metadata.phone,
+          company: metadata.company
+        }),
       });
 
-      if (error) {
-        setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
-        return { success: false, error: error.message };
+      const result = await response.json();
+
+      if (!response.ok) {
+        setAuthState(prev => ({ ...prev, loading: false, error: result.error || 'Signup failed' }));
+        return { success: false, error: result.error || 'Signup failed' };
       }
 
       setAuthState(prev => ({ ...prev, loading: false }));

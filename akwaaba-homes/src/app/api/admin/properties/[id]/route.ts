@@ -1,24 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { requireAdmin, logAdminAction } from '@/lib/middleware/adminAuth';
 
-// Helper function to check if user is admin
-async function checkAdminAccess(supabase: any, userId: string) {
-  const { data: userProfile, error: profileError } = await supabase
-    .from('profiles')
-    .select('user_role, is_verified')
-    .eq('user_id', userId)
-    .single();
 
-  if (profileError || !userProfile) {
-    return { isAdmin: false, error: 'User profile not found' };
-  }
-
-  if (userProfile.user_role !== 'admin') {
-    return { isAdmin: false, error: 'Admin role required' };
-  }
-
-  return { isAdmin: true, profile: userProfile };
-}
 
 // GET method to get a specific property with admin privileges
 export async function GET(
@@ -27,26 +12,12 @@ export async function GET(
 ) {
   try {
     const { id: propertyId } = await params;
-    const supabase = await createApiRouteSupabaseClient();
-
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is an admin
-    const adminCheck = await checkAdminAccess(supabase, user.id);
-    if (!adminCheck.isAdmin) {
-      return NextResponse.json(
-        { error: adminCheck.error },
-        { status: 403 }
-      );
-    }
+    // Authenticate admin with read permissions
+    const authResult = await requireAdmin(['read:properties'])(request);
+    if (authResult instanceof NextResponse) return authResult;
+    
+    const { user, supabase } = authResult;
 
     // Validate property ID
     if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
@@ -56,15 +27,7 @@ export async function GET(
     // Fetch property with related data - simplified to avoid JOIN issues
     const { data: property, error } = await supabase
       .from('properties')
-      .select(`
-        *,
-        property_images (
-          id,
-          image_url,
-          is_primary,
-          caption
-        )
-      `)
+      .select('*')
       .eq('id', propertyId)
       .single();
 
@@ -84,9 +47,9 @@ export async function GET(
     if (property && property.seller_id) {
       try {
         const { data: seller, error: sellerError } = await supabase
-          .from('users')
-          .select('id, full_name, company_name, phone, email, user_type, is_verified')
-          .eq('id', property.seller_id)
+          .from('profiles')
+          .select('user_id, full_name, company_name, phone, email, user_role, verification_status')
+          .eq('user_id', property.seller_id)
           .single();
 
         if (!sellerError && seller) {
@@ -133,26 +96,12 @@ export async function PUT(
 ) {
   try {
     const { id: propertyId } = await params;
-    const supabase = await createApiRouteSupabaseClient();
-
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is an admin
-    const adminCheck = await checkAdminAccess(supabase, user.id);
-    if (!adminCheck.isAdmin) {
-      return NextResponse.json(
-        { error: adminCheck.error },
-        { status: 403 }
-      );
-    }
+    // Authenticate admin with write permissions
+    const authResult = await requireAdmin(['write:properties'])(request);
+    if (authResult instanceof NextResponse) return authResult;
+    
+    const { user, supabase } = authResult;
 
     // Validate property ID
     if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
@@ -232,26 +181,12 @@ export async function DELETE(
 ) {
   try {
     const { id: propertyId } = await params;
-    const supabase = await createApiRouteSupabaseClient();
-
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is an admin
-    const adminCheck = await checkAdminAccess(supabase, user.id);
-    if (!adminCheck.isAdmin) {
-      return NextResponse.json(
-        { error: adminCheck.error },
-        { status: 403 }
-      );
-    }
+    // Authenticate admin with delete permissions
+    const authResult = await requireAdmin(['delete:properties'])(request);
+    if (authResult instanceof NextResponse) return authResult;
+    
+    const { user, supabase } = authResult;
 
     // Validate property ID
     if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
@@ -273,10 +208,9 @@ export async function DELETE(
     const { error: archiveError } = await supabase
       .from('properties')
       .update({ 
-        status: 'archived',
+        status: 'inactive',
         updated_at: new Date().toISOString(),
-        archived_at: new Date().toISOString(),
-        archived_by: user.id
+        archived_at: new Date().toISOString()
       })
       .eq('id', propertyId);
 

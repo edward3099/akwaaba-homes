@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/authContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,18 @@ export default function LoginPage() {
 
   const { signIn, isAuthenticated, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle URL parameters and set initial state
+  useEffect(() => {
+    const message = searchParams.get('message');
+    const email = searchParams.get('email');
+    
+    if (message === 'profile-setup-complete' && email) {
+      setSuccess(`Profile setup completed! Please check your email (${email}) to verify your account, then you can sign in.`);
+      setEmail(email);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated - moved to useEffect to avoid setState during render
   useEffect(() => {
@@ -53,7 +65,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    setSuccess('');
+    setSuccess(''); // Clear any existing success message
 
     try {
       const result = await signIn(email, password);
@@ -62,7 +74,12 @@ export default function LoginPage() {
         setSuccess('Login successful! Redirecting...');
         // The auth context will handle the redirect
       } else {
-        setError(result.error || 'Login failed');
+        // Provide better error messages for common issues
+        if (result.error?.includes('email not confirmed') || result.error?.includes('Email not confirmed')) {
+          setError(`Please check your email (${email}) and click the verification link before signing in. If you don't see the email, check your spam folder.`);
+        } else {
+          setError(result.error || 'Login failed');
+        }
       }
     } catch (err) {
       setError('An unexpected error occurred');

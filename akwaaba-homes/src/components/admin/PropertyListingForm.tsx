@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth/authContext';
+import MobileMoneyPayment from '@/components/payments/MobileMoneyPayment';
 
 interface PropertyFormData {
   // Basic Information
@@ -117,6 +118,15 @@ export default function PropertyListingForm() {
   const [dragActive, setDragActive] = useState(false);
   const [debugMode, setDebugMode] = useState(false); // Debug mode for troubleshooting
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null); // State to hold created property ID
+  
+  // Payment-related state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState({
+    paymentProcessingEnabled: false,
+    premiumListingPrice: 50,
+    featuredListingPrice: 30,
+    urgentListingPrice: 20
+  });
 
   // File input ref
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,8 +140,113 @@ export default function PropertyListingForm() {
     };
   }, [imagePreviewUrls]);
 
+  // Fetch payment settings
+  useEffect(() => {
+    const fetchPaymentSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const settings = data.settings?.platform;
+          if (settings) {
+            setPaymentSettings({
+              paymentProcessingEnabled: settings.payment_processing_enabled || false,
+              premiumListingPrice: settings.premium_listing_price || 50,
+              featuredListingPrice: settings.featured_listing_price || 30,
+              urgentListingPrice: settings.urgent_listing_price || 20
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch payment settings:', error);
+      }
+    };
+
+    fetchPaymentSettings();
+  }, []);
+
   const updateFormData = (field: keyof PropertyFormData, value: PropertyFormData[keyof PropertyFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle payment completion
+  const handlePaymentComplete = async () => {
+    setShowPaymentModal(false);
+    setIsSubmitting(true);
+    
+    try {
+      // Check authentication before making API call
+      if (!session?.access_token) {
+        throw new Error('Authentication token not found. Please sign in again.');
+      }
+      
+      // Create the property with premium tier
+      const propertyDataWithoutImages = {
+        ...formData,
+        image_urls: [],
+        images: [],
+        // Map tier to database fields
+        is_featured: formData.tier === 'premium'
+      };
+      
+      console.log('📤 Creating premium property with data:', propertyDataWithoutImages);
+      
+      const createResponse = await fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(propertyDataWithoutImages),
+      });
+      
+      if (!createResponse.ok) {
+        let errorMessage = 'Failed to create property';
+        try {
+          const errorData = await createResponse.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          errorMessage = `HTTP ${createResponse.status}: ${createResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const createdProperty = await createResponse.json();
+      console.log('✅ Premium property created successfully:', createdProperty);
+      
+      // Upload images if any
+      if (uploadedImages.length > 0) {
+        await uploadImagesToProperty(createdProperty.id);
+      }
+      
+      // Show success and redirect
+      setCreatedPropertyId(createdProperty.id);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        setShowSuccess(false);
+        setCreatedPropertyId(null);
+        setFormData(initialFormData);
+        setUploadedImages([]);
+        setImagePreviewUrls([]);
+        setCurrentStep(1);
+        window.location.href = '/agent-dashboard';
+      }, 2000);
+      
+    } catch (error) {
+      console.error('❌ Error creating premium property:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create property');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle payment cancellation
+  const handlePaymentCancel = () => {
+    setShowPaymentModal(false);
+    toast.info('Payment cancelled. You can change the listing tier or try again later.');
   };
 
   // Handle file selection
@@ -383,6 +498,12 @@ export default function PropertyListingForm() {
       return;
     }
     
+    // Check if premium tier requires payment
+    if (formData.tier === 'premium' && paymentSettings.paymentProcessingEnabled) {
+      setShowPaymentModal(true);
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -396,7 +517,9 @@ export default function PropertyListingForm() {
         ...formData,
         // Don't include images yet - we'll upload them after property creation
         image_urls: [],
-        images: []
+        images: [],
+        // Map tier to database fields
+        is_featured: formData.tier === 'premium'
       };
       
       console.log('📤 Creating property with data:', propertyDataWithoutImages);
@@ -725,8 +848,26 @@ export default function PropertyListingForm() {
             required
           >
             <option value="normal">Normal (Free)</option>
-            <option value="premium">Premium (Paid)</option>
+            <option value="premium">
+              Premium {paymentSettings.paymentProcessingEnabled ? `(GHS ${paymentSettings.premiumListingPrice})` : '(Paid)'}
+            </option>
           </select>
+          {formData.tier === 'premium' && paymentSettings.paymentProcessingEnabled && (
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm text-blue-800">
+                <strong>Premium Listing Benefits:</strong>
+              </p>
+              <ul className="text-xs text-blue-700 mt-1 list-disc list-inside">
+                <li>Top placement in search results</li>
+                <li>Priority support</li>
+                <li>Enhanced visibility</li>
+                <li>Analytics dashboard</li>
+              </ul>
+              <p className="text-sm text-blue-800 mt-2">
+                <strong>Cost: GHS {paymentSettings.premiumListingPrice}</strong>
+              </p>
+            </div>
+          )}
         </div>
         
         <div className="md:col-span-2">
@@ -1387,6 +1528,22 @@ export default function PropertyListingForm() {
           )}
         </div>
       </form>
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <MobileMoneyPayment
+              propertyId="temp" // Will be updated after payment
+              propertyTitle={formData.title}
+              tier="premium"
+              amount={paymentSettings.premiumListingPrice}
+              onPaymentComplete={handlePaymentComplete}
+              onCancel={handlePaymentCancel}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

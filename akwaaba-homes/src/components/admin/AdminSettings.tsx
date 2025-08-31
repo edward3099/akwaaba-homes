@@ -21,7 +21,9 @@ import {
   MapPin,
   Clock,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  CreditCard,
+  Smartphone
 } from 'lucide-react'
 import { useApiMutation } from '@/lib/hooks/useApiMutation'
 import { toast } from 'sonner'
@@ -63,6 +65,12 @@ interface PlatformSettings {
     max_file_size_mb: number
     max_users_per_plan: number
   }
+  payments: {
+    mobile_money_merchant_number: string
+    premium_listing_price: number
+    featured_listing_price: number
+    urgent_listing_price: number
+  }
 }
 
 const defaultSettings: PlatformSettings = {
@@ -101,6 +109,12 @@ const defaultSettings: PlatformSettings = {
     max_images_per_property: 10,
     max_file_size_mb: 5,
     max_users_per_plan: 1000
+  },
+  payments: {
+    mobile_money_merchant_number: '',
+    premium_listing_price: 50,
+    featured_listing_price: 30,
+    urgent_listing_price: 20
   }
 }
 
@@ -124,10 +138,63 @@ export default function AdminSettings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings')
+      const response = await fetch('/api/admin/settings', {
+        credentials: 'include'
+      })
       if (response.ok) {
         const data = await response.json()
-        setSettings(data.settings || defaultSettings)
+        const backendSettings = data.settings
+        
+        // Map backend settings to frontend structure
+        if (backendSettings) {
+          const mappedSettings: PlatformSettings = {
+            platform: {
+              name: backendSettings.platform?.name || defaultSettings.platform.name,
+              description: backendSettings.platform?.description || defaultSettings.platform.description,
+              version: backendSettings.platform?.version || defaultSettings.platform.version,
+              contact_email: backendSettings.platform?.contact_email || defaultSettings.platform.contact_email,
+              support_phone: backendSettings.platform?.support_phone || defaultSettings.platform.support_phone,
+              address: backendSettings.platform?.address || defaultSettings.platform.address,
+              business_hours: backendSettings.platform?.business_hours || defaultSettings.platform.business_hours
+            },
+            features: {
+              user_registration: backendSettings.platform?.user_registration_enabled ?? defaultSettings.features.user_registration,
+              property_listings: backendSettings.platform?.property_listings_enabled ?? defaultSettings.features.property_listings,
+              agent_verification: backendSettings.platform?.agent_verification_enabled ?? defaultSettings.features.agent_verification,
+              payment_processing: backendSettings.platform?.payment_processing_enabled ?? defaultSettings.features.payment_processing,
+              analytics_dashboard: backendSettings.platform?.analytics_dashboard_enabled ?? defaultSettings.features.analytics_dashboard,
+              mobile_app: backendSettings.platform?.mobile_app_enabled ?? defaultSettings.features.mobile_app
+            },
+            security: {
+              two_factor_auth: backendSettings.platform?.two_factor_auth ?? defaultSettings.security.two_factor_auth,
+              session_timeout: backendSettings.platform?.session_timeout ?? defaultSettings.security.session_timeout,
+              max_login_attempts: backendSettings.platform?.max_login_attempts ?? defaultSettings.security.max_login_attempts,
+              password_min_length: backendSettings.platform?.password_min_length ?? defaultSettings.security.password_min_length,
+              require_verification: backendSettings.platform?.require_verification ?? defaultSettings.security.require_verification
+            },
+            notifications: {
+              email_notifications: backendSettings.notification_settings?.email_notifications_enabled ?? defaultSettings.notifications.email_notifications,
+              sms_notifications: backendSettings.notification_settings?.sms_notifications_enabled ?? defaultSettings.notifications.sms_notifications,
+              push_notifications: backendSettings.notification_settings?.push_notifications_enabled ?? defaultSettings.notifications.push_notifications,
+              admin_alerts: backendSettings.notification_settings?.admin_alerts_enabled ?? defaultSettings.notifications.admin_alerts
+            },
+            limits: {
+              max_properties_per_user: backendSettings.platform?.max_properties_per_user ?? defaultSettings.limits.max_properties_per_user,
+              max_images_per_property: backendSettings.platform?.max_images_per_property ?? defaultSettings.limits.max_images_per_property,
+              max_file_size_mb: backendSettings.platform?.max_file_size_mb ?? defaultSettings.limits.max_file_size_mb,
+              max_users_per_plan: backendSettings.platform?.max_users_per_plan ?? defaultSettings.limits.max_users_per_plan
+            },
+            payments: {
+              mobile_money_merchant_number: backendSettings.platform?.mobile_money_merchant_number ?? defaultSettings.payments.mobile_money_merchant_number,
+              premium_listing_price: backendSettings.platform?.premium_listing_price ?? defaultSettings.payments.premium_listing_price,
+              featured_listing_price: backendSettings.platform?.featured_listing_price ?? defaultSettings.payments.featured_listing_price,
+              urgent_listing_price: backendSettings.platform?.urgent_listing_price ?? defaultSettings.payments.urgent_listing_price
+            }
+          }
+          setSettings(mappedSettings)
+        } else {
+          setSettings(defaultSettings)
+        }
       } else {
         console.error('Failed to fetch settings')
         toast.error('Failed to load settings', {
@@ -160,12 +227,51 @@ export default function AdminSettings() {
 
   const saveSettings = async () => {
     await saveSettingsMutation.mutate(async () => {
+      // Structure the data for the backend API
+      const apiData = {
+        platform: {
+          name: settings.platform.name,
+          description: settings.platform.description,
+          version: settings.platform.version,
+          contact_email: settings.platform.contact_email,
+          support_phone: settings.platform.support_phone,
+          address: settings.platform.address,
+          business_hours: settings.platform.business_hours,
+          user_registration_enabled: settings.features.user_registration,
+          property_listings_enabled: settings.features.property_listings,
+          agent_verification_enabled: settings.features.agent_verification,
+          payment_processing_enabled: settings.features.payment_processing,
+          analytics_dashboard_enabled: settings.features.analytics_dashboard,
+          mobile_app_enabled: settings.features.mobile_app,
+          two_factor_auth: settings.security.two_factor_auth,
+          session_timeout: settings.security.session_timeout,
+          max_login_attempts: settings.security.max_login_attempts,
+          password_min_length: settings.security.password_min_length,
+          require_verification: settings.security.require_verification,
+          max_properties_per_user: settings.limits.max_properties_per_user,
+          max_images_per_property: settings.limits.max_images_per_property,
+          max_file_size_mb: settings.limits.max_file_size_mb,
+          max_users_per_plan: settings.limits.max_users_per_plan,
+          mobile_money_merchant_number: settings.payments.mobile_money_merchant_number,
+          premium_listing_price: settings.payments.premium_listing_price,
+          featured_listing_price: settings.payments.featured_listing_price,
+          urgent_listing_price: settings.payments.urgent_listing_price
+        },
+        notification_settings: {
+          email_notifications_enabled: settings.notifications.email_notifications,
+          sms_notifications_enabled: settings.notifications.sms_notifications,
+          push_notifications_enabled: settings.notifications.push_notifications,
+          admin_alerts_enabled: settings.notifications.admin_alerts
+        }
+      }
+
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ settings })
+        credentials: 'include',
+        body: JSON.stringify(apiData)
       })
 
       if (!response.ok) {
@@ -515,6 +621,88 @@ export default function AdminSettings() {
               />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CreditCard className="w-5 h-5 mr-2 text-ghana-green" />
+            Payment Settings
+          </CardTitle>
+          <CardDescription>
+            Configure mobile money integration and listing prices
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Label htmlFor="merchant-number" className="flex items-center">
+                <Smartphone className="w-4 h-4 mr-2" />
+                Mobile Money Merchant Number
+              </Label>
+              <Input
+                id="merchant-number"
+                value={settings.payments.mobile_money_merchant_number}
+                onChange={(e) => handleSettingChange('payments.mobile_money_merchant_number', e.target.value)}
+                placeholder="Enter merchant number (e.g., 0241234567)"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                This is the number agents will send payments to for premium listings
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="premium-price">Premium Listing Price (GHS)</Label>
+              <Input
+                id="premium-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.payments.premium_listing_price}
+                onChange={(e) => handleSettingChange('payments.premium_listing_price', parseFloat(e.target.value))}
+                placeholder="50.00"
+              />
+            </div>
+            <div>
+              <Label htmlFor="featured-price">Featured Listing Price (GHS)</Label>
+              <Input
+                id="featured-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.payments.featured_listing_price}
+                onChange={(e) => handleSettingChange('payments.featured_listing_price', parseFloat(e.target.value))}
+                placeholder="30.00"
+              />
+            </div>
+            <div>
+              <Label htmlFor="urgent-price">Urgent Listing Price (GHS)</Label>
+              <Input
+                id="urgent-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.payments.urgent_listing_price}
+                onChange={(e) => handleSettingChange('payments.urgent_listing_price', parseFloat(e.target.value))}
+                placeholder="20.00"
+              />
+            </div>
+          </div>
+          {!settings.payments.mobile_money_merchant_number && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+                <div>
+                  <h4 className="text-sm font-medium text-yellow-800">Mobile Money Not Configured</h4>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    Add a merchant number to enable mobile money payments for premium listings.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
