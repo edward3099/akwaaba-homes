@@ -170,7 +170,6 @@ export async function POST(request: NextRequest) {
         .from('profiles')
         .update({
           verification_status: newStatus,
-          updated_at: new Date().toISOString(),
           admin_reviewed_by: user.id,
           admin_reviewed_at: new Date().toISOString(),
           admin_review_notes: reason || null
@@ -189,7 +188,6 @@ export async function POST(request: NextRequest) {
         .from('properties')
         .update({
           status: newStatus,
-          updated_at: new Date().toISOString(),
           admin_reviewed_by: user.id,
           admin_reviewed_at: new Date().toISOString(),
           admin_review_notes: reason || null
