@@ -76,41 +76,38 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.ilike('city', `%${city}%`);
     }
     if (region) {
-      // Implement proper ranking: city-specific properties first, then broader region properties
-      // This provides clear separation and better user experience
-      const searchText = region.trim();
+      // Implement precise location filtering: prioritize exact city matches
+      const searchText = region.trim().toLowerCase();
       if (searchText) {
-        // First, get properties that have the search term in their address (city-specific)
-        // These are the most relevant results and should appear first
-        const citySpecificQuery = supabase
+        // First, get properties that have the search term in their city field (most precise)
+        const cityQuery = supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'active')
+          .eq('listing_type', listingType)
+          .ilike('city', `%${searchText}%`)
+          .order('created_at', { ascending: false });
+
+        // Then, get properties that have the search term in their address (specific location)
+        const addressQuery = supabase
           .from('properties')
           .select('*')
           .eq('status', 'active')
           .eq('listing_type', listingType)
           .ilike('address', `%${searchText}%`)
-          .order('created_at', { ascending: false });
-
-        // Then, get properties that have the search term in their region (broader area)
-        // These are less relevant but still useful
-        const regionQuery = supabase
-          .from('properties')
-          .select('*')
-          .eq('status', 'active')
-          .eq('listing_type', listingType)
-          .ilike('region', `%${searchText}%`)
-          .not('address', 'ilike', `%${searchText}%`) // Exclude city-specific ones to avoid duplicates
+          .not('city', 'ilike', `%${searchText}%`) // Exclude city matches to avoid duplicates
           .order('created_at', { ascending: false });
 
         // Execute both queries
-        const [cityResults, regionResults] = await Promise.all([
-          citySpecificQuery,
-          regionQuery
+        const [cityResults, addressResults] = await Promise.all([
+          cityQuery,
+          addressQuery
         ]);
 
-        // Combine results with city-specific first, then region results
+        // Combine results with city matches first, then address matches
         let allResults = [];
         if (cityResults.data) allResults.push(...cityResults.data);
-        if (regionResults.data) allResults.push(...regionResults.data);
+        if (addressResults.data) allResults.push(...addressResults.data);
 
         // Apply pagination manually
         const startIndex = (currentPage - 1) * propertiesPerPage;

@@ -342,7 +342,7 @@ export function FeaturedProperties() {
 
           // Apply location filter
           if (filters.location) {
-            apiFilters.location = filters.location;
+            apiFilters.region = filters.location;
           }
 
           // Apply keywords filter
@@ -460,8 +460,8 @@ export function FeaturedProperties() {
     newSearchParams.set('minprice', selectedMinPrice);
     newSearchParams.set('maxprice', selectedMaxPrice);
     newSearchParams.set('keywords', searchKeywords);
-    if (debouncedSearchRegion) {
-      newSearchParams.set('region', debouncedSearchRegion);
+    if (searchRegion) {
+      newSearchParams.set('region', searchRegion);
     } else {
       newSearchParams.delete('region');
     }
@@ -489,6 +489,13 @@ export function FeaturedProperties() {
     if (urlKeywords !== searchKeywords) setSearchKeywords(urlKeywords);
     if (urlRegion !== searchRegion) setSearchRegion(urlRegion);
     if (urlRegion !== debouncedSearchRegion) setDebouncedSearchRegion(urlRegion);
+    
+    // Update filters with location from URL
+    if (urlRegion) {
+      updateFilter('location', urlRegion);
+    } else {
+      updateFilter('location', '');
+    }
     
     // Validate page number and ensure it's within valid range
     const requestedPage = parseInt(urlPage);
