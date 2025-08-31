@@ -19,7 +19,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 }
 
 // Base API client configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Helper function for making API requests
 async function apiRequest<T>(
