@@ -59,8 +59,13 @@ export default function AdminVerificationsPage() {
       });
 
       if (response.ok) {
-        toast.success(`${type} approved successfully!`);
-        // Refresh the data
+        const result = await response.json();
+        if (result.data?.alreadyProcessed) {
+          toast.info(`${type} was already processed`);
+        } else {
+          toast.success(`${type} approved successfully!`);
+        }
+        // Always refresh the data to get the latest state
         fetchVerifications();
       } else {
         const error = await response.json();
@@ -92,8 +97,13 @@ export default function AdminVerificationsPage() {
       });
 
       if (response.ok) {
-        toast.success(`${type} rejected successfully!`);
-        // Refresh the data
+        const result = await response.json();
+        if (result.data?.alreadyProcessed) {
+          toast.info(`${type} was already processed`);
+        } else {
+          toast.success(`${type} rejected successfully!`);
+        }
+        // Always refresh the data to get the latest state
         fetchVerifications();
       } else {
         const error = await response.json();

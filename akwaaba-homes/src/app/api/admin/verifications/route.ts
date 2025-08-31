@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 
     // Transform the data to match what the page expects
     const transformedAgents = (agentVerifications || []).map(agent => ({
-      id: agent.id,
+      id: agent.user_id, // Use user_id instead of internal id
       name: agent.full_name,
       company: agent.company_name,
       phone: agent.phone,
@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
     
     // Check if user is authenticated and is admin
     const { data: { user }, error: authError } = await supabase.auth.getUser();
+    console.log('POST - Auth check result:', { user: user?.id, email: user?.email, error: authError });
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -166,6 +167,29 @@ export async function POST(request: NextRequest) {
       // Handle agent verification
       const newStatus = action === 'approve' ? 'verified' : 'rejected';
       
+      console.log('POST - Updating agent profile:', { verificationId, newStatus, adminId: user.id });
+      
+      // First check if the agent is already in the target status
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('verification_status')
+        .eq('user_id', verificationId)
+        .single();
+        
+      if (checkError) {
+        console.error('Error checking existing profile:', checkError);
+        return NextResponse.json({ error: 'Failed to check profile status' }, { status: 500 });
+      }
+      
+      if (existingProfile.verification_status === newStatus) {
+        console.log('Profile already in target status:', newStatus);
+        return NextResponse.json({ 
+          success: true, 
+          message: `${verificationType} is already ${newStatus}`,
+          data: { alreadyProcessed: true }
+        });
+      }
+      
       const { data, error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -175,8 +199,9 @@ export async function POST(request: NextRequest) {
           admin_review_notes: reason || null
         })
         .eq('user_id', verificationId)
-        .select()
-        .single();
+        .select();
+        
+      console.log('POST - Update result:', { data, error: updateError });
 
       result = data;
       error = updateError;
@@ -192,7 +217,7 @@ export async function POST(request: NextRequest) {
           admin_reviewed_at: new Date().toISOString(),
           admin_review_notes: reason || null
         })
-        .eq('agent_id', verificationId)
+        .eq('id', verificationId)
         .select()
         .single();
 
