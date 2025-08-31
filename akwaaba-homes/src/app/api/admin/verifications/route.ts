@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('user_role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     console.log('Profile check result:', { profile, error: profileError });
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('user_role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (profileError || profile?.user_role !== 'admin') {
