@@ -294,7 +294,7 @@ export default function MobileMoneyPayment({
             <Button
               onClick={handleVerifyPayment}
               disabled={isVerifying || timeLeft === 0}
-              className="flex-1 bg-ghana-green hover:bg-ghana-green-dark text-white"
+              className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg"
             >
               {isVerifying ? (
                 <>
@@ -322,17 +322,17 @@ export default function MobileMoneyPayment({
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
+    <div className="w-full max-w-2xl mx-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold flex items-center">
           <Smartphone className="w-5 h-5 mr-2 text-ghana-green" />
           Mobile Money Payment
-        </CardTitle>
-        <CardDescription>
+        </h2>
+        <p className="text-gray-600 mt-1">
           Upgrade your property to {tier} listing for GHS {amount}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+        </p>
+      </div>
+      <div className="space-y-6">
         {/* Payment Summary */}
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Payment Summary</h3>
@@ -389,20 +389,20 @@ export default function MobileMoneyPayment({
         </div>
 
         {/* Actions */}
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 pt-6 border-t border-gray-200">
           <Button
             onClick={handleInitiatePayment}
             disabled={isLoading || !phoneNumber.trim()}
-            className="flex-1 bg-ghana-green hover:bg-ghana-green-dark text-white"
+            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white h-12 text-lg font-semibold shadow-lg"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Processing...
               </>
             ) : (
               <>
-                <CreditCard className="w-4 h-4 mr-2" />
+                <CreditCard className="w-5 h-5 mr-2" />
                 Pay GHS {amount}
               </>
             )}
@@ -411,11 +411,12 @@ export default function MobileMoneyPayment({
             variant="outline"
             onClick={onCancel}
             disabled={isLoading}
+            className="h-12 px-6"
           >
             Cancel
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

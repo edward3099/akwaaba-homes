@@ -123,9 +123,7 @@ export default function PropertyListingForm() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState({
     paymentProcessingEnabled: false,
-    premiumListingPrice: 50,
-    featuredListingPrice: 30,
-    urgentListingPrice: 20
+    premiumListingPrice: 50
   });
 
   // File input ref
@@ -144,18 +142,16 @@ export default function PropertyListingForm() {
   useEffect(() => {
     const fetchPaymentSettings = async () => {
       try {
-        const response = await fetch('/api/admin/settings', {
+        const response = await fetch('/api/agent/payment-settings', {
           credentials: 'include'
         });
         if (response.ok) {
           const data = await response.json();
-          const settings = data.settings?.platform;
+          const settings = data.paymentSettings;
           if (settings) {
             setPaymentSettings({
               paymentProcessingEnabled: settings.payment_processing_enabled || false,
-              premiumListingPrice: settings.premium_listing_price || 50,
-              featuredListingPrice: settings.featured_listing_price || 30,
-              urgentListingPrice: settings.urgent_listing_price || 20
+              premiumListingPrice: settings.premium_listing_price || 50
             });
           }
         }
@@ -218,7 +214,7 @@ export default function PropertyListingForm() {
       
       // Upload images if any
       if (uploadedImages.length > 0) {
-        await uploadImagesToProperty(createdProperty.id);
+        await handleImageUpload();
       }
       
       // Show success and redirect
@@ -859,9 +855,7 @@ export default function PropertyListingForm() {
               </p>
               <ul className="text-xs text-blue-700 mt-1 list-disc list-inside">
                 <li>Top placement in search results</li>
-                <li>Priority support</li>
                 <li>Enhanced visibility</li>
-                <li>Analytics dashboard</li>
               </ul>
               <p className="text-sm text-blue-800 mt-2">
                 <strong>Cost: GHS {paymentSettings.premiumListingPrice}</strong>
@@ -1532,9 +1526,9 @@ export default function PropertyListingForm() {
       {/* Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[98vh] overflow-y-auto">
             <MobileMoneyPayment
-              propertyId="temp" // Will be updated after payment
+              propertyId={null} // Will be updated after payment completion
               propertyTitle={formData.title}
               tier="premium"
               amount={paymentSettings.premiumListingPrice}

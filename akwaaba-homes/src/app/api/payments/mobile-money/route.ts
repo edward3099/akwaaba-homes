@@ -1,149 +1,179 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
-import { z } from 'zod';
+import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mobile Money payment schema
-const mobileMoneyPaymentSchema = z.object({
-  propertyId: z.string().uuid(),
-  amount: z.number().positive(),
-  currency: z.literal('GHS'),
-  provider: z.enum(['mtn', 'vodafone', 'airteltigo']),
-  phoneNumber: z.string().regex(/^(\+233|0)[0-9]{9}$/, 'Invalid Ghana phone number'),
-  tier: z.enum(['premium', 'featured', 'urgent']),
-});
-
-// Initialize payment
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient();
-    
+    // Create Supabase client with proper server-side authentication
+    const supabase = await createApiRouteSupabaseClient();
+
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+      console.error('Authentication error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    
+    console.log('Authenticated user:', user.id);
 
-    // Parse and validate request body
     const body = await request.json();
-    const validatedData = mobileMoneyPaymentSchema.parse(body);
+    const { propertyId, amount, currency, provider, phoneNumber, tier } = body;
+    
+    console.log('Request body:', { propertyId, amount, currency, provider, phoneNumber, tier });
 
-    // Get admin settings to check if payment processing is enabled
-    const { data: settings } = await supabase
+    // Validate required fields (propertyId can be null for pending payments)
+    if (!amount || !currency || !provider || !phoneNumber || !tier) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Get payment settings from platform_settings
+    const { data: settings, error: settingsError } = await supabase
       .from('platform_settings')
-      .select('payment_processing_enabled, mobile_money_merchant_number')
+      .select('platform')
+      .eq('id', 1)
       .single();
 
-    if (!settings?.payment_processing_enabled) {
-      return NextResponse.json({ 
-        error: 'Payment processing is currently disabled' 
-      }, { status: 400 });
+    if (settingsError) {
+      console.error('Error fetching payment settings:', settingsError);
+      return NextResponse.json({ error: 'Failed to fetch payment settings' }, { status: 500 });
     }
 
-    if (!settings?.mobile_money_merchant_number) {
-      return NextResponse.json({ 
-        error: 'Mobile money merchant number not configured. Please contact admin.' 
-      }, { status: 400 });
+    const merchantNumber = settings.platform?.mobile_money_merchant_number;
+    if (!merchantNumber) {
+      return NextResponse.json({ error: 'Merchant number not configured' }, { status: 500 });
     }
 
-    // Verify property exists and belongs to user
-    const { data: property, error: propertyError } = await supabase
-      .from('properties')
-      .select('id, title, seller_id, is_featured')
-      .eq('id', validatedData.propertyId)
-      .eq('seller_id', user.id)
-      .single();
+    // Generate unique payment reference
+    const paymentId = uuidv4();
+    const reference = `AKW${Date.now().toString().slice(-8)}`;
 
-    if (propertyError || !property) {
-      return NextResponse.json({ 
-        error: 'Property not found or access denied' 
-      }, { status: 404 });
-    }
+    // Create payment instructions based on provider
+    const getPaymentInstructions = (provider: string) => {
+      const instructions = {
+        mtn: {
+          provider: 'MTN Mobile Money',
+          steps: [
+            `Dial *170# on your phone`,
+            `Select "Send Money"`,
+            `Enter merchant number: ${merchantNumber}`,
+            `Enter amount: GHS ${amount}`,
+            `Enter reference: ${reference}`,
+            `Enter your PIN to confirm`
+          ],
+          note: 'Make sure to use the exact reference number provided above.'
+        },
+        vodafone: {
+          provider: 'Vodafone Cash',
+          steps: [
+            `Dial *110# on your phone`,
+            `Select "Transfer Money"`,
+            `Enter merchant number: ${merchantNumber}`,
+            `Enter amount: GHS ${amount}`,
+            `Enter reference: ${reference}`,
+            `Enter your PIN to confirm`
+          ],
+          note: 'Make sure to use the exact reference number provided above.'
+        },
+        airteltigo: {
+          provider: 'AirtelTigo Money',
+          steps: [
+            `Dial *110# on your phone`,
+            `Select "Send Money"`,
+            `Enter merchant number: ${merchantNumber}`,
+            `Enter amount: GHS ${amount}`,
+            `Enter reference: ${reference}`,
+            `Enter your PIN to confirm`
+          ],
+          note: 'Make sure to use the exact reference number provided above.'
+        }
+      };
 
-    // Check if property is already premium (using is_featured as a proxy for premium)
-    if (validatedData.tier === 'premium' && property.is_featured) {
-      return NextResponse.json({ 
-        error: 'Property is already premium' 
-      }, { status: 400 });
-    }
+      return instructions[provider as keyof typeof instructions] || instructions.mtn;
+    };
 
-    // Generate payment reference
-    const paymentRef = `AKW-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const paymentInstructions = getPaymentInstructions(provider);
 
-    // Create payment record
+    // Create payment record in database
+    const paymentData = {
+      id: paymentId,
+      property_id: propertyId || null, // Allow null for pending payments
+      agent_id: user.id,
+      amount: amount,
+      currency: currency,
+      provider: provider,
+      phone_number: phoneNumber,
+      merchant_number: merchantNumber,
+      reference: reference,
+      tier: tier,
+      status: 'pending',
+      payment_method: provider,
+      instructions: paymentInstructions,
+      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutes from now
+    };
+
+    // Insert payment record
+    console.log('About to insert payment data:', paymentData);
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
-      .insert({
-        id: paymentRef,
-        property_id: validatedData.propertyId,
-        agent_id: user.id,
-        amount: validatedData.amount,
-        currency: validatedData.currency,
-        payment_method: 'mobile_money',
-        payment_provider: validatedData.provider,
-        phone_number: validatedData.phoneNumber,
-        tier: validatedData.tier,
-        status: 'pending',
-        merchant_number: settings.mobile_money_merchant_number,
-        created_at: new Date().toISOString(),
-      })
+      .insert([paymentData])
       .select()
       .single();
 
     if (paymentError) {
-      console.error('Payment creation error:', paymentError);
+      console.error('Error creating payment record - Full details:', {
+        error: paymentError,
+        message: paymentError.message,
+        details: paymentError.details,
+        hint: paymentError.hint,
+        code: paymentError.code
+      });
       return NextResponse.json({ 
-        error: 'Failed to create payment record' 
+        error: 'Failed to create payment record',
+        details: paymentError.message,
+        code: paymentError.code
       }, { status: 500 });
     }
 
-    // Return payment instructions
+    console.log('Payment created successfully:', payment);
+
+    // Return payment data to frontend
     return NextResponse.json({
       success: true,
       payment: {
         id: payment.id,
         amount: payment.amount,
         currency: payment.currency,
-        provider: payment.payment_provider,
+        provider: payment.provider,
         phoneNumber: payment.phone_number,
         merchantNumber: payment.merchant_number,
-        reference: payment.id,
-        instructions: generatePaymentInstructions(payment),
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 minutes
+        reference: payment.reference,
+        instructions: payment.instructions,
+        expiresAt: payment.expires_at
       }
     });
 
   } catch (error) {
-    console.error('Mobile money payment error:', error);
-    
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        error: 'Invalid payment data', 
-        details: error.errors 
-      }, { status: 400 });
-    }
-
-    return NextResponse.json({ 
-      error: 'Internal server error' 
-    }, { status: 500 });
+    console.error('Error in mobile money payment API:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// Verify payment status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient();
-    
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const paymentId = searchParams.get('paymentId');
 
     if (!paymentId) {
       return NextResponse.json({ error: 'Payment ID required' }, { status: 400 });
+    }
+
+    // Create Supabase client with proper server-side authentication
+    const supabase = await createApiRouteSupabaseClient();
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get payment record
@@ -155,85 +185,50 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (paymentError || !payment) {
-      return NextResponse.json({ 
-        error: 'Payment not found' 
-      }, { status: 404 });
+      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
     }
 
-    // In a real implementation, you would check with the mobile money provider
-    // For now, we'll simulate the verification process
-    const isVerified = await verifyMobileMoneyPayment(payment);
-
-    if (isVerified && payment.status === 'pending') {
-      // Update payment status
+    // Check if payment has expired
+    const now = new Date();
+    const expiresAt = new Date(payment.expires_at);
+    
+    if (now > expiresAt && payment.status === 'pending') {
+      // Update payment status to expired
       await supabase
         .from('payments')
-        .update({ 
-          status: 'completed',
-          completed_at: new Date().toISOString()
-        })
+        .update({ status: 'expired' })
         .eq('id', paymentId);
-
-      // Update property tier (using is_featured for premium)
-      if (payment.tier === 'premium') {
-        await supabase
-          .from('properties')
-          .update({ 
-            is_featured: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', payment.property_id);
-      }
-
-      return NextResponse.json({
-        success: true,
-        status: 'completed',
-        message: 'Payment verified and property upgraded successfully'
+      
+      return NextResponse.json({ 
+        status: 'expired',
+        message: 'Payment has expired'
       });
     }
 
+    // For now, we'll simulate payment verification
+    // In a real implementation, you would integrate with mobile money APIs
+    // or use webhooks to verify payments
+    
+    // Simulate payment completion (remove this in production)
+    if (payment.status === 'pending') {
+      // In production, this would be triggered by a webhook or manual verification
+      // For demo purposes, we'll keep it as pending
+    }
+
     return NextResponse.json({
-      success: true,
       status: payment.status,
-      message: payment.status === 'pending' ? 'Payment still pending' : 'Payment already processed'
+      payment: {
+        id: payment.id,
+        amount: payment.amount,
+        currency: payment.currency,
+        provider: payment.provider,
+        reference: payment.reference,
+        status: payment.status
+      }
     });
 
   } catch (error) {
-    console.error('Payment verification error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error' 
-    }, { status: 500 });
+    console.error('Error in payment verification API:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
-
-function generatePaymentInstructions(payment: any) {
-  const providerNames = {
-    mtn: 'MTN Mobile Money',
-    vodafone: 'Vodafone Cash',
-    airteltigo: 'AirtelTigo Money'
-  };
-
-  return {
-    provider: providerNames[payment.payment_provider as keyof typeof providerNames],
-    steps: [
-      `Dial *170# on your ${providerNames[payment.payment_provider as keyof typeof providerNames]} registered phone`,
-      'Select "Send Money"',
-      `Enter merchant number: ${payment.merchant_number}`,
-      `Enter amount: GHS ${payment.amount}`,
-      `Enter reference: ${payment.id}`,
-      'Confirm transaction',
-      'Wait for confirmation SMS'
-    ],
-    note: 'Payment will be verified automatically within 15 minutes'
-  };
-}
-
-async function verifyMobileMoneyPayment(payment: any): Promise<boolean> {
-  // In a real implementation, this would:
-  // 1. Call the mobile money provider's API
-  // 2. Check transaction status using the reference number
-  // 3. Verify amount and merchant number
-  
-  // For demo purposes, we'll simulate a 70% success rate
-  return Math.random() > 0.3;
 }
