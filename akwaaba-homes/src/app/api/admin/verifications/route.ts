@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
           admin_reviewed_at: new Date().toISOString(),
           admin_review_notes: reason || null
         })
-        .eq('id', verificationId)
+        .eq('user_id', verificationId)
         .select()
         .single();
 
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
           admin_reviewed_at: new Date().toISOString(),
           admin_review_notes: reason || null
         })
-        .eq('id', verificationId)
+        .eq('user_id', verificationId)
         .select()
         .single();
 
