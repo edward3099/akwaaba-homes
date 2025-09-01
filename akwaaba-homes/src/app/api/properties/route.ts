@@ -41,10 +41,20 @@ export async function GET(request: NextRequest) {
     const addedToSite = searchParams.get('added_to_site');
     const propertyRef = searchParams.get('property_ref');
 
-    // Build query - start with basic properties
+    // Build query - start with basic properties and join with users table for seller info
     let query = supabase
       .from('properties')
-      .select('*')
+      .select(`
+        *,
+        users!properties_seller_id_fkey (
+          id,
+          full_name,
+          phone,
+          email,
+          user_type,
+          is_verified
+        )
+      `)
       .eq('status', status)
       .order('created_at', { ascending: false });
 
@@ -168,14 +178,14 @@ export async function GET(request: NextRequest) {
       },
       seller: {
         id: property.seller_id || 'unknown',
-        name: property.seller_name || 'Unknown Seller',
-        type: 'individual' as const,
-        phone: property.seller_phone || '',
-        email: property.seller_email || undefined,
-        whatsapp: property.seller_whatsapp || undefined,
-        isVerified: property.seller_verified || false,
-        company: property.seller_company || undefined,
-        licenseNumber: property.seller_license || undefined
+        name: property.users?.full_name || 'Unknown Seller',
+        type: (property.users?.user_type as 'individual' | 'agent' | 'developer') || 'individual',
+        phone: property.users?.phone || '',
+        email: property.users?.email || undefined,
+        whatsapp: property.users?.phone || undefined, // Use phone as WhatsApp
+        isVerified: property.users?.is_verified || false,
+        company: undefined, // Not stored in users table
+        licenseNumber: undefined // Not stored in users table
       },
       verification: {
         isVerified: property.verification_status === 'verified',

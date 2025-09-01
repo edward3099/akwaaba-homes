@@ -64,28 +64,34 @@ export default function PropertyCard({
     e.stopPropagation();
     
     // Check if seller has a phone number
-    if (!property.seller.phone) {
+    if (!property.seller.phone || property.seller.phone.trim() === '') {
       // Show a toast that contact information is not available
-      toast.warning('Contact information not available for this property. Please use the inquiry form.');
+      toast.warning('Contact information not available for this property. Please use the inquiry form or contact the agent through the property details page.');
       return;
     }
     
+    // Clean phone number (remove spaces, dashes, etc.)
+    const cleanPhone = property.seller.phone.replace(/[\s\-\(\)]/g, '');
+    
     // Open phone dialer
-    window.open(`tel:${property.seller.phone}`, '_self');
+    window.open(`tel:${cleanPhone}`, '_self');
   };
 
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
     
     // Check if seller has a phone number
-    if (!property.seller.phone) {
+    if (!property.seller.phone || property.seller.phone.trim() === '') {
       // Show a toast that contact information is not available
-      toast.warning('Contact information not available for this property. Please use the inquiry form.');
+      toast.warning('Contact information not available for this property. Please use the inquiry form or contact the agent through the property details page.');
       return;
     }
     
-    const message = `Hi, I'm interested in this property: ${property.title} - ${formatCurrency(property.price, showCurrency)}`;
-    const whatsappUrl = `https://wa.me/${property.seller.phone}?text=${encodeURIComponent(message)}`;
+    // Clean phone number (remove spaces, dashes, etc.)
+    const cleanPhone = property.seller.phone.replace(/[\s\-\(\)]/g, '');
+    
+    const message = `Hi! I'm interested in the property "${property.title}" at ${property.location.address}, ${property.location.city}. I found this listing on AkwaabaHomes. Could you please provide more information?`;
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
