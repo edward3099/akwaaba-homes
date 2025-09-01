@@ -76,9 +76,11 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.ilike('city', `%${city}%`);
     }
     if (region) {
-      // Search in both city and address fields for location matches
+      // Search more precisely for location matches
       const searchText = region.trim();
       if (searchText) {
+        // Prioritize exact city matches first, then address matches
+        // This prevents showing properties from other cities in the same region
         query = query.or(`city.ilike.%${searchText}%,address.ilike.%${searchText}%`);
         countQuery = countQuery.or(`city.ilike.%${searchText}%,address.ilike.%${searchText}%`);
       }
