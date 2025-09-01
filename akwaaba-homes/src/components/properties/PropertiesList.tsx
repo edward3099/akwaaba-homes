@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useProperties } from '@/lib/hooks/useApi';
-import PropertyCard from './PropertyCard';
+import { PropertyCard } from './PropertyCard';
 import { DatabaseProperty } from '@/lib/types/database';
 import { Property } from '@/lib/types/index';
 

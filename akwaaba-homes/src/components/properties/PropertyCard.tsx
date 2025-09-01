@@ -30,7 +30,7 @@ interface PropertyCardProps {
   className?: string;
 }
 
-export default function PropertyCard({ 
+export function PropertyCard({ 
   property, 
   viewMode = 'grid', 
   showCurrency = 'GHS',
