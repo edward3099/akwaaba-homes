@@ -76,56 +76,11 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.ilike('city', `%${city}%`);
     }
     if (region) {
-      // Implement precise location filtering: prioritize exact city matches
-      const searchText = region.trim().toLowerCase();
+      // Search in both city and address fields for location matches
+      const searchText = region.trim();
       if (searchText) {
-        // First, get properties that have the search term in their city field (most precise)
-        const cityQuery = supabase
-          .from('properties')
-          .select('*')
-          .eq('status', 'active')
-          .eq('listing_type', listingType)
-          .ilike('city', `%${searchText}%`)
-          .order('created_at', { ascending: false });
-
-        // Then, get properties that have the search term in their address (specific location)
-        const addressQuery = supabase
-          .from('properties')
-          .select('*')
-          .eq('status', 'active')
-          .eq('listing_type', listingType)
-          .ilike('address', `%${searchText}%`)
-          .not('city', 'ilike', `%${searchText}%`) // Exclude city matches to avoid duplicates
-          .order('created_at', { ascending: false });
-
-        // Execute both queries
-        const [cityResults, addressResults] = await Promise.all([
-          cityQuery,
-          addressQuery
-        ]);
-
-        // Combine results with city matches first, then address matches
-        let allResults = [];
-        if (cityResults.data) allResults.push(...cityResults.data);
-        if (addressResults.data) allResults.push(...addressResults.data);
-
-        // Apply pagination manually
-        const startIndex = (currentPage - 1) * propertiesPerPage;
-        const endIndex = startIndex + propertiesPerPage;
-        const paginatedResults = allResults.slice(startIndex, endIndex);
-
-        // Get total count for pagination
-        const totalCount = allResults.length;
-
-        return NextResponse.json({
-          properties: paginatedResults,
-          pagination: {
-            currentPage,
-            totalPages: Math.ceil(totalCount / propertiesPerPage),
-            totalCount,
-            propertiesPerPage
-          }
-        });
+        query = query.or(`city.ilike.%${searchText}%,address.ilike.%${searchText}%`);
+        countQuery = countQuery.or(`city.ilike.%${searchText}%,address.ilike.%${searchText}%`);
       }
     }
     if (bedrooms) {

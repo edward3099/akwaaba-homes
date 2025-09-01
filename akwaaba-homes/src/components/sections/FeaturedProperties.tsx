@@ -355,6 +355,9 @@ export function FeaturedProperties() {
             apiFilters.addedToSite = (filters as any).addedToSite;
           }
 
+          // Debug: Log API filters before making the call
+          
+          
           // Make the API call
           const response = await fetch('/api/properties?' + new URLSearchParams(apiFilters));
           
@@ -452,18 +455,18 @@ export function FeaturedProperties() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Update URL parameters with new search criteria
+    // Update URL parameters with new search criteria using the correct parameter names for search state
     const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set('cid', selectedPropertyType);
-    newSearchParams.set('tid', selectedType);
+    newSearchParams.set('status', selectedPropertyType); // Use 'status' instead of 'cid'
+    newSearchParams.set('type', selectedType === '0' ? 'all' : selectedType); // Use 'type' instead of 'tid'
     newSearchParams.set('bedrooms', selectedBedrooms);
     newSearchParams.set('minprice', selectedMinPrice);
     newSearchParams.set('maxprice', selectedMaxPrice);
     newSearchParams.set('keywords', searchKeywords);
     if (searchRegion) {
-      newSearchParams.set('region', searchRegion);
+      newSearchParams.set('q', searchRegion); // Use 'q' instead of 'region' for location
     } else {
-      newSearchParams.delete('region');
+      newSearchParams.delete('q');
     }
     newSearchParams.set('page', '1'); // Reset to first page on new search
     router.push(`${window.location.pathname}?${newSearchParams.toString()}`);
@@ -471,31 +474,28 @@ export function FeaturedProperties() {
 
   // Watch for URL parameter changes and update local state
   useEffect(() => {
-    const urlCid = searchParams.get('cid') || 'for-sale';
-    const urlTid = searchParams.get('tid') || '0';
+    const urlStatus = searchParams.get('status') || 'for-sale';
+    const urlType = searchParams.get('type') || '0';
     const urlBedrooms = searchParams.get('bedrooms') || '0';
     const urlMinPrice = searchParams.get('minprice') || '0';
     const urlMaxPrice = searchParams.get('maxprice') || '0';
     const urlKeywords = searchParams.get('keywords') || '';
-    const urlRegion = searchParams.get('region') || '';
+    const urlLocation = searchParams.get('q') || '';
     const urlPage = searchParams.get('page') || '1';
 
     // Only update state if URL parameters have actually changed
     // This prevents unnecessary re-renders and state resets
-    if (urlTid !== selectedType) setSelectedType(urlTid);
+    // Note: selectedPropertyType is derived from filters.status, not a state variable
+    if (urlType !== selectedType) setSelectedType(urlType);
     if (urlBedrooms !== selectedBedrooms) setSelectedBedrooms(urlBedrooms);
     if (urlMinPrice !== selectedMinPrice) setSelectedMinPrice(urlMinPrice);
     if (urlMaxPrice !== selectedMaxPrice) setSelectedMaxPrice(urlMaxPrice);
     if (urlKeywords !== searchKeywords) setSearchKeywords(urlKeywords);
-    if (urlRegion !== searchRegion) setSearchRegion(urlRegion);
-    if (urlRegion !== debouncedSearchRegion) setDebouncedSearchRegion(urlRegion);
+    if (urlLocation !== searchRegion) setSearchRegion(urlLocation);
+    if (urlLocation !== debouncedSearchRegion) setDebouncedSearchRegion(urlLocation);
     
-    // Update filters with location from URL
-    if (urlRegion) {
-      updateFilter('location', urlRegion);
-    } else {
-      updateFilter('location', '');
-    }
+    // Note: We don't need to manually update filters here as the search state hook 
+    // handles URL parameter parsing automatically
     
     // Validate page number and ensure it's within valid range
     const requestedPage = parseInt(urlPage);
@@ -619,6 +619,7 @@ export function FeaturedProperties() {
                   <input
                     type="text"
                     id="searchRegion"
+                    name="region"
                     placeholder="e.g., Accra, Kumasi, East Legon, Cantonments"
                     value={searchRegion}
                     onChange={(e) => handleSearchRegionChange(e.target.value)}

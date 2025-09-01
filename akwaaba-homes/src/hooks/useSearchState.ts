@@ -58,6 +58,23 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     setIsInitialized(true);
   }, [searchParams, isInitialized, persistToLocalStorage, localStorageKey]);
 
+  // Watch for URL parameter changes after initialization
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const urlFilters = parseSearchParams(searchParams);
+    console.log('🔍 DEBUG useSearchState: URL changed, new urlFilters:', urlFilters);
+    
+    // Only update if the URL filters are different from current filters
+    const currentFiltersString = JSON.stringify(filters);
+    const urlFiltersString = JSON.stringify(urlFilters);
+    
+    if (currentFiltersString !== urlFiltersString) {
+      console.log('🔍 DEBUG useSearchState: updating filters from URL change:', urlFilters);
+      setFilters(urlFilters);
+    }
+  }, [searchParams, isInitialized, filters]);
+
   // Parse search params into filters object
   const parseSearchParams = useCallback((params: URLSearchParams): SearchFilters => {
     const filters: SearchFilters = {};
@@ -139,8 +156,8 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     if ((newFilters as any).page) params.set('page', (newFilters as any).page.toString());
     
     // Set default values for required params
-    if (!params.has('cid')) params.set('cid', 'for-sale');
-    if (!params.has('tid')) params.set('tid', '0');
+    if (!params.has('status')) params.set('status', 'for-sale');
+    if (!params.has('type')) params.set('type', '0');
     if (!params.has('minprice')) params.set('minprice', '0');
     if (!params.has('maxprice')) params.set('maxprice', '0');
     if (!params.has('bedrooms')) params.set('bedrooms', '0');
