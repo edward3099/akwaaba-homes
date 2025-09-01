@@ -152,9 +152,9 @@ export default function PropertyCard({
         property.tier === 'premium' ? 'premium-card-glow' : ''
       }`}>
         <CardContent className="p-0">
-          <Link href={createReturnURL()} className="block">
-            <div className="flex flex-col md:flex-row">
-              {/* Image Section */}
+          <div className="flex flex-col md:flex-row">
+            {/* Image Section - Clickable Link */}
+            <Link href={createReturnURL()} className="block">
               <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0 overflow-hidden">
                 {currentImage ? (
                   <Image
@@ -204,6 +204,7 @@ export default function PropertyCard({
                       <button
                         key={index}
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setCurrentImageIndex(index);
                         }}
@@ -245,9 +246,11 @@ export default function PropertyCard({
                   </div>
                 )}
               </div>
+            </Link>
 
-              {/* Content Section */}
-              <div className="flex-1 p-4">
+            {/* Content Section - Clickable Link */}
+            <Link href={createReturnURL()} className="block flex-1">
+              <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
@@ -301,32 +304,33 @@ export default function PropertyCard({
                   {property.description}
                 </p>
 
-                {/* Seller Info & Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Listed by </span>
-                      <span className="font-medium">{property.seller.name}</span>
-                      {property.seller.isVerified && (
-                        <Verified className="inline w-3 h-3 ml-1 text-verified" />
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={handleContact}>
-                      <Phone className="h-4 w-4 mr-1" />
-                      Call
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleWhatsApp}>
-                      <MessageCircle className="h-4 w-4 mr-1" />
-                      WhatsApp
-                    </Button>
+                {/* Seller Info */}
+                <div className="flex items-center space-x-2">
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Listed by </span>
+                    <span className="font-medium">{property.seller.name}</span>
+                    {property.seller.isVerified && (
+                      <Verified className="inline w-3 h-3 ml-1 text-verified" />
+                    )}
                   </div>
                 </div>
               </div>
+            </Link>
+
+            {/* Actions - Outside of Link to prevent navigation conflicts */}
+            <div className="p-4 pt-0">
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" onClick={handleContact}>
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleWhatsApp}>
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  WhatsApp
+                </Button>
+              </div>
             </div>
-          </Link>
+          </div>
         </CardContent>
       </Card>
     );
@@ -334,12 +338,12 @@ export default function PropertyCard({
 
   // Grid View
   return (
-    <Link href={createReturnURL()}>
-      <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden h-full flex flex-col cursor-pointer ${className} ${
-        property.tier === 'premium' ? 'premium-card-glow' : ''
-      }`}>
-        <CardContent className="p-0 flex flex-col h-full">
-          {/* Image Section */}
+    <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 group overflow-hidden h-full flex flex-col cursor-pointer ${className} ${
+      property.tier === 'premium' ? 'premium-card-glow' : ''
+    }`}>
+      <CardContent className="p-0 flex flex-col h-full">
+        {/* Image Section - Clickable Link */}
+        <Link href={createReturnURL()} className="block">
           <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden flex-shrink-0">
             {currentImage ? (
               <Image
@@ -425,9 +429,11 @@ export default function PropertyCard({
               </div>
             )}
           </div>
+        </Link>
 
-          {/* Content Section */}
-          <div className="p-2 sm:p-3 md:p-4 flex flex-col flex-1">
+        {/* Content Section - Clickable Link */}
+        <Link href={createReturnURL()} className="block flex-1">
+          <div className="p-2 sm:p-3 md:p-4 flex flex-col h-full">
             {/* Price */}
             <div className="mb-1 sm:mb-2">
               <div className="text-lg sm:text-xl font-bold text-primary">
@@ -493,22 +499,8 @@ export default function PropertyCard({
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex space-x-1 sm:space-x-2 mt-auto">
-              <Button variant="outline" size="sm" onClick={handleContact} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
-                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden sm:inline">Call</span>
-                <span className="sm:hidden">Call</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleWhatsApp} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
-                <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span className="hidden sm:inline">WhatsApp</span>
-                <span className="sm:hidden">WA</span>
-              </Button>
-            </div>
-
             {/* Seller Info */}
-            <div className="pt-2 border-t text-xs sm:text-sm text-muted-foreground">
+            <div className="pt-2 border-t text-xs sm:text-sm text-muted-foreground mt-auto">
               <div className="flex items-center gap-1">
                 <span className="flex-shrink-0">Listed by</span>
                 <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
@@ -520,8 +512,24 @@ export default function PropertyCard({
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </Link>
+
+        {/* Actions - Outside of Link to prevent navigation conflicts */}
+        <div className="p-2 sm:p-3 md:p-4 pt-0">
+          <div className="flex space-x-1 sm:space-x-2">
+            <Button variant="outline" size="sm" onClick={handleContact} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
+              <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Call</span>
+              <span className="sm:hidden">Call</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleWhatsApp} className="flex-1 text-xs sm:text-sm h-7 sm:h-8">
+              <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">WhatsApp</span>
+              <span className="sm:hidden">WA</span>
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
