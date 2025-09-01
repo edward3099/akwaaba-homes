@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import PropertyCard from '@/components/properties/PropertyCard';
+import { PropertyCard } from '@/components/properties/PropertyCard';
 import { MapPin, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -124,11 +124,6 @@ export function FeaturedProperties() {
   const [addedToSite, setAddedToSite] = useState<string>('0'); // 0 = Anytime, 1 = Last 24h, 2 = Last 3d, etc.
   const [expandedKeywords, setExpandedKeywords] = useState<string>('');
   
-  // Debounced search state to prevent API calls on every keystroke
-  const [debouncedSearchKeywords, setDebouncedSearchKeywords] = useState<string>('');
-  const [debouncedExpandedKeywords, setDebouncedExpandedKeywords] = useState<string>('');
-  const [debouncedSearchRegion, setDebouncedSearchRegion] = useState<string>('');
-  
   // Sync local state with search state hook when it's initialized
   useEffect(() => {
     if (isInitialized && filters) {
@@ -158,11 +153,11 @@ export function FeaturedProperties() {
       }
       if (filters.location) {
         setSearchRegion(filters.location);
-        setDebouncedSearchRegion(filters.location);
+        
       }
       if ((filters as any).keywords) {
         setSearchKeywords((filters as any).keywords);
-        setDebouncedSearchKeywords((filters as any).keywords);
+        
       }
       if ((filters as any).addedToSite) {
         setAddedToSite((filters as any).addedToSite);
@@ -232,30 +227,7 @@ export function FeaturedProperties() {
     // Don't reset page immediately - let debouncing handle it
   };
   
-  // Debounced search effect - only triggers API calls after user stops typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchKeywords(searchKeywords);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [searchKeywords]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedExpandedKeywords(expandedKeywords);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [expandedKeywords]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchRegion(searchRegion);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [searchRegion]);
+  
 
   // Update search state when addedToSite changes
   useEffect(() => {
@@ -265,20 +237,8 @@ export function FeaturedProperties() {
     }
   }, [addedToSite, updateFilter]);
 
-  // Separate effect to trigger search only after debounced values change
+    // Always fetch on initial load, or when filters change
   useEffect(() => {
-    // Only trigger search when debounced values change
-    // This prevents immediate API calls when user is still typing
-    if (debouncedSearchKeywords !== '' || 
-        debouncedSearchRegion !== '' || 
-        debouncedExpandedKeywords !== '') {
-      setCurrentPage(1);
-    }
-  }, [debouncedSearchKeywords, debouncedSearchRegion, debouncedExpandedKeywords]);
-
-  // Main effect to fetch properties when filters change
-  useEffect(() => {
-    // Always fetch on initial load, or when filters/debounced values change
     if (isInitialized) {
       
       let ignore = false;
@@ -409,7 +369,7 @@ export function FeaturedProperties() {
         ignore = true;
       };
     }
-  }, [isInitialized, filters, currentPage, debouncedSearchKeywords, debouncedSearchRegion, debouncedExpandedKeywords]);
+  }, [isInitialized, filters, currentPage]);
 
   // Transform database properties to frontend format with better safety
   const transformedProperties = useMemo(() => {
@@ -492,7 +452,7 @@ export function FeaturedProperties() {
     if (urlMaxPrice !== selectedMaxPrice) setSelectedMaxPrice(urlMaxPrice);
     if (urlKeywords !== searchKeywords) setSearchKeywords(urlKeywords);
     if (urlLocation !== searchRegion) setSearchRegion(urlLocation);
-    if (urlLocation !== debouncedSearchRegion) setDebouncedSearchRegion(urlLocation);
+    
     
     // Note: We don't need to manually update filters here as the search state hook 
     // handles URL parameter parsing automatically
