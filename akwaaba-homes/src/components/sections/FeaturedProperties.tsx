@@ -933,12 +933,7 @@ export function FeaturedProperties() {
         )}
 
 
-        {/* Bottom Pagination Text */}
-        {currentPageProperties && currentPageProperties.length > 0 && totalPages > 0 && (
-          <div className="text-center mb-6">
-            <p className="text-gray-600">Page {currentPage} of {totalPages} • Showing {((currentPage - 1) * propertiesPerPage) + 1}-{Math.min(currentPage * propertiesPerPage, totalProperties)} of {totalProperties} verified properties</p>
-          </div>
-        )}
+
 
       </div>
     </section>
