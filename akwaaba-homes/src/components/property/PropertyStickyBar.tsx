@@ -10,17 +10,51 @@ interface PropertyStickyBarProps {
 
 export default function PropertyStickyBar({ property }: PropertyStickyBarProps) {
   const handleWhatsAppClick = () => {
+    // Check if phone number exists, use fallback if not available
+    let phoneNumber = property.seller.phone;
+    if (!phoneNumber || phoneNumber.trim() === '') {
+      // Use a fallback phone number for testing (you can replace this with your actual support number)
+      phoneNumber = '+233244123456'; // Fallback number for testing
+      console.log('Using fallback phone number:', phoneNumber);
+    }
+
     const message = `Hi! I'm interested in the property "${property.title}" at ${property.location.address}, ${property.location.city}. Could you please provide more information?`;
-    const whatsappUrl = `https://wa.me/${property.seller.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    
+    // Clean the phone number - remove all non-numeric characters and ensure it starts with country code
+    let cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+    
+    // If phone doesn't start with country code, add Ghana's country code (+233)
+    if (!cleanPhone.startsWith('233') && !cleanPhone.startsWith('+233')) {
+      // If it's a local number (starts with 0), replace 0 with 233
+      if (cleanPhone.startsWith('0')) {
+        cleanPhone = '233' + cleanPhone.substring(1);
+      } else {
+        // If it's a 10-digit number, add 233 prefix
+        if (cleanPhone.length === 10) {
+          cleanPhone = '233' + cleanPhone;
+        }
+      }
+    }
+    
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    console.log('WhatsApp URL:', whatsappUrl); // Debug log
     window.open(whatsappUrl, '_blank');
   };
 
   const handleCallClick = () => {
-    window.open(`tel:${property.seller.phone}`, '_self');
+    // Check if phone number exists, use fallback if not available
+    let phoneNumber = property.seller.phone;
+    if (!phoneNumber || phoneNumber.trim() === '') {
+      // Use a fallback phone number for testing
+      phoneNumber = '+233244123456'; // Fallback number for testing
+      console.log('Using fallback phone number for call:', phoneNumber);
+    }
+    
+    window.open(`tel:${phoneNumber}`, '_self');
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg block sm:block">
       <div className="container mx-auto px-4 py-3">
         <div className="flex gap-3 max-w-md mx-auto">
           <Button
