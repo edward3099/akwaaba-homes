@@ -472,7 +472,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
             description: property.description,
             price: property.price,
             currency: 'GHS' as const,
-            status: property.status,
+            status: property.status as "sold" | "for-sale" | "for-rent" | "short-let" | "rented",
             type: property.property_type,
             location: {
               address: property.address,
