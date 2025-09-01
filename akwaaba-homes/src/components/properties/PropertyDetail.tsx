@@ -420,12 +420,11 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
 
                 <div className="space-y-2">
                   <Button className="w-full" onClick={() => {
-                    // Check if phone number exists, use fallback if not available
-                    let phoneNumber = property.users?.phone;
+                    // Check if phone number exists
+                    const phoneNumber = property.users?.phone;
                     if (!phoneNumber || phoneNumber.trim() === '') {
-                      // Use a fallback phone number for testing
-                      phoneNumber = '+233244123456'; // Fallback number for testing
-                      console.log('Using fallback phone number for call:', phoneNumber);
+                      alert('Phone number not available for this property. Please contact the agent through other means.');
+                      return;
                     }
                     window.open(`tel:${phoneNumber}`, '_self');
                   }}>
@@ -433,15 +432,14 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                     Call Now
                   </Button>
                   <Button variant="outline" className="w-full" onClick={() => {
-                    // Check if phone number exists, use fallback if not available
-                    let phoneNumber = property.users?.phone;
+                    // Check if phone number exists
+                    const phoneNumber = property.users?.phone;
                     if (!phoneNumber || phoneNumber.trim() === '') {
-                      // Use a fallback phone number for testing
-                      phoneNumber = '+233244123456'; // Fallback number for testing
-                      console.log('Using fallback phone number:', phoneNumber);
+                      alert('Phone number not available for this property. Please contact the agent through other means.');
+                      return;
                     }
 
-                    const message = `Hi, I'm interested in this property: ${property.title}`;
+                    const message = `Hi, I'm interested in this property: ${property.title}. I found this listing on AkwaabaHomes. Could you please provide more information?`;
                     
                     // Clean the phone number - remove all non-numeric characters and ensure it starts with country code
                     let cleanPhone = phoneNumber.replace(/[^0-9]/g, '');

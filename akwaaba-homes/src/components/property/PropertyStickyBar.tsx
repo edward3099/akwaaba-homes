@@ -10,15 +10,14 @@ interface PropertyStickyBarProps {
 
 export default function PropertyStickyBar({ property }: PropertyStickyBarProps) {
   const handleWhatsAppClick = () => {
-    // Check if phone number exists, use fallback if not available
-    let phoneNumber = property.seller.phone;
+    // Check if phone number exists
+    const phoneNumber = property.seller.phone;
     if (!phoneNumber || phoneNumber.trim() === '') {
-      // Use a fallback phone number for testing (you can replace this with your actual support number)
-      phoneNumber = '+233244123456'; // Fallback number for testing
-      console.log('Using fallback phone number:', phoneNumber);
+      alert('Phone number not available for this property. Please contact the agent through other means.');
+      return;
     }
 
-    const message = `Hi! I'm interested in the property "${property.title}" at ${property.location.address}, ${property.location.city}. Could you please provide more information?`;
+    const message = `Hi! I'm interested in the property "${property.title}" at ${property.location.address}, ${property.location.city}. I found this listing on AkwaabaHomes. Could you please provide more information?`;
     
     // Clean the phone number - remove all non-numeric characters and ensure it starts with country code
     let cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
@@ -42,12 +41,11 @@ export default function PropertyStickyBar({ property }: PropertyStickyBarProps) 
   };
 
   const handleCallClick = () => {
-    // Check if phone number exists, use fallback if not available
-    let phoneNumber = property.seller.phone;
+    // Check if phone number exists
+    const phoneNumber = property.seller.phone;
     if (!phoneNumber || phoneNumber.trim() === '') {
-      // Use a fallback phone number for testing
-      phoneNumber = '+233244123456'; // Fallback number for testing
-      console.log('Using fallback phone number for call:', phoneNumber);
+      alert('Phone number not available for this property. Please contact the agent through other means.');
+      return;
     }
     
     window.open(`tel:${phoneNumber}`, '_self');
