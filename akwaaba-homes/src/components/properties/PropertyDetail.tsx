@@ -496,7 +496,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
             seller: {
               id: property.users?.id || '',
               name: property.users?.full_name || 'Agent',
-              type: property.users?.user_type || 'agent',
+              type: (property.users?.user_type || 'agent') as "agent" | "individual" | "developer",
               phone: property.users?.phone || '',
               email: property.users?.email || '',
               isVerified: property.users?.is_verified || false
