@@ -32,6 +32,7 @@ import { CurrencyCode } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
 import { useLoadingState } from '@/lib/utils/loadingStates';
 import { propertiesApi } from '@/lib/api/client';
+import PropertyStickyBar from '@/components/property/PropertyStickyBar';
 
 interface Property {
   id: string;
@@ -166,7 +167,7 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-4 sm:py-6 pb-20 xl:pb-6">
+      <div className="container mx-auto px-4 py-4 sm:py-6 pb-24">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content Column */}
           <div className="xl:col-span-2 space-y-4 sm:space-y-6">
@@ -461,6 +462,63 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
           </div>
         </div>
       </div>
+
+      {/* Sticky Bottom Bar */}
+      {property && (
+        <PropertyStickyBar 
+          property={{
+            id: property.id,
+            title: property.title,
+            description: property.description,
+            price: property.price,
+            currency: 'GHS' as const,
+            status: property.status,
+            type: property.property_type,
+            location: {
+              address: property.address,
+              city: property.city,
+              region: property.region,
+              country: 'Ghana',
+              coordinates: {
+                lat: 0,
+                lng: 0
+              }
+            },
+            specifications: {
+              bedrooms: property.bedrooms || 0,
+              bathrooms: property.bathrooms || 0,
+              size: property.square_feet || 0,
+              sizeUnit: 'sqft' as const
+            },
+            images: images,
+            features: property.features || [],
+            amenities: property.amenities || [],
+            seller: {
+              id: property.users?.id || '',
+              name: property.users?.full_name || 'Agent',
+              type: property.users?.user_type || 'agent',
+              phone: property.users?.phone || '',
+              email: property.users?.email || '',
+              isVerified: property.users?.is_verified || false
+            },
+            verification: {
+              isVerified: property.users?.is_verified || false,
+              documentsUploaded: false,
+              verificationDate: property.created_at
+            },
+            createdAt: property.created_at,
+            updatedAt: property.created_at,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            tier: 'normal' as const,
+            diasporaFeatures: {
+              multiCurrencyDisplay: true,
+              inspectionScheduling: true,
+              virtualTourAvailable: false,
+              familyRepresentativeContact: property.users?.phone || ''
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
