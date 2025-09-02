@@ -84,24 +84,37 @@ export default function SignupPage() {
     setSuccess('');
 
     try {
-      const metadata = {
-        full_name: formData.fullName,
-        user_type: 'agent',
-        phone: formData.phone,
-        company: formData.company,
-        verification_status: 'pending'
-      };
+      // Use custom signup API that bypasses Supabase email confirmation
+      const response = await fetch('/api/auth/custom-signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          company: formData.company,
+          phone: formData.phone,
+          userType: 'agent'
+        }),
+      });
 
-      const result = await signUp(formData.email, formData.password, metadata);
-      console.log('SignUp result in component:', result);
-      
+      const result = await response.json();
+
       if (result.success) {
-        setSuccess('Account created successfully! Please sign in to continue.'); // Force redeploy
+        setSuccess('Account created successfully! Please check your email to verify your account.');
+        
+        // Show confirmation URL for testing (in production, this would be sent via email)
+        if (result.confirmationUrl) {
+          console.log('Confirmation URL:', result.confirmationUrl);
+          setSuccess(`Account created successfully! Confirmation URL: ${result.confirmationUrl}`);
+        }
         
         // Redirect to sign in page after showing success message
         setTimeout(() => {
           router.push('/login');
-        }, 2000); // Wait 2 seconds to show success message
+        }, 3000); // Wait 3 seconds to show success message
       } else {
         setError(result.error || 'Signup failed');
       }

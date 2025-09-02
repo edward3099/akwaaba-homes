@@ -4,11 +4,11 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { token_hash, email } = await request.json();
 
-    if (!email) {
+    if (!token_hash || !email) {
       return NextResponse.json(
-        { error: 'Email is required' },
+        { error: 'Token hash and email are required' },
         { status: 400 }
       );
     }
@@ -30,57 +30,38 @@ export async function POST(request: NextRequest) {
             } catch {
               // The `setAll` method was called from a Server Component.
               // This can be ignored if you have middleware refreshing
+              // user sessions.
             }
           },
         },
       }
     );
 
-    // For development/testing purposes, we'll manually verify the user
-    // In production, this would be handled by Supabase's email verification flow
-    
-    // Get the user by email
-    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
-    
-    if (userError) {
-      console.error('Error fetching users:', userError);
+    // Verify the email using the token hash
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash,
+      type: 'email'
+    });
+
+    if (error) {
+      console.error('Email verification error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch users' },
-        { status: 500 }
+        { error: 'Email verification failed' },
+        { status: 400 }
       );
     }
 
-    const user = users.find((u: any) => u.email === email);
-    
-    if (!user) {
+    if (!data.user) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    // Manually verify the user's email
-    const { data: updatedUser, error: updateError } = await supabase.auth.admin.updateUserById(
-      user.id,
-      { email_confirm: true }
-    );
-
-    if (updateError) {
-      console.error('Error verifying user:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to verify user' },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json({
       success: true,
       message: 'Email verified successfully',
-      user: {
-        id: updatedUser.user.id,
-        email: updatedUser.user.email,
-        email_verified: updatedUser.user.email_confirmed_at
-      }
+      user: data.user
     });
 
   } catch (error) {
@@ -90,12 +71,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Handle unsupported methods
-export async function GET() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
 }
