@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Manually send confirmation email with correct URL
-    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaaba-homes-fawcwt8af-eds-projects-934496ce.vercel.app'}/auth/confirm?token_hash=${data.user.id}&type=email`;
+    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaabahomes.com'}/auth/confirm?token_hash=${data.user.id}&type=email`;
     
     // For now, we'll return the confirmation URL in the response
     // In production, you would send this via email service

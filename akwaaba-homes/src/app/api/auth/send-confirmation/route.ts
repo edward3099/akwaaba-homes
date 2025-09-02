@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       type: 'signup',
       email: email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaaba-homes-qyrauhkpo-eds-projects-934496ce.vercel.app'}/auth/confirm`
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaabahomes.com'}/auth/confirm`
       }
     });
 
