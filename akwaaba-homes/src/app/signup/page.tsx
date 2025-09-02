@@ -96,16 +96,13 @@ export default function SignupPage() {
       console.log('SignUp result in component:', result);
       
       if (result.success) {
-        setSuccess('Account created successfully! Please verify your email to continue.');
+        setSuccess('Account created successfully! Please sign in to continue.');
         
-        // Redirect to email verification page after showing success message
-        console.log('Setting timeout to redirect to verify-email');
+        // Redirect to sign in page after showing success message
         setTimeout(() => {
-          console.log('Executing redirect to verify-email');
-          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+          router.push('/login');
         }, 2000); // Wait 2 seconds to show success message
       } else {
-        console.error('Signup failed in component:', result.error);
         setError(result.error || 'Signup failed');
       }
     } catch (err) {
