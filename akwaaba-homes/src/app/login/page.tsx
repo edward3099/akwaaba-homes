@@ -186,6 +186,15 @@ function LoginForm() {
               Forgot your password?
             </Link>
             
+            <div>
+              <Link
+                href="/resend-confirmation"
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Need to resend confirmation email?
+              </Link>
+            </div>
+            
             <div className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link
