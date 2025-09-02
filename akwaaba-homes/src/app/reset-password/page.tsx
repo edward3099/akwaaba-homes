@@ -47,8 +47,10 @@ function ResetPasswordForm() {
           
           if (!response.ok) {
             setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+          } else {
+            // Code exchange successful, clear any auth errors so the form can be shown
+            setAuthError(null);
           }
-          // If successful, the session will be established and we can proceed
         } catch (error) {
           setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
         }
@@ -62,6 +64,9 @@ function ResetPasswordForm() {
           const response = await fetch('/api/auth/me');
           if (!response.ok) {
             setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+          } else {
+            // User is authenticated, clear any auth errors
+            setAuthError(null);
           }
         } catch (error) {
           setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
