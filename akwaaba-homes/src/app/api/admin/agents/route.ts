@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('user_role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (profileError || !profile || profile.user_role !== 'admin') {
@@ -118,7 +118,7 @@ export async function DELETE(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('user_role')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (profileError || !profile || profile.user_role !== 'admin') {
