@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+// Removed missing imports - using available components instead
 import { Eye, Trash2, User, Mail, Phone, Calendar, Shield, Building, Award, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -142,184 +141,150 @@ export default function AgentManagement() {
               <p className="text-gray-600">No agents have registered on the platform yet.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Joined</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {agents.map((agent) => (
-                    <TableRow key={agent.id}>
-                      <TableCell className="font-medium">
-                        {agent.first_name} {agent.last_name}
-                      </TableCell>
-                      <TableCell>
+            <div className="grid gap-4">
+              {agents.map((agent) => (
+                <Card key={agent.id} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4 mb-2">
+                        <h3 className="font-semibold text-lg">{agent.first_name} {agent.last_name}</h3>
+                        {getVerificationBadge(agent.verification_status)}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-gray-400" />
+                          <Mail className="h-4 w-4" />
                           {agent.email}
                           {agent.email_verified && (
-                            <Shield className="h-4 w-4 text-green-500" title="Email verified" />
+                            <Shield className="h-4 w-4 text-green-500" />
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell>
                         <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-gray-400" />
+                          <Phone className="h-4 w-4" />
                           {agent.phone || 'Not provided'}
                         </div>
-                      </TableCell>
-                      <TableCell>
                         <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4 text-gray-400" />
+                          <Building className="h-4 w-4" />
                           {agent.company_name || 'Not provided'}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {getVerificationBadge(agent.verification_status)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          {formatDate(agent.created_at)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedAgent(agent)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle>Agent Details</DialogTitle>
-                                <DialogDescription>
-                                  Complete information for {agent.first_name} {agent.last_name}
-                                </DialogDescription>
-                              </DialogHeader>
-                              {selectedAgent && (
-                                <div className="space-y-6">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Full Name</label>
-                                      <p className="text-sm text-gray-900">{selectedAgent.first_name} {selectedAgent.last_name}</p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Email</label>
-                                      <p className="text-sm text-gray-900 flex items-center gap-2">
-                                        {selectedAgent.email}
-                                        {selectedAgent.email_verified && (
-                                          <Shield className="h-4 w-4 text-green-500" title="Email verified" />
-                                        )}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Phone</label>
-                                      <p className="text-sm text-gray-900">{selectedAgent.phone || 'Not provided'}</p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Company</label>
-                                      <p className="text-sm text-gray-900">{selectedAgent.company_name || 'Not provided'}</p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Business Type</label>
-                                      <p className="text-sm text-gray-900">{selectedAgent.business_type || 'Not provided'}</p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Experience</label>
-                                      <p className="text-sm text-gray-900 flex items-center gap-2">
-                                        <Award className="h-4 w-4 text-gray-400" />
-                                        {selectedAgent.experience_years ? `${selectedAgent.experience_years} years` : 'Not provided'}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">License Number</label>
-                                      <p className="text-sm text-gray-900 flex items-center gap-2">
-                                        <FileText className="h-4 w-4 text-gray-400" />
-                                        {selectedAgent.license_number || 'Not provided'}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Verification Status</label>
-                                      <div className="mt-1">
-                                        {getVerificationBadge(selectedAgent.verification_status)}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  
-                                  {selectedAgent.bio && (
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Bio</label>
-                                      <p className="text-sm text-gray-900 mt-1 p-3 bg-gray-50 rounded-md">
-                                        {selectedAgent.bio}
-                                      </p>
-                                    </div>
-                                  )}
-                                  
-                                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Joined</label>
-                                      <p className="text-sm text-gray-900">{formatDate(selectedAgent.created_at)}</p>
-                                    </div>
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Last Updated</label>
-                                      <p className="text-sm text-gray-900">{formatDate(selectedAgent.updated_at)}</p>
-                                    </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        Joined {formatDate(agent.created_at)}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedAgent(agent)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Agent Details</DialogTitle>
+                            <DialogDescription>
+                              Complete information for {agent.first_name} {agent.last_name}
+                            </DialogDescription>
+                          </DialogHeader>
+                          {selectedAgent && (
+                            <div className="space-y-6">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Full Name</label>
+                                  <p className="text-sm text-gray-900">{selectedAgent.first_name} {selectedAgent.last_name}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Email</label>
+                                  <p className="text-sm text-gray-900 flex items-center gap-2">
+                                    {selectedAgent.email}
+                                    {selectedAgent.email_verified && (
+                                      <Shield className="h-4 w-4 text-green-500" />
+                                    )}
+                                  </p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Phone</label>
+                                  <p className="text-sm text-gray-900">{selectedAgent.phone || 'Not provided'}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Company</label>
+                                  <p className="text-sm text-gray-900">{selectedAgent.company_name || 'Not provided'}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Business Type</label>
+                                  <p className="text-sm text-gray-900">{selectedAgent.business_type || 'Not provided'}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Experience</label>
+                                  <p className="text-sm text-gray-900 flex items-center gap-2">
+                                    <Award className="h-4 w-4 text-gray-400" />
+                                    {selectedAgent.experience_years ? `${selectedAgent.experience_years} years` : 'Not provided'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">License Number</label>
+                                  <p className="text-sm text-gray-900 flex items-center gap-2">
+                                    <FileText className="h-4 w-4 text-gray-400" />
+                                    {selectedAgent.license_number || 'Not provided'}
+                                  </p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Verification Status</label>
+                                  <div className="mt-1">
+                                    {getVerificationBadge(selectedAgent.verification_status)}
                                   </div>
                                 </div>
+                              </div>
+                              
+                              {selectedAgent.bio && (
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Bio</label>
+                                  <p className="text-sm text-gray-900 mt-1 p-3 bg-gray-50 rounded-md">
+                                    {selectedAgent.bio}
+                                  </p>
+                                </div>
                               )}
-                            </DialogContent>
-                          </Dialog>
+                              
+                              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Joined</label>
+                                  <p className="text-sm text-gray-900">{formatDate(selectedAgent.created_at)}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">Last Updated</label>
+                                  <p className="text-sm text-gray-900">{formatDate(selectedAgent.updated_at)}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
 
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Agent</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete {agent.first_name} {agent.last_name}? 
-                                  This action cannot be undone and will permanently remove the agent from the platform.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteAgent(agent.id, `${agent.first_name} ${agent.last_name}`)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                  disabled={deleteLoading === agent.id}
-                                >
-                                  {deleteLoading === agent.id ? 'Deleting...' : 'Delete'}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete ${agent.first_name} ${agent.last_name}? This action cannot be undone.`)) {
+                            handleDeleteAgent(agent.id, `${agent.first_name} ${agent.last_name}`);
+                          }
+                        }}
+                        disabled={deleteLoading === agent.id}
+                      >
+                        {deleteLoading === agent.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           )}
         </CardContent>
