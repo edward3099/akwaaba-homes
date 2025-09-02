@@ -151,7 +151,8 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
         const isAgent = userProfile?.user_type === 'agent' || user.user_metadata?.user_type === 'agent';
         const isAdmin = userProfile?.user_type === 'admin' || user.user_metadata?.user_type === 'admin';
 
-        setAuthState({
+        setAuthState(prev => ({
+          ...prev,
           user: user,
           session,
           loading: false,
@@ -163,9 +164,10 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
           jwtClaims,
           jwtValidation,
           userProfile: userProfile
-        });
+        }));
       } else {
-        setAuthState({
+        setAuthState(prev => ({
+          ...prev,
           user: null,
           session: null,
           loading: false,
@@ -177,7 +179,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
           jwtClaims: null,
           jwtValidation: { isValid: false, errors: [], warnings: [] },
           userProfile: null
-        });
+        }));
       }
     } catch (error) {
       console.error('Error updating auth state:', error);
@@ -187,7 +189,12 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
 
   // Initialize auth state
   useEffect(() => {
+    let isInitialized = false;
+    
     const initializeAuth = async () => {
+      if (isInitialized) return;
+      isInitialized = true;
+      
       try {
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
