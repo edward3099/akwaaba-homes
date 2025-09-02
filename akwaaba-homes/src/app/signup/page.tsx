@@ -96,7 +96,7 @@ export default function SignupPage() {
       console.log('SignUp result in component:', result);
       
       if (result.success) {
-        setSuccess('Account created successfully! Please sign in to continue.');
+        setSuccess('Account created successfully! Please sign in to continue.'); // Force redeploy
         
         // Redirect to sign in page after showing success message
         setTimeout(() => {
