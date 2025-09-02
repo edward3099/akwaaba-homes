@@ -37,8 +37,13 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    // Get the site URL from environment or construct it from the request
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                   'https://akwaabahomes.com';
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      redirectTo: `${siteUrl}/auth/callback`
     });
 
     if (error) {
