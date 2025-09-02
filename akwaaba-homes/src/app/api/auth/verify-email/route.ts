@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = users.find(u => u.email === email);
+    const user = users.find((u: any) => u.email === email);
     
     if (!user) {
       return NextResponse.json(
