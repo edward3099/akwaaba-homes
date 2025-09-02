@@ -27,10 +27,16 @@ function LoginForm() {
   useEffect(() => {
     const message = searchParams.get('message');
     const email = searchParams.get('email');
+    const verified = searchParams.get('verified');
+    const error = searchParams.get('error');
     
     if (message === 'profile-setup-complete' && email) {
       setSuccess(`Profile setup completed! Please check your email (${email}) to verify your account, then you can sign in.`);
       setEmail(email);
+    } else if (verified === 'true') {
+      setSuccess('Email verified successfully! You can now sign in to your account.');
+    } else if (error === 'verification_failed') {
+      setError('Email verification failed. Please try again or contact support.');
     }
   }, [searchParams]);
 

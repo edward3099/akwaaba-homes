@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
           phone: phone || null,
           company: company || null
         },
-        // Disable email confirmation for development/testing
-        emailRedirectTo: undefined
+        // Use production URL for email confirmation
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaaba-homes-dd29cl1bc-eds-projects-934496ce.vercel.app'}/login`
       }
     });
 
