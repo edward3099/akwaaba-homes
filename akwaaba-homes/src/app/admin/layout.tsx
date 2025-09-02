@@ -49,7 +49,7 @@ export default async function AdminLayout({
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('user_role, verification_status')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .single();
 
   if (profileError || !profile) {
@@ -61,8 +61,8 @@ export default async function AdminLayout({
     redirect('/unauthorized');
   }
 
-  // Check if user is verified
-  if (profile.verification_status !== 'verified') {
+  // Check if user is verified (be more lenient for admin users)
+  if (profile.verification_status !== 'verified' && profile.user_role !== 'admin') {
     redirect('/unauthorized?reason=unverified');
   }
 

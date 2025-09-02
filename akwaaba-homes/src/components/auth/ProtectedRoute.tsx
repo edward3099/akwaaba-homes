@@ -20,7 +20,7 @@ export default function ProtectedRoute({
   redirectTo = '/auth',
   requireAuth = true 
 }: ProtectedRouteProps) {
-  const { user, loading, isAuthenticated, isAgent, isAdmin } = useAuth();
+  const { user, userProfile, loading, isAuthenticated, isAgent, isAdmin } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -45,8 +45,11 @@ export default function ProtectedRoute({
         hasRequiredRole = true;
       } else if (allowedRoles.includes('admin') && isAdmin) {
         hasRequiredRole = true;
-      } else if (allowedRoles.includes('seller') && user?.user_metadata?.user_type === 'seller') {
-        hasRequiredRole = true;
+      } else if (allowedRoles.includes('seller')) {
+        const userRole = userProfile?.user_type || user?.user_metadata?.user_type;
+        if (userRole === 'seller') {
+          hasRequiredRole = true;
+        }
       }
       
       if (!hasRequiredRole) {
@@ -58,7 +61,7 @@ export default function ProtectedRoute({
 
     // Clear any previous errors
     setError(null);
-  }, [user, loading, isAuthenticated, isAgent, isAdmin, allowedRoles, requireAuth, redirectTo, router]);
+  }, [user, userProfile, loading, isAuthenticated, isAgent, isAdmin, allowedRoles, requireAuth, redirectTo, router]);
 
   // Show loading state
   if (loading) {

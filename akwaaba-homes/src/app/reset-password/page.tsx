@@ -29,15 +29,23 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
-  // Check if we have the necessary tokens from the URL
+  // Check if user is authenticated (session should be established by callback)
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    // The session should be established by the auth callback route
+    // We'll check authentication status when the component mounts
+    const checkAuthStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (!response.ok) {
+          setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+        }
+      } catch (error) {
+        setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+      }
+    };
     
-    if (!accessToken || !refreshToken) {
-      setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
-    }
-  }, [searchParams]);
+    checkAuthStatus();
+  }, []);
 
   const validateForm = () => {
     if (password.length < 8) {

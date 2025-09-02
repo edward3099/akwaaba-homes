@@ -2,17 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { email } = await request.json();
-
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      );
-    }
-
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,25 +28,27 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-    });
-
-    if (error) {
-      console.error('Forgot password error:', error);
+    // Get current session to verify user is authenticated
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
       return NextResponse.json(
-        { error: error.message || 'Failed to send reset email' },
-        { status: 400 }
+        { error: 'Not authenticated' },
+        { status: 401 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Password reset email sent. Please check your email for further instructions.'
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        user_metadata: session.user.user_metadata
+      }
     });
 
   } catch (error) {
-    console.error('Forgot password API error:', error);
+    console.error('Auth check error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -64,7 +57,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle unsupported methods
-export async function GET() {
+export async function POST() {
   return NextResponse.json(
     { error: 'Method not allowed' },
     { status: 405 }

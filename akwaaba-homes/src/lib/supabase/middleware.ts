@@ -91,12 +91,22 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
-    // Redirect authenticated users away from auth pages based on their role
+    // Only redirect authenticated users away from auth pages if they're not being redirected
+    // This prevents redirect loops when admin layout redirects to login
     const url = request.nextUrl.clone();
     
-    // Get user role from metadata or profile
+    // Check if there's a redirect parameter - if so, don't redirect away from auth pages
+    const redirectParam = url.searchParams.get('redirect');
+    if (redirectParam) {
+      // User is being redirected to auth page, don't redirect them away
+      return supabaseResponse;
+    }
+    
+    // Get user role from metadata (fallback to 'user' if not found)
     const userRole = user.user_metadata?.user_type || 'user';
     
+    // For now, use metadata-based redirection
+    // TODO: Consider fetching profile data in middleware for more accurate role checking
     if (userRole === 'admin') {
       url.pathname = '/admin';
     } else if (userRole === 'agent') {

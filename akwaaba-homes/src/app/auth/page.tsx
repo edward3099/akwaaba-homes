@@ -15,24 +15,43 @@ type AuthMode = 'signin' | 'signup' | 'forgot-password';
 
 export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>('signin');
-  const { user, loading } = useEnhancedAuth();
+  const { user, userProfile, loading } = useEnhancedAuth();
   const router = useRouter();
 
   // Redirect if already authenticated
   React.useEffect(() => {
     if (user && !loading) {
-      // Redirect based on user role
-      if (user.user_metadata?.user_type === 'admin') {
+      // Wait for userProfile to load before redirecting
+      // This prevents redirect loops when profile data is still loading
+      if (userProfile === null && !loading) {
+        // Profile is still loading, wait a bit more
+        return;
+      }
+      
+      // Check if there's a redirect parameter in the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect');
+      
+      if (redirectTo) {
+        // If there's a redirect parameter, use it instead of role-based redirect
+        router.push(redirectTo);
+        return;
+      }
+      
+      // Redirect based on user role from profile or metadata
+      const userRole = userProfile?.user_type || user.user_metadata?.user_type;
+      
+      if (userRole === 'admin') {
         router.push('/admin');
-      } else if (user.user_metadata?.user_type === 'agent') {
+      } else if (userRole === 'agent') {
         router.push('/agent-dashboard');
-      } else if (user.user_metadata?.user_type === 'seller') {
+      } else if (userRole === 'seller') {
         router.push('/seller-dashboard');
       } else {
         router.push('/dashboard');
       }
     }
-  }, [user, loading, router]);
+  }, [user, userProfile, loading, router]);
 
   if (loading) {
     return (
