@@ -50,8 +50,9 @@ export async function POST(request: NextRequest) {
           user_type: userType,
           phone: phone || null,
           company: company || null
-        }
-        // Removed emailRedirectTo to bypass email verification
+        },
+        // Disable email confirmation for development/testing
+        emailRedirectTo: undefined
       }
     });
 
@@ -69,6 +70,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Note: We don't auto sign-in because Supabase requires email verification
+    // The user will need to verify their email before they can sign in
 
     // Create profile record
     const { error: profileError } = await supabase
@@ -96,14 +100,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully. Please complete your profile.',
-      redirectTo: '/agent/profile',
+      message: 'Account created successfully! Please check your email to verify your account.',
+      redirectTo: '/login',
       user: {
         id: data.user.id,
         email: data.user.email,
         user_type: userType,
         full_name: fullName
-      }
+      },
+      requiresEmailVerification: true
     });
 
   } catch (error) {

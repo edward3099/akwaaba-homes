@@ -276,15 +276,31 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
       });
 
       const result = await response.json();
+      console.log('Signup API response:', { status: response.status, result });
 
       if (!response.ok) {
+        console.error('Signup failed:', result);
         setAuthState(prev => ({ ...prev, loading: false, error: result.error || 'Signup failed' }));
         return { success: false, error: result.error || 'Signup failed' };
       }
 
+      // DO NOT store signup data in localStorage as it causes redirect issues
+      // localStorage.setItem('agentOnboarding', JSON.stringify({
+      //   email,
+      //   fullName: metadata.full_name,
+      //   company: metadata.company,
+      //   phone: metadata.phone,
+      //   userType: metadata.user_type
+      // }));
+
+      // Since we don't auto sign-in anymore (email verification required),
+      // just set loading to false
       setAuthState(prev => ({ ...prev, loading: false }));
+      
+      console.log('Signup successful, returning success: true');
       return { success: true };
     } catch (error) {
+      console.error('Signup error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setAuthState(prev => ({ ...prev, loading: false, error: parseAuthError(error) }));
       return { success: false, error: errorMessage };

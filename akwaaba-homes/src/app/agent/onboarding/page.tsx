@@ -38,14 +38,22 @@ export default function OnboardingPage() {
     // Check if user is authenticated first
     const checkAuth = async () => {
       try {
+        // Wait a moment for auto sign-in to complete if it just happened
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const response = await fetch('/api/user/profile', {
           method: 'GET',
           credentials: 'include'
         });
         
         if (!response.ok) {
-          // User not authenticated, redirect to login
-          router.push('/login?redirect=/agent/onboarding');
+          if (response.status === 401) {
+            console.log('User not authenticated, redirecting to login');
+            router.push('/login?redirect=/agent/onboarding');
+          } else {
+            console.error('Auth check failed with status:', response.status);
+            setError('Authentication check failed. Please try refreshing the page.');
+          }
           return;
         }
         
@@ -62,11 +70,16 @@ export default function OnboardingPage() {
           }));
         } else {
           // If no onboarding data, redirect to signup
+          console.log('No onboarding data found, redirecting to signup');
           router.push('/signup');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        router.push('/login?redirect=/agent/onboarding');
+        setError('Failed to verify authentication. Please try refreshing the page.');
+        // Still redirect to login as fallback
+        setTimeout(() => {
+          router.push('/login?redirect=/agent/onboarding');
+        }, 3000);
       }
     };
     
@@ -219,9 +232,27 @@ export default function OnboardingPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save profile data');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to save profile data';
+        
+        if (response.status === 401) {
+          setError('Your session has expired. Please sign in again to continue.');
+          // Redirect to login after a short delay
+          setTimeout(() => {
+            router.push('/login?redirect=/agent/onboarding');
+          }, 2000);
+          return;
+        } else if (response.status === 400) {
+          setError(`Validation error: ${errorMessage}`);
+        } else if (response.status === 500) {
+          setError('Server error occurred. Please try again in a few moments.');
+        } else {
+          setError(`Error: ${errorMessage}`);
+        }
+        return;
       }
       
+      const result = await response.json();
       setSuccess('Profile setup completed successfully! Please check your email to verify your account, then you can sign in.');
       
       // Clear onboarding data
@@ -233,8 +264,8 @@ export default function OnboardingPage() {
       }, 3000);
       
     } catch (err) {
-      setError('Failed to save profile. Please try again.');
       console.error('Profile save error:', err);
+      setError('Network error occurred. Please check your internet connection and try again.');
     } finally {
       setIsLoading(false);
     }

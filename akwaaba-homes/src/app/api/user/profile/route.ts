@@ -142,56 +142,113 @@ export async function PUT(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - Please sign in again' },
         { status: 401 }
       );
     }
 
-    // Update profile data - fixed to use user_id instead of id
-    const updateData: Record<string, string | number | boolean | string[] | null> = {
-      ...validationResult.data,
-      updated_at: new Date().toISOString()
-    };
+    console.log('User authenticated:', user.id, user.email);
 
-    // Remove undefined values
-    Object.keys(updateData).forEach(key => 
-      updateData[key] === undefined && delete updateData[key]
-    );
-
-    const { data: updatedProfile, error: updateError } = await supabase
+    // Check if profile exists, if not create it
+    const { data: existingProfile, error: fetchError } = await supabase
       .from('profiles')
-      .update(updateData)
+      .select('*')
       .eq('user_id', user.id)
-      .select()
       .single();
 
-    if (updateError) {
-      console.error('Profile update error:', updateError);
+    let profileData;
+    
+    if (fetchError && fetchError.code === 'PGRST116') {
+      // Profile doesn't exist, create it
+      console.log('Profile not found, creating new profile for user:', user.id);
+      
+      const newProfileData = {
+        user_id: user.id,
+        email: user.email!,
+        full_name: validationResult.data.full_name || '',
+        phone: validationResult.data.phone || null,
+        company_name: validationResult.data.company_name || null,
+        license_number: validationResult.data.license_number || null,
+        experience_years: validationResult.data.experience_years || null,
+        bio: validationResult.data.bio || null,
+        user_role: 'agent', // Default to agent for onboarding
+        verification_status: 'pending',
+        is_verified: false,
+        avatar_url: validationResult.data.profile_image || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert([newProfileData])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Profile creation error:', createError);
+        return NextResponse.json(
+          { error: 'Failed to create profile', details: createError.message },
+          { status: 500 }
+        );
+      }
+
+      profileData = newProfile;
+    } else if (fetchError) {
+      console.error('Profile fetch error:', fetchError);
       return NextResponse.json(
-        { error: 'Failed to update profile', details: updateError.message },
+        { error: 'Failed to fetch profile', details: fetchError.message },
         { status: 500 }
       );
+    } else {
+      // Profile exists, update it
+      const updateData: Record<string, string | number | boolean | string[] | null> = {
+        ...validationResult.data,
+        updated_at: new Date().toISOString()
+      };
+
+      // Remove undefined values
+      Object.keys(updateData).forEach(key => 
+        updateData[key] === undefined && delete updateData[key]
+      );
+
+      const { data: updatedProfile, error: updateError } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update profile', details: updateError.message },
+          { status: 500 }
+        );
+      }
+
+      profileData = updatedProfile;
     }
 
     return NextResponse.json({
       message: 'Profile updated successfully',
       profile: {
-        id: updatedProfile.id,
-        email: updatedProfile.email,
-        full_name: updatedProfile.full_name,
-        phone: updatedProfile.phone,
-        company_name: updatedProfile.company_name,
-        license_number: updatedProfile.license_number,
-        specializations: updatedProfile.specializations,
-        experience_years: updatedProfile.experience_years,
-        bio: updatedProfile.bio,
-        profile_image: updatedProfile.profile_image,
-        cover_image: updatedProfile.cover_image,
-        user_role: updatedProfile.user_role,
-        verification_status: updatedProfile.verification_status,
-        created_at: updatedProfile.created_at,
-        updated_at: updatedProfile.updated_at
+        id: profileData.id,
+        email: profileData.email,
+        full_name: profileData.full_name,
+        phone: profileData.phone,
+        company_name: profileData.company_name,
+        license_number: profileData.license_number,
+        experience_years: profileData.experience_years,
+        bio: profileData.bio,
+        avatar_url: profileData.avatar_url,
+        user_role: profileData.user_role,
+        verification_status: profileData.verification_status,
+        is_verified: profileData.is_verified,
+        created_at: profileData.created_at,
+        updated_at: profileData.updated_at
       }
     });
 

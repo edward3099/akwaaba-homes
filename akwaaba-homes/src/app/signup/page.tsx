@@ -93,24 +93,19 @@ export default function SignupPage() {
       };
 
       const result = await signUp(formData.email, formData.password, metadata);
+      console.log('SignUp result in component:', result);
       
       if (result.success) {
-        setSuccess('Account created successfully! Please check your email to verify your account.');
+        setSuccess('Account created successfully! Please verify your email to continue.');
         
-        // For all user types, redirect to onboarding page to complete setup
-        // Store the signup data in localStorage for the onboarding process
-        localStorage.setItem('agentOnboarding', JSON.stringify({
-          email: formData.email,
-          fullName: formData.fullName,
-          company: formData.company,
-          phone: formData.phone,
-          userType: 'agent'
-        }));
-        
+        // Redirect to email verification page after showing success message
+        console.log('Setting timeout to redirect to verify-email');
         setTimeout(() => {
-          router.push('/agent/onboarding');
+          console.log('Executing redirect to verify-email');
+          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
         }, 2000); // Wait 2 seconds to show success message
       } else {
+        console.error('Signup failed in component:', result.error);
         setError(result.error || 'Signup failed');
       }
     } catch (err) {

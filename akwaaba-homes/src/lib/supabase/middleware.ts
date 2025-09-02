@@ -136,6 +136,7 @@ function isRouteProtected(pathname: string): boolean {
   const protectedPaths = [
     '/agent/dashboard',
     '/agent/profile',
+    '/agent/onboarding',
     '/admin',
     '/api/admin',
     '/api/user/profile',

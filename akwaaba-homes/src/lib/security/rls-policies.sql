@@ -2,6 +2,7 @@
 -- This file contains all the security policies to ensure proper data access control
 
 -- Enable RLS on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE property_images ENABLE ROW LEVEL SECURITY;
@@ -10,6 +11,52 @@ ALTER TABLE verifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- PROFILES TABLE POLICIES
+-- ============================================================================
+
+-- Users can read their own profile
+CREATE POLICY "Users can read own profile" ON profiles
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Users can create their own profile
+CREATE POLICY "Users can create own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Admins can read all profiles
+CREATE POLICY "Admins can read all profiles" ON profiles
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM profiles 
+      WHERE user_id = auth.uid() 
+      AND user_role IN ('admin', 'super_admin')
+    )
+  );
+
+-- Admins can update all profiles
+CREATE POLICY "Admins can update all profiles" ON profiles
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM profiles 
+      WHERE user_id = auth.uid() 
+      AND user_role IN ('admin', 'super_admin')
+    )
+  );
+
+-- Only admins can delete profiles
+CREATE POLICY "Only admins can delete profiles" ON profiles
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM profiles 
+      WHERE user_id = auth.uid() 
+      AND user_role IN ('admin', 'super_admin')
+    )
+  );
 
 -- ============================================================================
 -- USERS TABLE POLICIES
