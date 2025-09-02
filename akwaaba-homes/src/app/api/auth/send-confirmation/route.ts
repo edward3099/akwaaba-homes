@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Resend confirmation error:', error);
       return NextResponse.json(
-        { error: 'Failed to resend confirmation email' },
-        { status: 500 }
+        { error: error.message || 'Failed to resend confirmation email' },
+        { status: 400 }
       );
     }
 
