@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           company: company || null
         },
         // Use production URL for email confirmation
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaaba-homes-dd29cl1bc-eds-projects-934496ce.vercel.app'}/login`
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaaba-homes-f39xocwio-eds-projects-934496ce.vercel.app'}/auth/confirm`
       }
     });
 
