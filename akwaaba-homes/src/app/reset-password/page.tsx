@@ -29,23 +29,48 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
-  // Check if user is authenticated (session should be established by callback)
+  // Check if user is authenticated or handle code parameter
   useEffect(() => {
-    // The session should be established by the auth callback route
-    // We'll check authentication status when the component mounts
-    const checkAuthStatus = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (!response.ok) {
+    const code = searchParams.get('code');
+    
+    if (code) {
+      // Handle password reset code directly
+      const handlePasswordResetCode = async () => {
+        try {
+          const response = await fetch('/api/auth/exchange-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code }),
+          });
+          
+          if (!response.ok) {
+            setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+          }
+          // If successful, the session will be established and we can proceed
+        } catch (error) {
           setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
         }
-      } catch (error) {
-        setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
-      }
-    };
-    
-    checkAuthStatus();
-  }, []);
+      };
+      
+      handlePasswordResetCode();
+    } else {
+      // Check if user is authenticated (session should be established by callback)
+      const checkAuthStatus = async () => {
+        try {
+          const response = await fetch('/api/auth/me');
+          if (!response.ok) {
+            setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+          }
+        } catch (error) {
+          setAuthError(parseAuthError({ error: 'Invalid or expired reset link. Please request a new password reset.' }));
+        }
+      };
+      
+      checkAuthStatus();
+    }
+  }, [searchParams]);
 
   const validateForm = () => {
     if (password.length < 8) {
