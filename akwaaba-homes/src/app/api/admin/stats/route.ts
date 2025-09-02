@@ -27,8 +27,31 @@ export async function GET(request: NextRequest) {
       }
     );
     
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Check authentication - handle both cookie and header auth
+    let user = null;
+    let authError = null;
+    
+    // Try to get user from cookies first
+    const { data: { user: cookieUser }, error: cookieError } = await supabase.auth.getUser();
+    
+    if (cookieUser) {
+      user = cookieUser;
+    } else {
+      // If no cookie auth, try Authorization header
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const { data: { user: headerUser }, error: headerError } = await supabase.auth.getUser(token);
+        if (headerUser) {
+          user = headerUser;
+        } else {
+          authError = headerError;
+        }
+      } else {
+        authError = cookieError;
+      }
+    }
+    
     console.log('Admin stats API - Auth check:', { user: user?.id, authError }); // Added logging
     
     if (authError || !user) {
