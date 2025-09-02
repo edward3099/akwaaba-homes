@@ -541,8 +541,8 @@ export default function AgentProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center space-x-6">
-                <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   {profile.profile_image ? (
                     <img 
                       src={profile.profile_image} 
@@ -553,18 +553,37 @@ export default function AgentProfilePage() {
                     <User className="w-12 h-12 text-blue-600" />
                   )}
                 </div>
-                <div>
+                <div className="w-full sm:w-auto text-center sm:text-left">
                   <input
                     ref={profileImageInputRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
                     onChange={handleImageUpload}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed border border-dashed border-slate-300 rounded-lg p-4"
+                    className="hidden"
                     disabled={uploadingImage}
                     id="profile-photo-upload"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => profileImageInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="w-full sm:w-auto"
+                  >
+                    {uploadingImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose File
+                      </>
+                    )}
+                  </Button>
                   <p className="text-sm text-slate-500 mt-2">
-                    {uploadingImage ? 'Uploading your photo...' : 'Click "Choose File" above or drag and drop a professional photo (max 5MB)'}
+                    {uploadingImage ? 'Uploading your photo...' : 'Tap the button above to select a professional photo (max 5MB)'}
                   </p>
                 </div>
               </div>
@@ -584,38 +603,53 @@ export default function AgentProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="w-full h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
+                <div className="w-full h-48 sm:h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
                   {profile.cover_image ? (
                     <div className="w-full h-full relative">
                       <img 
                         src={profile.cover_image} 
                         alt="Cover" 
-                        className="max-w-full max-h-full object-contain object-center"
-                        style={{
-                          width: 'auto',
-                          height: 'auto'
-                        }}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   ) : (
                     <div className="text-center text-slate-500">
-                      <Camera className="w-12 h-12 mx-auto mb-2" />
-                      <p>No cover image uploaded</p>
+                      <Camera className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
+                      <p className="text-sm sm:text-base">No cover image uploaded</p>
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="text-center sm:text-left">
                   <input
                     ref={coverImageInputRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
                     onChange={handleCoverImageUpload}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed border border-dashed border-slate-300 rounded-lg p-4"
+                    className="hidden"
                     disabled={uploadingCoverImage}
                     id="cover-image-upload"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => coverImageInputRef.current?.click()}
+                    disabled={uploadingCoverImage}
+                    className="w-full sm:w-auto"
+                  >
+                    {uploadingCoverImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose File
+                      </>
+                    )}
+                  </Button>
                   <p className="text-sm text-slate-500 mt-2">
-                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Click "Choose File" above or drag and drop a cover image (max 10MB)'}
+                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Tap the button above to select a cover image (max 10MB)'}
                   </p>
                 </div>
               </div>
