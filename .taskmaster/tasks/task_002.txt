@@ -1,0 +1,37 @@
+# Task ID: 2
+# Title: Database Schema Design & Implementation
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Design and implement the complete database schema for Akwaaba Homes including all core tables and relationships
+# Details:
+Design the database schema using Supabase dashboard, create all necessary tables (users, properties, property_images, inquiries, verifications, analytics), set up proper relationships, indexes, and constraints. This includes implementing the data models defined in the requirements.
+
+# Test Strategy:
+Test database operations by creating, reading, updating, and deleting records in each table, verify relationships work correctly
+
+# Subtasks:
+## 2. Design Core Tables [pending]
+### Dependencies: None
+### Description: Design the structure for users, properties, and related tables
+### Details:
+Create table schemas with proper data types, constraints, and relationships
+
+## 2. Implement Users Table [pending]
+### Dependencies: None
+### Description: Create users table with authentication and profile fields
+### Details:
+Set up users table with auth integration, profile fields, and role management
+
+## 2. Implement Properties Table [pending]
+### Dependencies: None
+### Description: Create properties table with all required fields and relationships
+### Details:
+Set up properties table with location, specifications, pricing, and seller information
+
+## 2. Implement Supporting Tables [pending]
+### Dependencies: None
+### Description: Create property_images, inquiries, verifications, and analytics tables
+### Details:
+Set up all supporting tables with proper foreign key relationships
+

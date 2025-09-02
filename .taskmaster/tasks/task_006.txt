@@ -1,0 +1,37 @@
+# Task ID: 6
+# Title: Admin Dashboard Backend APIs
+# Status: pending
+# Dependencies: 3, 4
+# Priority: medium
+# Description: Develop backend APIs to support the admin dashboard including user management, property approval, and analytics
+# Details:
+Create comprehensive admin APIs for user management, property approval system, content moderation, analytics and reporting, system configuration, and administrative operations. Implement proper security and access control for admin functions.
+
+# Test Strategy:
+Test all admin APIs with proper authentication, verify role-based access control, and test administrative operations
+
+# Subtasks:
+## 6. User Management APIs [pending]
+### Dependencies: None
+### Description: Create APIs for managing users and their roles
+### Details:
+Build user management endpoints for creating, updating, and managing user accounts and roles
+
+## 6. Property Approval System [pending]
+### Dependencies: None
+### Description: Implement property approval and moderation APIs
+### Details:
+Create approval workflow for new property listings with moderation capabilities
+
+## 6. Analytics & Reporting APIs [pending]
+### Dependencies: None
+### Description: Develop analytics and reporting endpoints
+### Details:
+Create APIs for generating reports, analytics, and insights for admin users
+
+## 6. System Configuration APIs [pending]
+### Dependencies: None
+### Description: Implement system configuration and settings APIs
+### Details:
+Create endpoints for managing system settings, configurations, and administrative preferences
+

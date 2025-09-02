@@ -1,0 +1,59 @@
+# Task ID: 9
+# Title: Implement and Test Agent Signup Workflow
+# Status: done
+# Dependencies: 8
+# Priority: high
+# Description: Implement and test the agent signup workflow, including form validation, email verification, and profile setup.
+# Details:
+1.  Implement agent signup form with client-side validation using React Hook Form and Yup.
+2.  Integrate with Supabase Auth for user registration.
+3.  Implement email verification using Supabase's built-in functionality or a third-party service like SendGrid.
+4.  Create an agent profile setup form and store data in Supabase.
+5.  Use `supabase.auth.signUp()` for registration and `supabase.auth.verifyOTP()` for email verification.
+6.  Implement password reset functionality using Supabase Auth.
+7. Agent signup API now uses upsert instead of insert for profiles.
+
+# Test Strategy:
+1.  Manually test the signup process with valid and invalid data using existing verified agents.
+2.  Verify email verification flow.
+3.  Check that agent profiles are created correctly in Supabase.
+4.  Write E2E tests using Cypress to automate signup and verification.
+5. Focus testing efforts on property posting workflow with existing agents.
+
+# Subtasks:
+## 1.  [done]
+### Dependencies: None
+### Description: Implement agent signup form with comprehensive validation
+### Details:
+
+
+## 2.  [done]
+### Dependencies: None
+### Description: Integrate with Supabase Auth for user registration
+### Details:
+
+
+## 3.  [done]
+### Dependencies: None
+### Description: Implement agent profile setup and data storage in Supabase
+### Details:
+
+
+## 4.  [done]
+### Dependencies: None
+### Description: Implement email verification using Supabase's built-in functionality
+### Details:
+
+
+## 5.  [done]
+### Dependencies: None
+### Description: Implement password reset functionality using Supabase Auth
+### Details:
+
+
+## 6.  [done]
+### Dependencies: None
+### Description: Address phone number unique constraint issue separately (new task)
+### Details:
+
+

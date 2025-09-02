@@ -1,0 +1,154 @@
+# AkwaabaHomes - Project Intelligence & Patterns
+
+## Project Overview
+AkwaabaHomes is a real estate marketplace for Ghana with a focus on diaspora buyers. The project is 97% complete with a solid frontend foundation and fully integrated Supabase backend.
+
+## Critical Implementation Paths
+
+### 1. Ghana Cultural Integration
+- **Color System**: Always use Ghana flag colors (red: #C21807, gold: #FFD700, green: #00A86B)
+- **Language**: Use "Akwaaba" (Welcome) throughout the platform
+- **Local Context**: Integrate Plus codes, mobile money, WhatsApp for Ghana market
+- **Currency**: Store all prices in GHS, convert for display
+
+### 2. Diaspora-First Architecture
+- **Multi-Currency Display**: Real-time conversion for international buyers
+- **Inspection Scheduling**: Support self, family, and representative modes
+- **Trust Building**: Mandatory geo-tagging, seller verification, document validation
+- **Communication**: WhatsApp primary, phone secondary, email tertiary
+
+### 3. Component Patterns
+- **Mobile-First**: All components must work on mobile devices first
+- **Ghana Theme**: Use custom utility classes for Ghana-specific styling
+- **ShadCN UI**: Leverage existing component library with custom variants
+- **TypeScript Strict**: Maintain comprehensive type safety throughout
+
+## User Preferences & Workflow
+
+### Development Approach
+- **Frontend-First**: Build excellent UI/UX before backend integration
+- **Component-Based**: Create reusable, tested components
+- **Type Safety**: Use TypeScript strict mode for all new code
+- **Mobile Testing**: Regularly test across device sizes
+
+### Code Quality Standards
+- **ESLint**: Follow established linting rules
+- **Component Organization**: Group by feature in components/ directory
+- **File Naming**: Use kebab-case for files, PascalCase for components
+- **Documentation**: Update memory bank after significant changes
+
+## Project-Specific Patterns
+
+### Property Data Structure
+```typescript
+// Always use this structure for properties
+interface Property {
+  id: string;
+  title: string;
+  description: string;
+  price: number; // Always in GHS
+  currency: 'GHS'; // Enforced at type level
+  location: {
+    coordinates: [number, number]; // Mandatory geo-tagging
+    plusCode?: string;
+    address: string;
+  };
+  verification: {
+    geoTagged: boolean;
+    documentsVerified: boolean;
+    sellerVerified: boolean;
+  };
+}
+```
+
+### Search & Filter Patterns
+- **URL State**: Keep search filters in URL params for shareable links
+- **Advanced Filters**: Sidebar layout on desktop, modal on mobile
+- **Real-time Updates**: Use Supabase real-time subscriptions
+- **Pagination**: Intelligent page numbering with mobile optimization
+
+### Trust & Safety Implementation
+- **Verification Badges**: Green shield (verified), blue check (phone), gold star (premium)
+- **Document Upload**: Admin review workflow for all property documents
+- **Duplicate Detection**: Algorithm + manual review system
+- **Community Reporting**: Fraud flagging with admin monitoring
+
+## Known Challenges & Solutions
+
+### Performance Optimization
+- **Image Loading**: Use Next.js Image with proper sizing for Ghana's 3G networks
+- **Bundle Size**: Tree-shaking and dynamic imports for large components
+- **Mobile Performance**: Target <3s load time on 3G networks
+- **Caching**: Implement Redis caching for frequently accessed data
+
+### Backend Integration
+- **Supabase RLS**: All database operations must respect row-level security
+- **API Rate Limiting**: Implement rate limiting for all public endpoints
+- **Real-time Features**: Use Supabase real-time subscriptions for live updates
+- **Error Handling**: Comprehensive error responses with proper HTTP status codes
+
+## Tool Usage Patterns
+
+### Development Tools
+- **Next.js 15**: Use App Router with file-based routing
+- **TailwindCSS v4**: Latest version with custom Ghana theme
+- **ShadCN UI**: Base components with custom variants
+- **TypeScript**: Strict mode for all new code
+
+### Testing Strategy
+- **Component Testing**: Test all components in isolation
+- **Integration Testing**: Test API endpoints with proper auth
+- **E2E Testing**: Test complete user workflows
+- **Performance Testing**: Monitor Core Web Vitals
+
+## Evolution of Project Decisions
+
+### Architecture Evolution
+- **Started**: Simple frontend demo
+- **Evolved**: Full-stack application with Supabase
+- **Current**: Production-ready with comprehensive testing
+- **Next**: Performance optimization and monitoring
+
+### Technology Choices
+- **Frontend**: Next.js 15 for modern React development
+- **Backend**: Supabase for rapid development and scalability
+- **Styling**: TailwindCSS for utility-first approach
+- **State**: Zustand for lightweight state management
+
+## Critical Success Factors
+
+### User Experience
+- **Diaspora Journey**: Seamless experience for international buyers
+- **Local Market**: WhatsApp integration and mobile money preparation
+- **Trust Building**: Prominent verification indicators
+- **Mobile Optimization**: Touch-friendly interactions and smooth scrolling
+
+### Technical Excellence
+- **Type Safety**: Comprehensive TypeScript coverage
+- **Security**: RLS policies, rate limiting, input validation
+- **Performance**: Optimized for Ghana's network conditions
+- **Accessibility**: Screen reader support and keyboard navigation
+
+## Development Workflow
+
+### Session Start
+1. **Read Memory Bank**: Review all memory bank files for context
+2. **Check Current Status**: Understand what's completed and what's next
+3. **Update Documentation**: Keep memory bank current with changes
+4. **Follow Patterns**: Apply established patterns for consistency
+
+### Implementation Process
+1. **Plan**: Understand requirements and create implementation plan
+2. **Build**: Follow established component and styling patterns
+3. **Test**: Ensure mobile responsiveness and accessibility
+4. **Document**: Update memory bank with new patterns or decisions
+
+### Quality Assurance
+- **TypeScript**: No compilation errors
+- **ESLint**: Follow established code quality rules
+- **Mobile Testing**: Test across device sizes
+- **Performance**: Monitor load times and Core Web Vitals
+
+---
+
+*This file captures the collective intelligence and patterns discovered while working on AkwaabaHomes. Update it when new patterns emerge or when better approaches are discovered.*

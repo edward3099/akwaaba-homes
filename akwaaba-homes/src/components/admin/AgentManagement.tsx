@@ -1,336 +1,112 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { 
-  Search, 
-  UserCheck, 
-  UserX, 
-  Trash2, 
-  Eye, 
-  MoreHorizontal,
-  Filter,
-  Download,
-  Plus,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Mail,
-  Phone,
-  MapPin
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Eye, Trash2, User, Mail, Phone, Calendar, Shield, Building, Award, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Agent {
   id: string;
   email: string;
-  full_name: string;
-  phone?: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
   user_role: string;
+  verification_status: string;
   created_at: string;
   updated_at: string;
-  is_verified: boolean;
-  properties_count?: number;
-  last_active?: string;
-  city?: string;
-  region?: string;
-}
-
-interface AgentStats {
-  total: number;
-  verified: number;
-  pending: number;
-  active: number;
-  inactive: number;
+  bio?: string;
+  business_type?: string;
+  company_name?: string;
+  experience_years?: number;
+  license_number?: string;
+  email_verified?: boolean;
 }
 
 export default function AgentManagement() {
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [filteredAgents, setFilteredAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [stats, setStats] = useState<AgentStats>({
-    total: 0,
-    verified: 0,
-    pending: 0,
-    active: 0,
-    inactive: 0
-  });
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  
-  const { toast } = useToast();
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
-  // Fetch agents from database
+  useEffect(() => {
+    fetchAgents();
+  }, []);
+
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      console.log('Fetching agents...');
+      const response = await fetch('/api/admin/agents');
       
-      // Get all users with agent role
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          email,
-          full_name,
-          phone,
-          user_role,
-          created_at,
-          updated_at,
-          is_verified,
-          city,
-          region
-        `)
-        .in('user_role', ['agent'])
-        .order('created_at', { ascending: false });
-
-      console.log('Profiles query result:', { profiles, error });
-
-      if (error) {
-        console.error('Error fetching profiles:', error);
-        throw error;
+      if (!response.ok) {
+        throw new Error('Failed to fetch agents');
       }
-
-      // Get properties count for each agent
-      const agentsWithCounts = await Promise.all(
-        (profiles || []).map(async (agent) => {
-          const { count } = await supabase
-            .from('properties')
-            .select('*', { count: 'exact', head: true })
-            .eq('agent_id', agent.id);
-
-          return {
-            ...agent,
-            properties_count: count || 0,
-            last_active: agent.updated_at // Using updated_at as last_active for now
-          };
-        })
-      );
-
-      setAgents(agentsWithCounts);
-      setFilteredAgents(agentsWithCounts);
       
-      // Calculate stats
-      const newStats = {
-        total: agentsWithCounts.length,
-        verified: agentsWithCounts.filter(a => a.is_verified).length,
-        pending: agentsWithCounts.filter(a => !a.is_verified).length,
-        active: agentsWithCounts.filter(a => a.is_verified).length, // Assuming verified = active
-        inactive: agentsWithCounts.filter(a => !a.is_verified).length
-      };
-      setStats(newStats);
-
+      const data = await response.json();
+      setAgents(data.agents || []);
     } catch (error) {
       console.error('Error fetching agents:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch agents. Please try again.",
-        variant: "destructive"
-      });
+      toast.error('Failed to fetch agents');
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter agents based on search and filters
-  useEffect(() => {
-    let filtered = agents;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(agent =>
-        agent.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        agent.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        agent.phone?.includes(searchTerm)
-      );
-    }
-
-    // Role filter
-    if (filterRole !== 'all') {
-      filtered = filtered.filter(agent => agent.user_role === filterRole);
-    }
-
-    // Status filter
-    if (filterStatus !== 'all') {
-      if (filterStatus === 'verified') {
-        filtered = filtered.filter(agent => agent.is_verified);
-      } else if (filterStatus === 'pending') {
-        filtered = filtered.filter(agent => !agent.is_verified);
-      }
-    }
-
-    setFilteredAgents(filtered);
-  }, [agents, searchTerm, filterRole, filterStatus]);
-
-  // Load agents on component mount
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  // Delete agent
-  const handleDeleteAgent = async (agentId: string) => {
+  const handleDeleteAgent = async (agentId: string, agentName: string) => {
     try {
-      setDeleting(true);
-      console.log('Deleting agent:', agentId);
-      
-      // Delete from profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', agentId)
-        .select();
-
-      console.log('Profile deletion result:', { profileData, profileError });
-
-      if (profileError) {
-        console.error('Profile deletion error:', profileError);
-        throw profileError;
-      }
-
-      // Also delete from auth.users (this might require admin privileges)
-      try {
-        const { error: authError } = await supabase.auth.admin.deleteUser(agentId);
-        
-        if (authError) {
-          console.warn('Could not delete from auth.users:', authError);
-          // Continue anyway as the profile is deleted
-        } else {
-          console.log('User deleted from auth successfully');
-        }
-      } catch (authError) {
-        console.warn('Auth deletion failed:', authError);
-        // Continue anyway as the profile is deleted
-      }
-
-      console.log('Agent deleted successfully');
-      
-      // Refresh the list first
-      console.log('Refreshing agent list...');
-      await fetchAgents();
-      console.log('Agent list refreshed');
-      
-      // Close dialog
-      setShowDeleteDialog(false);
-      setSelectedAgent(null);
-      
-      // Show success message
-      alert('Agent has been deleted successfully!');
-      
-      toast({
-        title: "Success",
-        description: "Agent has been deleted successfully.",
+      setDeleteLoading(agentId);
+      const response = await fetch(`/api/admin/agents?id=${agentId}`, {
+        method: 'DELETE',
       });
-
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete agent');
+      }
+      
+      toast.success(`Agent ${agentName} deleted successfully`);
+      setAgents(agents.filter(agent => agent.id !== agentId));
     } catch (error) {
       console.error('Error deleting agent:', error);
-      toast({
-        title: "Error",
-        description: `Failed to delete agent: ${error.message || 'Unknown error'}`,
-        variant: "destructive"
-      });
+      toast.error('Failed to delete agent');
     } finally {
-      setDeleting(false);
+      setDeleteLoading(null);
     }
   };
 
-  // Toggle agent verification
-  const handleToggleVerification = async (agentId: string, currentStatus: boolean) => {
-    try {
-      console.log('Toggling verification for agent:', agentId, 'from', currentStatus, 'to', !currentStatus);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ 
-          is_verified: !currentStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', agentId)
-        .select();
-
-      console.log('Update result:', { data, error });
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Verification updated successfully');
-      
-      // Show success message
-      alert(`Agent ${!currentStatus ? 'verified' : 'unverified'} successfully!`);
-      
-      toast({
-        title: "Success",
-        description: `Agent ${!currentStatus ? 'verified' : 'unverified'} successfully.`,
-      });
-
-      // Refresh the list
-      await fetchAgents();
-
-    } catch (error) {
-      console.error('Error updating agent verification:', error);
-      toast({
-        title: "Error",
-        description: `Failed to update agent verification: ${error.message || 'Unknown error'}`,
-        variant: "destructive"
-      });
+  const getVerificationBadge = (status: string) => {
+    switch (status) {
+      case 'verified':
+        return <Badge className="bg-green-100 text-green-800 border-green-200">Verified</Badge>;
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
+      case 'rejected':
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Rejected</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Unknown</Badge>;
     }
   };
 
-  const getStatusBadge = (agent: Agent) => {
-    if (agent.is_verified) {
-      return <Badge className="bg-green-100 text-green-800">Verified</Badge>;
-    }
-    return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
-  };
-
-  const getRoleBadge = (role: string) => {
-    const roleColors = {
-      'agent': 'bg-blue-100 text-blue-800',
-      'moderator': 'bg-green-100 text-green-800',
-      'super_admin': 'bg-purple-100 text-purple-800',
-      'admin': 'bg-red-100 text-red-800',
-      'seller': 'bg-yellow-100 text-yellow-800'
-    };
-    
-    return (
-      <Badge className={roleColors[role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}>
-        {role.replace('_', ' ').toUpperCase()}
-      </Badge>
-    );
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Agent Management</h1>
-            <p className="text-gray-600">Manage and monitor all agents on the platform</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading agents...</p>
-          </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading agents...</p>
         </div>
       </div>
     );
@@ -338,253 +114,214 @@ export default function AgentManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Agent Management</h1>
-          <p className="text-gray-600">Manage and monitor all agents on the platform</p>
+          <h2 className="text-2xl font-bold text-gray-900">Agent Management</h2>
+          <p className="text-gray-600">Manage agents on the platform</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Agent
-          </Button>
-        </div>
+        <Button onClick={fetchAgents} variant="outline">
+          Refresh
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <UserCheck className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Agents</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Verified</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.verified}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <UserX className="h-8 w-8 text-red-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inactive</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters and Search */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search agents by name, email, or phone..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              >
-                <option value="all">All Roles</option>
-                <option value="agent">Agent</option>
-                <option value="moderator">Moderator</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              >
-                <option value="all">All Status</option>
-                <option value="verified">Verified</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Agents List */}
       <Card>
         <CardHeader>
-          <CardTitle>Agents ({filteredAgents.length})</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Agents ({agents.length})
+          </CardTitle>
           <CardDescription>
-            Manage all agents registered on the platform
+            View and manage all registered agents
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredAgents.map((agent) => (
-              <div key={agent.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{agent.full_name || 'N/A'}</h3>
-                        <p className="text-sm text-gray-500">ID: {agent.id.slice(0, 8)}...</p>
-                      </div>
-                      <div className="flex gap-2">
-                        {getRoleBadge(agent.user_role)}
-                        {getStatusBadge(agent)}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                      <div className="space-y-1">
-                        <div className="flex items-center text-gray-600">
-                          <Mail className="h-3 w-3 mr-1 text-gray-400" />
+          {agents.length === 0 ? (
+            <div className="text-center py-8">
+              <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No agents found</h3>
+              <p className="text-gray-600">No agents have registered on the platform yet.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Joined</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {agents.map((agent) => (
+                    <TableRow key={agent.id}>
+                      <TableCell className="font-medium">
+                        {agent.first_name} {agent.last_name}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-gray-400" />
                           {agent.email}
-                        </div>
-                        {agent.phone && (
-                          <div className="flex items-center text-gray-500">
-                            <Phone className="h-3 w-3 mr-1 text-gray-400" />
-                            {agent.phone}
-                          </div>
-                        )}
-                        {(agent.city || agent.region) && (
-                          <div className="flex items-center text-gray-500">
-                            <MapPin className="h-3 w-3 mr-1 text-gray-400" />
-                            {[agent.city, agent.region].filter(Boolean).join(', ')}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <div className="text-gray-600">
-                          <span className="font-medium">{agent.properties_count || 0}</span> properties
-                        </div>
-                        <div className="text-gray-500">
-                          Joined: {new Date(agent.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleVerification(agent.id, agent.is_verified)}
-                        >
-                          {agent.is_verified ? (
-                            <>
-                              <UserX className="h-3 w-3 mr-1" />
-                              Unverify
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="h-3 w-3 mr-1" />
-                              Verify
-                            </>
+                          {agent.email_verified && (
+                            <Shield className="h-4 w-4 text-green-500" title="Email verified" />
                           )}
-                        </Button>
-                        
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => setSelectedAgent(agent)}
-                            >
-                              <Trash2 className="h-3 w-3 mr-1" />
-                              Delete
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Delete Agent</DialogTitle>
-                              <DialogDescription>
-                                Are you sure you want to delete {selectedAgent?.full_name || selectedAgent?.email}? 
-                                This action cannot be undone and will remove all associated data.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => setSelectedAgent(null)}>
-                                Cancel
-                              </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-gray-400" />
+                          {agent.phone || 'Not provided'}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4 text-gray-400" />
+                          {agent.company_name || 'Not provided'}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getVerificationBadge(agent.verification_status)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-gray-400" />
+                          {formatDate(agent.created_at)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
                               <Button
-                                onClick={() => selectedAgent && handleDeleteAgent(selectedAgent.id)}
-                                className="bg-red-600 hover:bg-red-700"
-                                disabled={deleting}
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedAgent(agent)}
                               >
-                                {deleting ? 'Deleting...' : 'Delete Agent'}
+                                <Eye className="h-4 w-4" />
                               </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {filteredAgents.length === 0 && (
-              <div className="text-center py-8">
-                <UserCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No agents found</h3>
-                <p className="text-gray-500">
-                  {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
-                    ? 'Try adjusting your search or filters.'
-                    : 'No agents have registered on the platform yet.'}
-                </p>
-              </div>
-            )}
-          </div>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Agent Details</DialogTitle>
+                                <DialogDescription>
+                                  Complete information for {agent.first_name} {agent.last_name}
+                                </DialogDescription>
+                              </DialogHeader>
+                              {selectedAgent && (
+                                <div className="space-y-6">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Full Name</label>
+                                      <p className="text-sm text-gray-900">{selectedAgent.first_name} {selectedAgent.last_name}</p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Email</label>
+                                      <p className="text-sm text-gray-900 flex items-center gap-2">
+                                        {selectedAgent.email}
+                                        {selectedAgent.email_verified && (
+                                          <Shield className="h-4 w-4 text-green-500" title="Email verified" />
+                                        )}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Phone</label>
+                                      <p className="text-sm text-gray-900">{selectedAgent.phone || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Company</label>
+                                      <p className="text-sm text-gray-900">{selectedAgent.company_name || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Business Type</label>
+                                      <p className="text-sm text-gray-900">{selectedAgent.business_type || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Experience</label>
+                                      <p className="text-sm text-gray-900 flex items-center gap-2">
+                                        <Award className="h-4 w-4 text-gray-400" />
+                                        {selectedAgent.experience_years ? `${selectedAgent.experience_years} years` : 'Not provided'}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">License Number</label>
+                                      <p className="text-sm text-gray-900 flex items-center gap-2">
+                                        <FileText className="h-4 w-4 text-gray-400" />
+                                        {selectedAgent.license_number || 'Not provided'}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Verification Status</label>
+                                      <div className="mt-1">
+                                        {getVerificationBadge(selectedAgent.verification_status)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {selectedAgent.bio && (
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Bio</label>
+                                      <p className="text-sm text-gray-900 mt-1 p-3 bg-gray-50 rounded-md">
+                                        {selectedAgent.bio}
+                                      </p>
+                                    </div>
+                                  )}
+                                  
+                                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Joined</label>
+                                      <p className="text-sm text-gray-900">{formatDate(selectedAgent.created_at)}</p>
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Last Updated</label>
+                                      <p className="text-sm text-gray-900">{formatDate(selectedAgent.updated_at)}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Agent</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete {agent.first_name} {agent.last_name}? 
+                                  This action cannot be undone and will permanently remove the agent from the platform.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteAgent(agent.id, `${agent.first_name} ${agent.last_name}`)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                  disabled={deleteLoading === agent.id}
+                                >
+                                  {deleteLoading === agent.id ? 'Deleting...' : 'Delete'}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

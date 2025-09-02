@@ -1,0 +1,16 @@
+# Task ID: 21
+# Title: File Upload Verification
+# Status: pending
+# Dependencies: 20
+# Priority: medium
+# Description: Verify image upload and storage functionality, including file size and type validation.
+# Details:
+1.  Use Supabase Storage or a third-party service like Cloudinary to store images.
+2.  Implement file size and type validation on the client-side and server-side.
+3.  Verify that images are stored correctly and can be retrieved.
+4.  Use `supabase.storage.from('images').upload()` to upload images to Supabase Storage.
+
+# Test Strategy:
+1.  Write integration tests to verify image upload and storage functionality.
+2.  Manually test image upload with different file sizes and types.
+3.  Verify that images are stored correctly and can be retrieved.

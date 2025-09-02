@@ -1,0 +1,59 @@
+# Build Error Fix PRD for AkwaabaHomes
+
+## Project Overview
+AkwaabaHomes is a real estate marketplace for Ghana with a focus on diaspora buyers. The project is 97% complete but has multiple build errors that need to be fixed for production deployment.
+
+## Current Build Status
+The project has several categories of build errors:
+1. TypeScript type resolution issues with Property interface
+2. Zod validation syntax errors in API routes
+3. Supabase auth admin API compatibility issues
+4. ESLint configuration and rule issues
+5. Next.js 15 compatibility issues
+
+## Objectives
+- Fix all build errors to enable successful production build
+- Ensure type safety and proper error handling
+- Maintain production-ready code quality
+- Use Context7 research for each error type to implement proper solutions
+
+## Technical Requirements
+
+### 1. Type Resolution Issues
+- Fix Property interface import/export conflicts
+- Resolve type conflicts between different Property definitions
+- Ensure consistent type usage across components
+
+### 2. Zod Validation Fixes
+- Update all z.record(z.any()) syntax to z.record(z.string(), z.any())
+- Fix validation schemas in API routes
+- Ensure compatibility with newer Zod versions
+
+### 3. Supabase Auth API Compatibility
+- Fix getUserByEmail method calls (not available in Supabase v2)
+- Update auth admin API usage to v2 compatible methods
+- Ensure proper error handling for auth operations
+
+### 4. ESLint Configuration
+- Remove invalid ESLint rules
+- Fix accessibility rule configurations
+- Ensure proper TypeScript ESLint setup
+
+### 5. Next.js 15 Compatibility
+- Fix API route function signatures
+- Update searchParams handling in page components
+- Ensure proper async/await patterns
+
+## Success Criteria
+- Build completes successfully with npm run build
+- No TypeScript compilation errors
+- No ESLint errors
+- All API routes function correctly
+- Production-ready code quality maintained
+
+## Implementation Approach
+- Use Context7 research for each error type
+- Fix errors systematically by category
+- Test build after each major fix
+- Document all changes made
+- Ensure no regressions in functionality

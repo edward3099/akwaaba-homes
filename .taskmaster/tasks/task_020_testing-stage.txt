@@ -1,0 +1,42 @@
+# Task ID: 20
+# Title: Form Validation Testing
+# Status: pending
+# Dependencies: 19
+# Priority: high
+# Description: Test client-side and server-side form validation to ensure data integrity.
+# Details:
+1.  Implement client-side form validation using React Hook Form and Yup.
+2.  Implement server-side form validation using Supabase functions or a Node.js API.
+3.  Verify that form validation prevents invalid data from being submitted.
+4.  Use `yup` for schema validation.
+
+# Test Strategy:
+1.  Write unit tests for form validation functions.
+2.  Manually test form validation with different inputs and scenarios.
+3.  Use automated testing tools like Cypress to verify form validation.
+
+# Subtasks:
+## 1. Analyze Current Form Validation Systems [pending]
+### Dependencies: None
+### Description: Analyze all existing forms in the system to understand current validation approaches, identify gaps, and plan comprehensive testing strategy.
+### Details:
+Review SignUpForm, PropertyListingForm, API validation schemas, and InputValidationService to understand current validation implementation.
+
+## 2. Implement Client-Side Validation Testing [pending]
+### Dependencies: None
+### Description: Create comprehensive test cases for client-side form validation, including field validation, error display, and real-time feedback testing.
+### Details:
+Test form field validation, error message display, real-time validation feedback, and form submission prevention for invalid data.
+
+## 3. Implement Server-Side Validation Testing [pending]
+### Dependencies: None
+### Description: Test server-side validation endpoints, error responses, and data integrity validation using Supabase MCP tools.
+### Details:
+Test API endpoint validation, error response handling, data integrity checks, and validation schema enforcement.
+
+## 4. Test Integration Between Client and Server Validation [pending]
+### Dependencies: None
+### Description: Test end-to-end form submission with validation, ensuring seamless integration between client and server validation systems.
+### Details:
+Test complete form submission workflow, validation synchronization, error handling, and user experience consistency.
+

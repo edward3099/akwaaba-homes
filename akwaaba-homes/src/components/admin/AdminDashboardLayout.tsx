@@ -81,6 +81,12 @@ export default function AdminDashboardLayout({ children, currentTab }: AdminDash
       href: '/admin'
     },
     {
+      id: 'agents',
+      label: 'Agent Management',
+      icon: UserCheck,
+      href: '/admin/agents'
+    },
+    {
       id: 'users',
       label: 'User Management',
       icon: Users,

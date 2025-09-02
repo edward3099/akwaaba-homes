@@ -1,0 +1,37 @@
+# Task ID: 7
+# Title: Seller Dashboard Backend APIs
+# Status: pending
+# Dependencies: 3, 4
+# Priority: medium
+# Description: Develop backend APIs to support seller dashboard functionality including property management and inquiry handling
+# Details:
+Create seller-specific APIs for property listing management, inquiry handling, performance analytics, communication tools, and seller-specific operations. Implement proper access control and data isolation for sellers.
+
+# Test Strategy:
+Test seller APIs with proper authentication, verify data isolation between sellers, and test all seller dashboard functionality
+
+# Subtasks:
+## 7. Property Management APIs [pending]
+### Dependencies: None
+### Description: Create APIs for sellers to manage their properties
+### Details:
+Build endpoints for sellers to create, update, and manage their property listings
+
+## 7. Inquiry Management System [pending]
+### Dependencies: None
+### Description: Implement inquiry handling and management APIs
+### Details:
+Create system for sellers to receive, manage, and respond to property inquiries
+
+## 7. Performance Analytics APIs [pending]
+### Dependencies: None
+### Description: Develop analytics endpoints for seller performance
+### Details:
+Create APIs for sellers to view their performance metrics and analytics
+
+## 7. Communication Tools APIs [pending]
+### Dependencies: None
+### Description: Implement communication and messaging APIs
+### Details:
+Build messaging and communication tools for sellers to interact with potential buyers
+

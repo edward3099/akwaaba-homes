@@ -1,0 +1,87 @@
+# Task ID: 14
+# Title: Database Validation
+# Status: done
+# Dependencies: 13
+# Priority: medium
+# Description: Validate data persistence and relationships in the Supabase database. Comprehensive validation was performed during end-to-end testing.
+# Details:
+1.  Write SQL queries to verify that data is stored correctly in the Supabase database.
+2.  Verify that relationships between tables are correctly defined and enforced.
+3.  Test data integrity by updating and deleting data and verifying that the changes are reflected in the database.
+4.  Use Supabase's built-in data validation features to ensure data integrity.
+
+**Completed during end-to-end testing:**
+- Data persistence verification for users, properties, agent profiles, and images.
+- Table relationships validation for Users ↔ Profiles, Properties ↔ Users (seller), Properties ↔ Property Images, and Agent Applications ↔ Users.
+- Data integrity testing including updates, deletions, foreign key constraints, and unique constraints.
+- Supabase features validation including Row-Level Security (RLS) policies, real-time subscriptions, database triggers, and functions (handle_new_user).
+
+# Test Strategy:
+1.  Write integration tests to verify data persistence and relationships.
+2.  Use SQL queries to manually verify data integrity.
+3.  Monitor database performance using Supabase's built-in monitoring tools.
+
+**Completed during end-to-end testing:**
+- Verified database statistics including total tables, properties, users, agents, and pending properties.
+
+# Subtasks:
+## 1.  [completed]
+### Dependencies: None
+### Description: Verify user data persistence
+### Details:
+
+
+## 2.  [completed]
+### Dependencies: None
+### Description: Verify property data persistence
+### Details:
+
+
+## 3.  [completed]
+### Dependencies: None
+### Description: Validate Users <-> Profiles relationship
+### Details:
+
+
+## 4.  [completed]
+### Dependencies: None
+### Description: Validate Properties <-> Users (seller) relationship
+### Details:
+
+
+## 5.  [completed]
+### Dependencies: None
+### Description: Test data updates
+### Details:
+
+
+## 6.  [completed]
+### Dependencies: None
+### Description: Test data deletions
+### Details:
+
+
+## 7.  [completed]
+### Dependencies: None
+### Description: Validate Row-Level Security (RLS) policies
+### Details:
+
+
+## 8.  [completed]
+### Dependencies: None
+### Description: Validate Real-time subscriptions
+### Details:
+
+
+## 9.  [completed]
+### Dependencies: None
+### Description: Validate database triggers
+### Details:
+
+
+## 10.  [completed]
+### Dependencies: None
+### Description: Validate handle_new_user function
+### Details:
+
+
