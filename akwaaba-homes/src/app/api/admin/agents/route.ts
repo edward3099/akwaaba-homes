@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
-    // Fetch all agents with their profiles
+    // Fetch all agents and sellers with their profiles
     const { data: agents, error: agentsError } = await supabase
       .from('profiles')
       .select(`
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         license_number,
         email_verified
       `)
-      .eq('user_role', 'agent')
+      .in('user_role', ['agent', 'seller'])
       .order('created_at', { ascending: false });
 
     if (agentsError) {
@@ -137,7 +137,7 @@ export async function DELETE(request: NextRequest) {
       .from('profiles')
       .delete()
       .eq('id', agentId)
-      .eq('user_role', 'agent');
+      .in('user_role', ['agent', 'seller']);
 
     if (deleteError) {
       console.error('Error deleting agent:', deleteError);
