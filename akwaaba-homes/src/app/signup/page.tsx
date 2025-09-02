@@ -105,12 +105,6 @@ export default function SignupPage() {
       if (result.success) {
         setSuccess('Account created successfully! Please check your email to verify your account.');
         
-        // Show confirmation URL for testing (in production, this would be sent via email)
-        if (result.confirmationUrl) {
-          console.log('Confirmation URL:', result.confirmationUrl);
-          setSuccess(`Account created successfully! Confirmation URL: ${result.confirmationUrl}`);
-        }
-        
         // Redirect to sign in page after showing success message
         setTimeout(() => {
           router.push('/login');

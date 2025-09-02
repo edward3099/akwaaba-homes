@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Create user account with email confirmation disabled
+    // Create user account with proper email confirmation
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
           phone: phone || null,
           company: company || null
         },
-        // Disable email confirmation to prevent localhost redirect
-        emailRedirectTo: undefined
+        // Use custom domain for email confirmation
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaabahomes.com'}/auth/confirm`
       }
     });
 
@@ -69,16 +69,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Manually send confirmation email with correct URL
-    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://akwaabahomes.com'}/auth/confirm?token_hash=${data.user.id}&type=email`;
-    
-    // For now, we'll return the confirmation URL in the response
-    // In production, you would send this via email service
+    // Supabase will automatically send the confirmation email with the correct URL
     return NextResponse.json({
       success: true,
       message: 'Account created successfully! Please check your email to verify your account.',
       requiresEmailVerification: true,
-      confirmationUrl: confirmationUrl, // This would be sent via email in production
       redirectTo: '/login'
     });
 
