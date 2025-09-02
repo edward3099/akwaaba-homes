@@ -226,8 +226,15 @@ export default function AgentProfilePage() {
 
       const data = await response.json();
       
+      console.log('Avatar upload response:', data);
+      
       // Update the profile state with the new image URL
-      setProfile(prev => prev ? { ...prev, profile_image: data.avatarUrl } : null);
+      setProfile(prev => {
+        if (!prev) return null;
+        const updated = { ...prev, profile_image: data.avatarUrl };
+        console.log('Updated profile state:', updated);
+        return updated;
+      });
       
       toast({
         title: "Success",
@@ -292,8 +299,15 @@ export default function AgentProfilePage() {
 
       const result = await response.json();
       
+      console.log('Cover image upload response:', result);
+      
       // Update the profile state with the new cover image URL
-      setProfile(prev => prev ? { ...prev, cover_image: result.publicUrl } : null);
+      setProfile(prev => {
+        if (!prev) return null;
+        const updated = { ...prev, cover_image: result.publicUrl };
+        console.log('Updated profile state with cover image:', updated);
+        return updated;
+      });
       
       // Also refresh the profile data to ensure UI is updated
       await fetchProfile();
@@ -545,6 +559,7 @@ export default function AgentProfilePage() {
                 <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   {profile.profile_image ? (
                     <img 
+                      key={profile.profile_image}
                       src={profile.profile_image} 
                       alt="Profile" 
                       className="w-24 h-24 object-cover"
@@ -607,6 +622,7 @@ export default function AgentProfilePage() {
                   {profile.cover_image ? (
                     <div className="w-full h-full relative">
                       <img 
+                        key={profile.cover_image}
                         src={profile.cover_image} 
                         alt="Cover" 
                         className="w-full h-full object-cover"
