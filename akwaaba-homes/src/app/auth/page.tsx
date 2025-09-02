@@ -41,14 +41,33 @@ export default function AuthPage() {
       // Redirect based on user role from profile or metadata
       const userRole = userProfile?.user_type || user.user_metadata?.user_type;
       
+      // Use window.location.href for mobile devices to ensure proper navigation
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
       if (userRole === 'admin') {
-        router.push('/admin');
+        if (isMobile) {
+          window.location.href = '/admin';
+        } else {
+          router.push('/admin');
+        }
       } else if (userRole === 'agent') {
-        router.push('/agent-dashboard');
+        if (isMobile) {
+          window.location.href = '/agent-dashboard';
+        } else {
+          router.push('/agent-dashboard');
+        }
       } else if (userRole === 'seller') {
-        router.push('/seller-dashboard');
+        if (isMobile) {
+          window.location.href = '/seller-dashboard';
+        } else {
+          router.push('/seller-dashboard');
+        }
       } else {
-        router.push('/dashboard');
+        if (isMobile) {
+          window.location.href = '/dashboard';
+        } else {
+          router.push('/dashboard');
+        }
       }
     }
   }, [user, userProfile, loading, router]);
@@ -74,6 +93,7 @@ export default function AuthPage() {
 
   const handleSuccess = () => {
     // Form will handle success, this is just a fallback
+    // The redirect will be handled by the useEffect that watches for user changes
   };
 
   return (

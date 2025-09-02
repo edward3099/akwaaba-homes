@@ -32,6 +32,7 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onForgotPasswo
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const {
     register,
@@ -58,25 +59,67 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp, onForgotPasswo
   // Removed the problematic useEffect that was causing infinite loop
   // The form validation will still work through the onBlur handlers
 
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
+    };
+  }, [loadingTimeout]);
+
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
     setAuthError(null);
 
+    // Clear any existing timeout
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+    }
+
+    // Set a timeout to prevent infinite loading (especially on mobile)
+    const timeout = setTimeout(() => {
+      console.warn('Login timeout - forcing loading state to false');
+      setIsLoading(false);
+      setAuthError(parseAuthError({ error: 'Login is taking longer than expected. Please try again.' }));
+    }, 15000); // 15 second timeout
+
+    setLoadingTimeout(timeout);
+
     try {
       const { success, error } = await signIn(data.email, data.password);
+
+      // Clear the timeout since we got a response
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+        setLoadingTimeout(null);
+      }
 
       if (error) {
         const parsedError = parseAuthError(error);
         setAuthError(parsedError);
+        setIsLoading(false);
       } else if (success) {
+        // Don't set loading to false here - let the redirect handle it
+        // This prevents the "Signing In..." from disappearing before redirect
         onSuccess?.();
+        // Keep loading state true until redirect happens
+        return;
       }
     } catch (error) {
+      // Clear the timeout since we got an error
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+        setLoadingTimeout(null);
+      }
+      
       const parsedError = parseAuthError(error);
       setAuthError(parsedError);
-    } finally {
       setIsLoading(false);
     }
+    
+    // Only set loading to false if we didn't return early (i.e., no success)
+    setIsLoading(false);
   };
 
   const handleRetry = () => {
