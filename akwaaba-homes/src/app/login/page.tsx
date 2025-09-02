@@ -19,7 +19,7 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const { signIn, isAuthenticated, user } = useAuth();
+  const { signIn, isAuthenticated, user, userProfile, isAdmin, isAgent } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -43,15 +43,15 @@ function LoginForm() {
   // Redirect if already authenticated - moved to useEffect to avoid setState during render
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.user_metadata?.user_type === 'agent') {
+      if (isAgent) {
         router.push('/agent-dashboard');
-      } else if (user.user_metadata?.user_type === 'admin') {
+      } else if (isAdmin) {
         router.push('/admin');
       } else {
         router.push('/dashboard');
       }
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, isAgent, isAdmin, router]);
 
   // Show loading state while checking authentication
   if (isAuthenticated && user) {

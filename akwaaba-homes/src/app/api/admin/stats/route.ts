@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('user_type', 'agent'),
+        .eq('user_role', 'agent'),
       
       // Total properties
       supabase
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
       supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('user_type', 'agent')
+        .eq('user_role', 'agent')
         .eq('verification_status', 'pending'),
       
       // Pending property approvals
