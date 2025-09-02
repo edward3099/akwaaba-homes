@@ -24,6 +24,8 @@ export default function OnboardingPage() {
     profile_image: '',
     cover_image: ''
   });
+  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
+  const [uploadingCoverImage, setUploadingCoverImage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -33,21 +35,42 @@ export default function OnboardingPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Get onboarding data from localStorage
-    const storedData = localStorage.getItem('agentOnboarding');
-    if (storedData) {
-      const data = JSON.parse(storedData);
-      setOnboardingData(data);
-      setFormData(prev => ({
-        ...prev,
-        full_name: data.fullName || '',
-        company_name: data.company || '',
-        phone: data.phone || ''
-      }));
-    } else {
-      // If no onboarding data, redirect to signup
-      router.push('/signup');
-    }
+    // Check if user is authenticated first
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          // User not authenticated, redirect to login
+          router.push('/login?redirect=/agent/onboarding');
+          return;
+        }
+        
+        // User is authenticated, get onboarding data
+        const storedData = localStorage.getItem('agentOnboarding');
+        if (storedData) {
+          const data = JSON.parse(storedData);
+          setOnboardingData(data);
+          setFormData(prev => ({
+            ...prev,
+            full_name: data.fullName || '',
+            company_name: data.company || '',
+            phone: data.phone || ''
+          }));
+        } else {
+          // If no onboarding data, redirect to signup
+          router.push('/signup');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/login?redirect=/agent/onboarding');
+      }
+    };
+    
+    checkAuth();
   }, [router]);
 
   const handleInputChange = (field: string, value: string) => {
@@ -62,6 +85,62 @@ export default function OnboardingPage() {
         ? prev.specializations.filter(s => s !== specialization)
         : [...prev.specializations, specialization]
     }));
+  };
+
+  const handleProfileImageUpload = async (file: File) => {
+    setUploadingProfileImage(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await fetch('/api/user/profile/avatar', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload profile image');
+      }
+      
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, profile_image: data.avatarUrl }));
+    } catch (err) {
+      setError('Failed to upload profile image. Please try again.');
+      console.error('Profile image upload error:', err);
+    } finally {
+      setUploadingProfileImage(false);
+    }
+  };
+
+  const handleCoverImageUpload = async (file: File) => {
+    setUploadingCoverImage(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('cover', file);
+      
+      const response = await fetch('/api/user/profile/cover', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload cover image');
+      }
+      
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, cover_image: data.coverUrl }));
+    } catch (err) {
+      setError('Failed to upload cover image. Please try again.');
+      console.error('Cover image upload error:', err);
+    } finally {
+      setUploadingCoverImage(false);
+    }
   };
 
   const validateStep = (step: number) => {
@@ -132,6 +211,8 @@ export default function OnboardingPage() {
           experience_years: parseInt(formData.experience_years),
           bio: formData.bio,
           specializations: formData.specializations,
+          profile_image: formData.profile_image,
+          cover_image: formData.cover_image,
           // Mark as onboarding completed
           onboarding_completed: true
         })
@@ -243,7 +324,109 @@ export default function OnboardingPage() {
 
       case 3:
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Profile Photo Upload */}
+            <div className="space-y-2">
+              <Label>Profile Photo</Label>
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {formData.profile_image ? (
+                    <img 
+                      src={formData.profile_image} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-2xl">👤</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleProfileImageUpload(file);
+                      }
+                    }}
+                    className="hidden"
+                    id="profile-upload"
+                    disabled={uploadingProfileImage}
+                  />
+                  <label
+                    htmlFor="profile-upload"
+                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${
+                      uploadingProfileImage ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {uploadingProfileImage ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload Profile Photo'
+                    )}
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Recommended: Square image, at least 200x200px
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cover Photo Upload */}
+            <div className="space-y-2">
+              <Label>Cover Photo</Label>
+              <div className="space-y-2">
+                <div className="w-full h-32 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {formData.cover_image ? (
+                    <img 
+                      src={formData.cover_image} 
+                      alt="Cover" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-4xl">🏠</span>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleCoverImageUpload(file);
+                      }
+                    }}
+                    className="hidden"
+                    id="cover-upload"
+                    disabled={uploadingCoverImage}
+                  />
+                  <label
+                    htmlFor="cover-upload"
+                    className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer ${
+                      uploadingCoverImage ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {uploadingCoverImage ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      'Upload Cover Photo'
+                    )}
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Recommended: 1200x400px or similar wide format
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="bio">Professional Bio *</Label>
               <Textarea
