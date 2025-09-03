@@ -1,0 +1,6 @@
+{
+  "version": "cache-bust-1756935000000",
+  "timestamp": "2025-01-03T22:36:40.000Z",
+  "buildId": "build-1756935000000-abc123def",
+  "description": "Cache busting version to force Vercel CDN refresh"
+}

@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
+  // Add timestamp to force cache invalidation
+  generateBuildId: async () => {
+    return `build-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  },
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
@@ -98,6 +103,29 @@ const nextConfig = {
   // Improve build performance
   compress: true,
   poweredByHeader: false,
+  // 🚀🚀🚀 CACHE BUST - FORCE CDN CACHE INVALIDATION 🚀🚀🚀
+  async headers() {
+    return [
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 export default nextConfig

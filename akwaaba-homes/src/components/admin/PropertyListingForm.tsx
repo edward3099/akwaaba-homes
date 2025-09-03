@@ -111,6 +111,22 @@ export default function PropertyListingForm() {
   console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
   console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
   
+  // Force cache bust by checking version
+  useEffect(() => {
+    fetch('/version.json?' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        console.log('🚀🚀🚀 VERSION CHECK:', data);
+        const storedVersion = localStorage.getItem('app-version');
+        if (storedVersion !== data.version) {
+          console.log('🚀🚀🚀 VERSION CHANGED - FORCING RELOAD');
+          localStorage.setItem('app-version', data.version);
+          window.location.reload();
+        }
+      })
+      .catch(err => console.log('Version check failed:', err));
+  }, []);
+  
   const { user, session } = useAuth();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState(1);
