@@ -482,11 +482,22 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    if (!formData.bedrooms || formData.bedrooms <= 0) {
-      validationErrors.push('Number of bedrooms must be greater than 0.');
+    // Only require bedrooms and bathrooms for residential property types
+    if (formData.type && !['land', 'commercial'].includes(formData.type)) {
+      if (!formData.bedrooms || formData.bedrooms <= 0) {
+        validationErrors.push('Number of bedrooms must be greater than 0.');
+      }
+      if (!formData.bathrooms || formData.bathrooms <= 0) {
+        validationErrors.push('Number of bathrooms must be greater than 0.');
+      }
     }
-    if (!formData.bathrooms || formData.bathrooms <= 0) {
-      validationErrors.push('Number of bathrooms must be greater than 0.');
+    
+    // Always require size and lot size (year built is now optional)
+    if (!formData.size || formData.size <= 0) {
+      validationErrors.push('Property size is required and must be greater than 0.');
+    }
+    if (!formData.lotSize || formData.lotSize <= 0) {
+      validationErrors.push('Lot size is required and must be greater than 0.');
     }
     
     if (validationErrors.length > 0) {
@@ -1012,7 +1023,7 @@ export default function PropertyListingForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bedrooms
+            Bedrooms {formData.type && !['land', 'commercial'].includes(formData.type) && <span className="text-red-500">*</span>}
           </label>
           <input
             type="number"
@@ -1026,7 +1037,7 @@ export default function PropertyListingForm() {
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bathrooms
+            Bathrooms {formData.type && !['land', 'commercial'].includes(formData.type) && <span className="text-red-500">*</span>}
           </label>
           <input
             type="number"
@@ -1065,7 +1076,7 @@ export default function PropertyListingForm() {
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Lot Size
+            Lot Size <span className="text-red-500">*</span>
           </label>
           <div className="flex">
             <input
