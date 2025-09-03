@@ -570,43 +570,43 @@ export default function AgentProfilePage() {
               </div>
             )}
             
-            {/* Title and Badge Section */}
-            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Profile Settings</h1>
-                <p className="text-sm sm:text-base text-slate-600 mt-1">
-                  {profileCompletion?.isComplete 
-                    ? "Manage your agent profile and preferences"
-                    : "Complete your profile to access the agent dashboard"
-                  }
-                </p>
-              </div>
-              <div className="flex-shrink-0 mt-2 sm:mt-0">
-                <Badge 
-                  variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
-                  className="text-xs px-2 py-1 sm:px-3"
-                >
-                  {isVerified ? (
-                    <>
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Verified Agent</span>
-                      <span className="sm:hidden">Verified</span>
-                    </>
-                  ) : isRejected ? (
-                    <>
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Verification Rejected</span>
-                      <span className="sm:hidden">Rejected</span>
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Pending Verification</span>
-                      <span className="sm:hidden">Pending</span>
-                    </>
-                  )}
-                </Badge>
-              </div>
+            {/* Title Section */}
+            <div className="space-y-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Profile Settings</h1>
+              <p className="text-sm sm:text-base text-slate-600">
+                {profileCompletion?.isComplete 
+                  ? "Manage your agent profile and preferences"
+                  : "Complete your profile to access the agent dashboard"
+                }
+              </p>
+            </div>
+            
+            {/* Badge Section - Separate row on mobile */}
+            <div className="flex justify-start">
+              <Badge 
+                variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
+                className="text-xs px-2 py-1 sm:px-3"
+              >
+                {isVerified ? (
+                  <>
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Verified Agent</span>
+                    <span className="sm:hidden">Verified</span>
+                  </>
+                ) : isRejected ? (
+                  <>
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Verification Rejected</span>
+                    <span className="sm:hidden">Rejected</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Pending Verification</span>
+                    <span className="sm:hidden">Pending</span>
+                  </>
+                )}
+              </Badge>
             </div>
           </div>
         </div>
