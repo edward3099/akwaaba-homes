@@ -29,6 +29,7 @@ import {
   Home,
   Upload
 } from 'lucide-react';
+import { FileUploadDropzone } from '@/components/ui/file-upload-dropzone';
 import { markProfileAsCompleted, getFieldDisplayName } from '@/lib/utils/profileCompletion';
 
 interface ProfileCompletionStatus {
@@ -203,13 +204,203 @@ export default function AgentProfilePage() {
     };
   }, []);
 
-  // Simple click handlers for file inputs
-  const handleProfileImageClick = () => {
-    profileImageInputRef.current?.click();
+  // New handlers for React Dropzone component
+  const handleProfileImageChange = async (file: File) => {
+    console.log('handleProfileImageChange called with file:', file);
+    
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Only JPEG, PNG, and WebP images are allowed.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Profile image must be less than 5MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await fetch('/api/user/profile/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload profile image');
+      }
+
+      const result = await response.json();
+      
+      // Update the profile state
+      setProfile(prev => ({
+        ...prev,
+        profile_image: result.avatar_url
+      }));
+
+      toast({
+        title: "Success",
+        description: "Profile image updated successfully!",
+      });
+
+      // Check completion status
+      await checkCompletion();
+      
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload profile image. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
-  const handleCoverImageClick = () => {
-    coverImageInputRef.current?.click();
+  const handleRemoveProfileImage = async () => {
+    try {
+      const response = await fetch('/api/user/profile/avatar', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove profile image');
+      }
+
+      setProfile(prev => ({
+        ...prev,
+        profile_image: ''
+      }));
+
+      toast({
+        title: "Success",
+        description: "Profile image removed successfully!",
+      });
+
+      await checkCompletion();
+      
+    } catch (error) {
+      console.error('Error removing profile image:', error);
+      toast({
+        title: "Remove Failed",
+        description: "Failed to remove profile image. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCoverImageChange = async (file: File) => {
+    console.log('handleCoverImageChange called with file:', file);
+    
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Only JPEG, PNG, and WebP images are allowed.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Cover image must be less than 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingCoverImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/user/profile/cover-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload cover image');
+      }
+
+      const result = await response.json();
+      
+      // Update the profile state
+      setProfile(prev => ({
+        ...prev,
+        cover_image: result.cover_image_url
+      }));
+
+      toast({
+        title: "Success",
+        description: "Cover image updated successfully!",
+      });
+
+      // Check completion status
+      await checkCompletion();
+      
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload cover image. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingCoverImage(false);
+    }
+  };
+
+  const handleRemoveCoverImage = async () => {
+    try {
+      const response = await fetch('/api/user/profile/cover-image', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove cover image');
+      }
+
+      setProfile(prev => ({
+        ...prev,
+        cover_image: ''
+      }));
+
+      toast({
+        title: "Success",
+        description: "Cover image removed successfully!",
+      });
+
+      await checkCompletion();
+      
+    } catch (error) {
+      console.error('Error removing cover image:', error);
+      toast({
+        title: "Remove Failed",
+        description: "Failed to remove cover image. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const checkCompletion = async () => {
@@ -670,135 +861,34 @@ export default function AgentProfilePage() {
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Profile Image Section */}
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
-                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Profile Photo</span>
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Add a professional photo to help clients recognize you
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-6">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                  {profile.profile_image ? (
-                    <img 
-                      key={profile.profile_image}
-                      src={profile.profile_image} 
-                      alt="Profile" 
-                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover"
-                    />
-                  ) : (
-                    <User className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" />
-                  )}
-                </div>
-                <div className="w-full text-center sm:text-left">
-                  <input
-                    ref={profileImageInputRef}
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={uploadingImage}
-                    id="profile-photo-upload"
-                    data-testid="profile-photo-upload"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleProfileImageClick}
-                    disabled={uploadingImage}
-                    className="w-full sm:w-auto min-h-[44px]"
-                  >
-                    {uploadingImage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Choose File
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-2">
-                    {uploadingImage ? 'Uploading your photo...' : 'Tap the button above to select a professional photo (max 5MB)'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <FileUploadDropzone
+            title="Profile Photo"
+            description="Add a professional photo to help clients recognize you"
+            currentImageUrl={profile.profile_image}
+            onFileSelect={handleProfileImageChange}
+            onFileRemove={handleRemoveProfileImage}
+            uploadButtonText="Choose Photo"
+            removeButtonText="Remove Photo"
+            maxSize={5 * 1024 * 1024} // 5MB
+            accept={{
+              'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+            }}
+          />
 
           {/* Cover Image Section */}
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
-                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Cover Image</span>
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Add a cover image that will be displayed on your agent profile page
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <div className="space-y-4">
-                <div className="w-full h-40 sm:h-48 md:h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
-                  {profile.cover_image ? (
-                    <div className="w-full h-full relative">
-                      <img 
-                        key={profile.cover_image}
-                        src={profile.cover_image} 
-                        alt="Cover" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-center text-slate-500">
-                      <Camera className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2" />
-                      <p className="text-xs sm:text-sm md:text-base">No cover image uploaded</p>
-                    </div>
-                  )}
-                </div>
-                <div className="text-center sm:text-left">
-                  <input
-                    ref={coverImageInputRef}
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleCoverImageUpload}
-                    className="hidden"
-                    disabled={uploadingCoverImage}
-                    id="cover-image-upload"
-                    data-testid="cover-image-upload"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCoverImageClick}
-                    disabled={uploadingCoverImage}
-                    className="w-full sm:w-auto min-h-[44px]"
-                  >
-                    {uploadingCoverImage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Choose File
-                      </>
-                    )}
-                  </Button>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-2">
-                    {uploadingCoverImage ? 'Uploading your cover image...' : 'Tap the button above to select a cover image (max 10MB)'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <FileUploadDropzone
+            title="Cover Image"
+            description="Add a cover image that will be displayed on your agent profile page"
+            currentImageUrl={profile.cover_image}
+            onFileSelect={handleCoverImageChange}
+            onFileRemove={handleRemoveCoverImage}
+            uploadButtonText="Choose Cover Image"
+            removeButtonText="Remove Cover Image"
+            maxSize={10 * 1024 * 1024} // 10MB
+            accept={{
+              'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+            }}
+          />
 
           {/* Personal Information */}
           <Card className="overflow-hidden">
