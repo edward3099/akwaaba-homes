@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
+  // 🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX 🚀🚀🚀
   // Add timestamp to force cache invalidation
   generateBuildId: async () => {
-    return `build-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `build-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-vercel-mcp`;
   },
   eslint: {
     // Warning: This allows production builds to successfully complete even if

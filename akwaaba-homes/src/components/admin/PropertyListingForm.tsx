@@ -106,10 +106,12 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
-  // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥
-  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
-  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
-  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
+  // 🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX 🚀🚀🚀
+  const cacheBustTimestamp = Date.now();
+  console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - COMPONENT LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - COMPONENT LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - COMPONENT LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 CACHE BUST TIMESTAMP:', cacheBustTimestamp, '🚀🚀🚀');
   
   // Force cache bust by checking version
   useEffect(() => {
@@ -470,10 +472,12 @@ export default function PropertyListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥
-    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
-    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
-    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
+    // 🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - HANDLE SUBMIT 🚀🚀🚀
+    const submitTimestamp = Date.now();
+    console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - HANDLE SUBMIT 🚀🚀🚀');
+    console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - HANDLE SUBMIT 🚀🚀🚀');
+    console.log('🚀🚀🚀 ULTIMATE CACHE BUST - VERCEL MCP FIX - HANDLE SUBMIT 🚀🚀🚀');
+    console.log('🚀🚀🚀 SUBMIT TIMESTAMP:', submitTimestamp, '🚀🚀🚀');
     
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];

@@ -1,6 +1,6 @@
 {
-  "version": "manual-fix-1756936000000",
-  "timestamp": "2025-01-03T22:40:00.000Z",
-  "buildId": "build-1756936000000-manual123",
-  "description": "Manual fix version with complete validation rewrite"
+  "version": "vercel-mcp-fix-1756937000000",
+  "timestamp": "2025-01-03T22:50:00.000Z",
+  "buildId": "build-1756937000000-vercel-mcp",
+  "description": "Vercel MCP fix with ultimate cache busting strategy"
 }
