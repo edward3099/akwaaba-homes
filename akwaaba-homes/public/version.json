@@ -1,6 +1,6 @@
 {
-  "version": "vercel-mcp-fix-1756937000000",
-  "timestamp": "2025-01-03T22:50:00.000Z",
-  "buildId": "build-1756937000000-vercel-mcp",
-  "description": "Vercel MCP fix with ultimate cache busting strategy"
+  "version": "github-pages-fixed-1756943000000",
+  "timestamp": "2025-01-03T23:10:00.000Z",
+  "buildId": "build-1756943000000-github-fixed",
+  "description": "Fresh deployment after fixing GitHub Pages auto-deployment issue"
 }
