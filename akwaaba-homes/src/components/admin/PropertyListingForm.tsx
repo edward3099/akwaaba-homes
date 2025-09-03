@@ -482,17 +482,17 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    // 🚀🚀🚀 VALIDATION FIX DEPLOYED - CACHE BUST VERSION 🚀🚀🚀
+    // 🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST VERSION 🚀🚀🚀🚀🚀
     // Only require bedrooms and bathrooms for residential property types
     // Land and commercial properties are excluded from bedroom/bathroom validation
-    console.log('🚀🚀🚀 VALIDATION FIX DEPLOYED - Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
+    console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
     
     // Check if property type is land or commercial - if so, skip bedroom/bathroom validation
     const isLandOrCommercial = formData.type && ['land', 'commercial'].includes(formData.type);
-    console.log('🚀🚀🚀 VALIDATION FIX DEPLOYED - Is land/commercial?', isLandOrCommercial);
+    console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Is land/commercial?', isLandOrCommercial);
     
     if (!isLandOrCommercial) {
-      console.log('🚀🚀🚀 VALIDATION FIX DEPLOYED - Applying residential validation rules');
+      console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Applying residential validation rules');
       if (!formData.bedrooms || formData.bedrooms <= 0) {
         validationErrors.push('Number of bedrooms must be greater than 0.');
       }
@@ -500,7 +500,7 @@ export default function PropertyListingForm() {
         validationErrors.push('Number of bathrooms must be greater than 0.');
       }
     } else {
-      console.log('🚀🚀🚀 VALIDATION FIX DEPLOYED - ✅ SKIPPING bedrooms/bathrooms validation for land/commercial property');
+      console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - ✅ SKIPPING bedrooms/bathrooms validation for land/commercial property');
     }
     
     // Always require size and lot size (year built is now optional)
