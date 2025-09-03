@@ -101,44 +101,104 @@ export default function AgentProfilePage() {
     fetchProfile();
   }, []);
 
-  // Ensure event handlers are attached as fallback
+  // Ensure event handlers are attached as fallback - more aggressive approach
   useEffect(() => {
     const attachEventHandlers = () => {
       const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
       const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
       
-      if (profileInput && !profileInput.onchange) {
-        console.log('Attaching fallback profile image handler');
-        profileInput.onchange = (event) => {
+      console.log('Attempting to attach event handlers...');
+      console.log('Profile input found:', !!profileInput);
+      console.log('Cover input found:', !!coverInput);
+      
+      if (profileInput) {
+        console.log('Attaching profile image handler');
+        profileInput.onchange = async (event) => {
+          console.log('Profile image change event triggered!');
           const target = event.target as HTMLInputElement;
-          const mockEvent = {
-            target: {
-              files: target.files
+          const file = target.files?.[0];
+          console.log('File selected:', file);
+          
+          if (!file) return;
+          
+          try {
+            console.log('Starting profile image upload...');
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            const response = await fetch('/api/user/profile/avatar', {
+              method: 'POST',
+              body: formData
+            });
+            
+            const result = await response.json();
+            console.log('Profile image upload response:', result);
+            
+            if (result.success) {
+              // Update the profile image display
+              const profileImg = document.querySelector('img[alt="Profile"]') as HTMLImageElement;
+              if (profileImg) {
+                profileImg.src = result.avatarUrl + '?t=' + Date.now();
+                console.log('Profile image updated successfully');
+              }
+              // Also update the React state
+              setProfile(prev => prev ? { ...prev, profile_image: result.avatarUrl } : null);
             }
-          } as React.ChangeEvent<HTMLInputElement>;
-          handleImageUpload(mockEvent);
+          } catch (error) {
+            console.error('Profile image upload error:', error);
+          }
         };
       }
       
-      if (coverInput && !coverInput.onchange) {
-        console.log('Attaching fallback cover image handler');
-        coverInput.onchange = (event) => {
+      if (coverInput) {
+        console.log('Attaching cover image handler');
+        coverInput.onchange = async (event) => {
+          console.log('Cover image change event triggered!');
           const target = event.target as HTMLInputElement;
-          const mockEvent = {
-            target: {
-              files: target.files
+          const file = target.files?.[0];
+          console.log('File selected:', file);
+          
+          if (!file) return;
+          
+          try {
+            console.log('Starting cover image upload...');
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/user/profile/cover-image', {
+              method: 'POST',
+              body: formData
+            });
+            
+            const result = await response.json();
+            console.log('Cover image upload response:', result);
+            
+            if (result.success) {
+              // Update the cover image display
+              const coverImg = document.querySelector('img[alt="Cover"]') as HTMLImageElement;
+              if (coverImg) {
+                coverImg.src = result.coverImageUrl + '?t=' + Date.now();
+                console.log('Cover image updated successfully');
+              }
+              // Also update the React state
+              setProfile(prev => prev ? { ...prev, cover_image: result.coverImageUrl } : null);
             }
-          } as React.ChangeEvent<HTMLInputElement>;
-          handleCoverImageUpload(mockEvent);
+          } catch (error) {
+            console.error('Cover image upload error:', error);
+          }
         };
       }
     };
     
-    // Attach handlers after a short delay to ensure DOM is ready
-    const timeoutId = setTimeout(attachEventHandlers, 100);
+    // Try multiple times to ensure handlers are attached
+    const timeoutId1 = setTimeout(attachEventHandlers, 100);
+    const timeoutId2 = setTimeout(attachEventHandlers, 500);
+    const timeoutId3 = setTimeout(attachEventHandlers, 1000);
     
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
     };
   }, []);
 
