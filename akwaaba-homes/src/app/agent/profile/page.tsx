@@ -557,58 +557,58 @@ export default function AgentProfilePage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
-          <div className="space-y-4">
-            {/* Back to Dashboard Button - Full width on mobile */}
-            {profileCompletion?.isComplete && (
-              <div className="w-full">
+          {/* Mobile: Stack vertically, Desktop: Horizontal layout */}
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            {/* Left side: Back button and title */}
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
+              {/* Back to Dashboard Button */}
+              {profileCompletion?.isComplete && (
                 <Link href="/agent-dashboard">
                   <Button variant="outline" className="w-full sm:w-auto">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Dashboard
                   </Button>
                 </Link>
-              </div>
-            )}
-            
-            {/* Title and Badge Section - Stack vertically on mobile */}
-            <div className="space-y-3">
-              <div className="space-y-2">
+              )}
+              
+              {/* Title Section */}
+              <div>
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Profile Settings</h1>
-                <p className="text-sm sm:text-base text-slate-600">
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
                   {profileCompletion?.isComplete 
                     ? "Manage your agent profile and preferences"
                     : "Complete your profile to access the agent dashboard"
                   }
                 </p>
               </div>
-              
-              {/* Badge - Always on its own line */}
-              <div className="flex justify-start">
-                <Badge 
-                  variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
-                  className="text-xs px-2 py-1 sm:px-3"
-                >
-                  {isVerified ? (
-                    <>
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Verified Agent</span>
-                      <span className="sm:hidden">Verified</span>
-                    </>
-                  ) : isRejected ? (
-                    <>
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Verification Rejected</span>
-                      <span className="sm:hidden">Rejected</span>
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Pending Verification</span>
-                      <span className="sm:hidden">Pending</span>
-                    </>
-                  )}
-                </Badge>
-              </div>
+            </div>
+            
+            {/* Right side: Badge */}
+            <div className="flex justify-start sm:justify-end">
+              <Badge 
+                variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
+                className="text-xs px-2 py-1 sm:px-3"
+              >
+                {isVerified ? (
+                  <>
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Verified Agent</span>
+                    <span className="sm:hidden">Verified</span>
+                  </>
+                ) : isRejected ? (
+                  <>
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Verification Rejected</span>
+                    <span className="sm:hidden">Rejected</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Pending Verification</span>
+                    <span className="sm:hidden">Pending</span>
+                  </>
+                )}
+              </Badge>
             </div>
           </div>
         </div>
