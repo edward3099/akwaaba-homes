@@ -106,12 +106,12 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
-  // 🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION 🔥🔥🔥
-  const mcpCacheBustTimestamp = Date.now();
-  console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - COMPONENT LOADED 🔥🔥🔥');
-  console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - COMPONENT LOADED 🔥🔥🔥');
-  console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - COMPONENT LOADED 🔥🔥🔥');
-  console.log('🔥🔥🔥 MCP CACHE BUST TIMESTAMP:', mcpCacheBustTimestamp, '🔥🔥🔥');
+  // 🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED
+  const context7Timestamp = Date.now();
+  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
+  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
+  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
+  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - TIMESTAMP:', context7Timestamp, '🎯');
   
   // Force cache bust by checking version
   useEffect(() => {
@@ -472,12 +472,12 @@ export default function PropertyListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - HANDLE SUBMIT 🔥🔥🔥
-    const mcpSubmitTimestamp = Date.now();
-    console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - HANDLE SUBMIT 🔥🔥🔥');
-    console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - HANDLE SUBMIT 🔥🔥🔥');
-    console.log('🔥🔥🔥 VERCEL MCP CACHE BUST - FINAL SOLUTION - HANDLE SUBMIT 🔥🔥🔥');
-    console.log('🔥🔥🔥 MCP SUBMIT TIMESTAMP:', mcpSubmitTimestamp, '🔥🔥🔥');
+    // 🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT
+    const context7SubmitTimestamp = Date.now();
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - SUBMIT TIMESTAMP:', context7SubmitTimestamp, '🎯');
     
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];
@@ -512,19 +512,18 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPLETE VALIDATION REWRITE 🔥🔥🔥🔥🔥🔥
-    // COMPLETELY NEW VALIDATION LOGIC - FORCE VERCEL TO SERVE NEW CODE
-    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPLETE VALIDATION REWRITE 🔥🔥🔥🔥🔥🔥');
-    console.log('🔥🔥🔥🔥🔥🔥 Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
+    // 🎯 CONTEXT7 EXPERT VALIDATION FIX - CONDITIONAL VALIDATION LOGIC
+    // Based on Next.js and Conform best practices for conditional form validation
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
     
-    // NEW APPROACH: Check if property type is residential (house, apartment, townhouse, condo)
+    // Define residential property types that require bedrooms/bathrooms
     const residentialTypes = ['house', 'apartment', 'townhouse', 'condo'];
     const isResidentialProperty = formData.type && residentialTypes.includes(formData.type);
-    console.log('🔥🔥🔥🔥🔥🔥 Is residential property?', isResidentialProperty);
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Is residential property?', isResidentialProperty);
     
-    // ONLY validate bedrooms/bathrooms for residential properties
+    // Apply conditional validation based on property type
     if (isResidentialProperty) {
-      console.log('🔥🔥🔥🔥🔥🔥 Applying residential validation rules');
+      console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Applying residential validation rules');
       if (!formData.bedrooms || formData.bedrooms <= 0) {
         validationErrors.push('Number of bedrooms must be greater than 0.');
       }
@@ -532,7 +531,7 @@ export default function PropertyListingForm() {
         validationErrors.push('Number of bathrooms must be greater than 0.');
       }
     } else {
-      console.log('🔥🔥🔥🔥🔥🔥 ✅ SKIPPING bedrooms/bathrooms validation for non-residential property');
+      console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - ✅ SKIPPING bedrooms/bathrooms validation for non-residential property');
     }
     
     // Always require size and lot size (year built is now optional)
