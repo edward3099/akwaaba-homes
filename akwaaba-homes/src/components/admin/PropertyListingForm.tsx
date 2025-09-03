@@ -483,13 +483,17 @@ export default function PropertyListingForm() {
       validationErrors.push('Listing type is required.');
     }
     // Only require bedrooms and bathrooms for residential property types (land and commercial are excluded)
+    console.log('🔍 VALIDATION DEBUG: Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
     if (formData.type && !['land', 'commercial'].includes(formData.type)) {
+      console.log('🔍 VALIDATION DEBUG: Applying residential validation rules');
       if (!formData.bedrooms || formData.bedrooms <= 0) {
         validationErrors.push('Number of bedrooms must be greater than 0.');
       }
       if (!formData.bathrooms || formData.bathrooms <= 0) {
         validationErrors.push('Number of bathrooms must be greater than 0.');
       }
+    } else {
+      console.log('🔍 VALIDATION DEBUG: Skipping bedrooms/bathrooms validation for land/commercial property');
     }
     
     // Always require size and lot size (year built is now optional)
