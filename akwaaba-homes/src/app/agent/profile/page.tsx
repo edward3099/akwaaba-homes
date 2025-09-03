@@ -1,5 +1,5 @@
 'use client';
-// Version: 2025-01-02 - Mobile responsiveness fixes
+// Version: 2025-01-02 - React Dropzone implementation - FORCE DEPLOYMENT
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
