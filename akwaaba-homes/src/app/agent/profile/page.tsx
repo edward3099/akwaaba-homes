@@ -556,19 +556,24 @@ export default function AgentProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
-              {profileCompletion?.isComplete && (
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+          <div className="space-y-3 sm:space-y-0">
+            {/* Back to Dashboard Button - Full width on mobile */}
+            {profileCompletion?.isComplete && (
+              <div className="w-full">
                 <Link href="/agent-dashboard">
                   <Button variant="outline" className="w-full sm:w-auto">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Dashboard
                   </Button>
                 </Link>
-              )}
-              <div className="flex-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Profile Settings</h1>
+              </div>
+            )}
+            
+            {/* Title and Badge Section */}
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Profile Settings</h1>
                 <p className="text-sm sm:text-base text-slate-600 mt-1">
                   {profileCompletion?.isComplete 
                     ? "Manage your agent profile and preferences"
@@ -576,35 +581,38 @@ export default function AgentProfilePage() {
                   }
                 </p>
               </div>
-            </div>
-            <div className="flex items-center justify-center sm:justify-end">
-              <Badge 
-                variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
-                className="text-xs px-3 py-1"
-              >
-                {isVerified ? (
-                  <>
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Verified Agent
-                  </>
-                ) : isRejected ? (
-                  <>
-                    <AlertCircle className="w-3 h-3 mr-1" />
-                    Verification Rejected
-                  </>
-                ) : (
-                  <>
-                    <Clock className="w-3 h-3 mr-1" />
-                    Pending Verification
-                  </>
-                )}
-              </Badge>
+              <div className="flex-shrink-0">
+                <Badge 
+                  variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
+                  className="text-xs px-2 py-1 sm:px-3"
+                >
+                  {isVerified ? (
+                    <>
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Verified Agent</span>
+                      <span className="sm:hidden">Verified</span>
+                    </>
+                  ) : isRejected ? (
+                    <>
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Verification Rejected</span>
+                      <span className="sm:hidden">Rejected</span>
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Pending Verification</span>
+                      <span className="sm:hidden">Pending</span>
+                    </>
+                  )}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-8">
         {/* Profile Completion Status */}
         {profileCompletion && (
           <Card className="mb-6 sm:mb-8 overflow-hidden">
