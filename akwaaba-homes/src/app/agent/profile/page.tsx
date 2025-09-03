@@ -556,7 +556,7 @@ export default function AgentProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
               {profileCompletion?.isComplete && (
@@ -604,21 +604,21 @@ export default function AgentProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Profile Completion Status */}
         {profileCompletion && (
-          <Card className="mb-6 sm:mb-8">
-            <CardHeader className="pb-4">
+          <Card className="mb-6 sm:mb-8 overflow-hidden">
+            <CardHeader className="pb-3">
               <CardTitle className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                 <span className="flex items-center space-x-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="text-lg sm:text-xl">Profile Completion</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-base sm:text-lg">Profile Completion</span>
                 </span>
-                <Badge variant={profileCompletion.isComplete ? "default" : "secondary"} className="w-fit">
+                <Badge variant={profileCompletion.isComplete ? "default" : "secondary"} className="w-fit text-xs">
                   {profileCompletion.completionPercentage}% Complete
                 </Badge>
               </CardTitle>
-              <CardDescription className="text-sm sm:text-base">
+              <CardDescription className="text-sm">
                 Complete all required fields to access your agent dashboard
               </CardDescription>
             </CardHeader>
@@ -659,17 +659,17 @@ export default function AgentProfilePage() {
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Profile Image Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Camera className="w-5 h-5" />
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Profile Photo</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Add a professional photo to help clients recognize you
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-2">
               <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-6">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   {profile.profile_image ? (
@@ -722,17 +722,17 @@ export default function AgentProfilePage() {
           </Card>
 
           {/* Cover Image Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Camera className="w-5 h-5" />
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Cover Image</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Add a cover image that will be displayed on your agent profile page
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-2">
               <div className="space-y-4">
                 <div className="w-full h-40 sm:h-48 md:h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
                   {profile.cover_image ? (
@@ -790,17 +790,17 @@ export default function AgentProfilePage() {
           </Card>
 
           {/* Personal Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="w-5 h-5" />
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                <User className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Personal Information</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Your basic personal details and contact information
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 pt-2">
               <div className="space-y-2">
                 <Label htmlFor="full_name" className="text-sm font-medium">Full Name *</Label>
                 <Input
@@ -891,17 +891,17 @@ export default function AgentProfilePage() {
           </Card>
 
           {/* Professional Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Building2 className="w-5 h-5" />
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Professional Information</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Your business details and professional credentials
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 pt-2">
               <div className="space-y-2">
                 <Label htmlFor="company_name" className="text-sm font-medium">Company Name *</Label>
                 <Input
@@ -959,17 +959,17 @@ export default function AgentProfilePage() {
           </Card>
 
           {/* Specializations */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Award className="w-5 h-5" />
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Specializations</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Select the areas of real estate you specialize in
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-2">
               <div className="flex flex-wrap gap-2">
                 {formData.specializations.map((spec, index) => (
                   <Badge key={index} variant="secondary" className="text-xs sm:text-sm px-2 py-1">
@@ -1012,15 +1012,15 @@ export default function AgentProfilePage() {
 
           {/* Verification Status */}
           {!isVerified && (
-            <Card className={`${isRejected ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'}`}>
-              <CardHeader>
-                <CardTitle className={`flex items-center space-x-2 ${isRejected ? 'text-red-800' : 'text-orange-800'}`}>
-                  {isRejected ? <AlertCircle className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+            <Card className={`overflow-hidden ${isRejected ? 'border-red-200 bg-red-50' : 'border-orange-200 bg-orange-50'}`}>
+              <CardHeader className="pb-3">
+                <CardTitle className={`flex items-center space-x-2 text-base sm:text-lg ${isRejected ? 'text-red-800' : 'text-orange-800'}`}>
+                  {isRejected ? <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Clock className="w-4 h-4 sm:w-5 sm:h-5" />}
                   <span>
                     {isRejected ? 'Verification Rejected' : 'Verification Pending'}
                   </span>
                 </CardTitle>
-                <CardDescription className={isRejected ? 'text-red-700' : 'text-orange-700'}>
+                <CardDescription className={`text-sm ${isRejected ? 'text-red-700' : 'text-orange-700'}`}>
                   {isRejected 
                     ? 'Your agent application was not approved. Please contact support for more information.'
                     : 'Your agent application is currently under review. This process typically takes 2-3 business days.'
