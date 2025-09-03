@@ -557,7 +557,7 @@ export default function AgentProfilePage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
-          <div className="space-y-3 sm:space-y-0">
+          <div className="space-y-4">
             {/* Back to Dashboard Button - Full width on mobile */}
             {profileCompletion?.isComplete && (
               <div className="w-full">
@@ -571,7 +571,7 @@ export default function AgentProfilePage() {
             )}
             
             {/* Title and Badge Section */}
-            <div className="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <div className="flex-1 min-w-0">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Profile Settings</h1>
                 <p className="text-sm sm:text-base text-slate-600 mt-1">
@@ -581,7 +581,7 @@ export default function AgentProfilePage() {
                   }
                 </p>
               </div>
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mt-2 sm:mt-0">
                 <Badge 
                   variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
                   className="text-xs px-2 py-1 sm:px-3"
