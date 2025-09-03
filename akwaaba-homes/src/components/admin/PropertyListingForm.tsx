@@ -106,10 +106,10 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
-  // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
-  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
-  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
-  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
+  // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥
+  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
+  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
+  console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPONENT LOADED 🔥🔥🔥🔥🔥🔥');
   
   // Force cache bust by checking version
   useEffect(() => {
@@ -470,10 +470,10 @@ export default function PropertyListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
-    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
-    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
-    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
+    // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥
+    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
+    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
+    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - HANDLE SUBMIT 🔥🔥🔥🔥🔥🔥');
     
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];
@@ -508,17 +508,19 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    // 🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST VERSION 🚀🚀🚀🚀🚀
-    // Only require bedrooms and bathrooms for residential property types
-    // Land and commercial properties are excluded from bedroom/bathroom validation
-    console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
+    // 🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPLETE VALIDATION REWRITE 🔥🔥🔥🔥🔥🔥
+    // COMPLETELY NEW VALIDATION LOGIC - FORCE VERCEL TO SERVE NEW CODE
+    console.log('🔥🔥🔥🔥🔥🔥 MANUAL FIX - COMPLETE VALIDATION REWRITE 🔥🔥🔥🔥🔥🔥');
+    console.log('🔥🔥🔥🔥🔥🔥 Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
     
-    // Check if property type is land or commercial - if so, skip bedroom/bathroom validation
-    const isLandOrCommercial = formData.type && ['land', 'commercial'].includes(formData.type);
-    console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Is land/commercial?', isLandOrCommercial);
+    // NEW APPROACH: Check if property type is residential (house, apartment, townhouse, condo)
+    const residentialTypes = ['house', 'apartment', 'townhouse', 'condo'];
+    const isResidentialProperty = formData.type && residentialTypes.includes(formData.type);
+    console.log('🔥🔥🔥🔥🔥🔥 Is residential property?', isResidentialProperty);
     
-    if (!isLandOrCommercial) {
-      console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - Applying residential validation rules');
+    // ONLY validate bedrooms/bathrooms for residential properties
+    if (isResidentialProperty) {
+      console.log('🔥🔥🔥🔥🔥🔥 Applying residential validation rules');
       if (!formData.bedrooms || formData.bedrooms <= 0) {
         validationErrors.push('Number of bedrooms must be greater than 0.');
       }
@@ -526,7 +528,7 @@ export default function PropertyListingForm() {
         validationErrors.push('Number of bathrooms must be greater than 0.');
       }
     } else {
-      console.log('🚀🚀🚀🚀🚀 VALIDATION FIX DEPLOYED - ULTIMATE CACHE BUST - ✅ SKIPPING bedrooms/bathrooms validation for land/commercial property');
+      console.log('🔥🔥🔥🔥🔥🔥 ✅ SKIPPING bedrooms/bathrooms validation for non-residential property');
     }
     
     // Always require size and lot size (year built is now optional)
