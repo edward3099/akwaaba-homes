@@ -101,6 +101,47 @@ export default function AgentProfilePage() {
     fetchProfile();
   }, []);
 
+  // Ensure event handlers are attached as fallback
+  useEffect(() => {
+    const attachEventHandlers = () => {
+      const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
+      const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
+      
+      if (profileInput && !profileInput.onchange) {
+        console.log('Attaching fallback profile image handler');
+        profileInput.onchange = (event) => {
+          const target = event.target as HTMLInputElement;
+          const mockEvent = {
+            target: {
+              files: target.files
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+          handleImageUpload(mockEvent);
+        };
+      }
+      
+      if (coverInput && !coverInput.onchange) {
+        console.log('Attaching fallback cover image handler');
+        coverInput.onchange = (event) => {
+          const target = event.target as HTMLInputElement;
+          const mockEvent = {
+            target: {
+              files: target.files
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+          handleCoverImageUpload(mockEvent);
+        };
+      }
+    };
+    
+    // Attach handlers after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(attachEventHandlers, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   // Simple click handlers for file inputs
   const handleProfileImageClick = () => {
     profileImageInputRef.current?.click();
