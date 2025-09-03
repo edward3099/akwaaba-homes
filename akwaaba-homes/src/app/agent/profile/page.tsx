@@ -97,100 +97,18 @@ export default function AgentProfilePage() {
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
 
-  // Callback refs to ensure event handlers are attached
-  const setProfileImageRef = useCallback((node: HTMLInputElement | null) => {
-    if (node) {
-      profileImageInputRef.current = node;
-      console.log('Setting profile image ref and attaching handler');
-      node.onchange = (event) => {
-        const target = event.target as HTMLInputElement;
-        const mockEvent = {
-          target: {
-            files: target.files
-          }
-        } as React.ChangeEvent<HTMLInputElement>;
-        handleImageUpload(mockEvent);
-      };
-    }
-  }, []);
-
-  const setCoverImageRef = useCallback((node: HTMLInputElement | null) => {
-    if (node) {
-      coverImageInputRef.current = node;
-      console.log('Setting cover image ref and attaching handler');
-      node.onchange = (event) => {
-        const target = event.target as HTMLInputElement;
-        const mockEvent = {
-          target: {
-            files: target.files
-          }
-        } as React.ChangeEvent<HTMLInputElement>;
-        handleCoverImageUpload(mockEvent);
-      };
-    }
-  }, []);
-
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  // Ensure file input event handlers are properly attached
-  useEffect(() => {
-    const attachEventHandlers = () => {
-      const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
-      const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
-      
-      if (profileInput && !profileInput.onchange) {
-        console.log('Attaching profile image upload handler');
-        profileInput.onchange = (event) => {
-          console.log('Profile image change event triggered!');
-          const target = event.target as HTMLInputElement;
-          const mockEvent = {
-            target: {
-              files: target.files
-            }
-          } as React.ChangeEvent<HTMLInputElement>;
-          handleImageUpload(mockEvent);
-        };
-      }
-      
-      if (coverInput && !coverInput.onchange) {
-        console.log('Attaching cover image upload handler');
-        coverInput.onchange = (event) => {
-          console.log('Cover image change event triggered!');
-          const target = event.target as HTMLInputElement;
-          const mockEvent = {
-            target: {
-              files: target.files
-            }
-          } as React.ChangeEvent<HTMLInputElement>;
-          handleCoverImageUpload(mockEvent);
-        };
-      }
-    };
-    
-    // Attach handlers immediately
-    attachEventHandlers();
-    
-    // Also attach after a short delay to ensure DOM is ready
-    const timeoutId = setTimeout(attachEventHandlers, 100);
-    
-    // Use MutationObserver to watch for DOM changes and re-attach handlers
-    const observer = new MutationObserver(() => {
-      attachEventHandlers();
-    });
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
-    };
-  }, []);
+  // Simple click handlers for file inputs
+  const handleProfileImageClick = () => {
+    profileImageInputRef.current?.click();
+  };
+
+  const handleCoverImageClick = () => {
+    coverImageInputRef.current?.click();
+  };
 
   const checkCompletion = async () => {
     try {
@@ -666,9 +584,10 @@ export default function AgentProfilePage() {
                 </div>
                 <div className="w-full sm:w-auto text-center sm:text-left">
                   <input
-                    ref={setProfileImageRef}
+                    ref={profileImageInputRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageUpload}
                     className="hidden"
                     disabled={uploadingImage}
                     id="profile-photo-upload"
@@ -677,7 +596,7 @@ export default function AgentProfilePage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => profileImageInputRef.current?.click()}
+                    onClick={handleProfileImageClick}
                     disabled={uploadingImage}
                     className="w-full sm:w-auto"
                   >
@@ -733,9 +652,10 @@ export default function AgentProfilePage() {
                 </div>
                 <div className="text-center sm:text-left">
                   <input
-                    ref={setCoverImageRef}
+                    ref={coverImageInputRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleCoverImageUpload}
                     className="hidden"
                     disabled={uploadingCoverImage}
                     id="cover-image-upload"
@@ -744,7 +664,7 @@ export default function AgentProfilePage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => coverImageInputRef.current?.click()}
+                    onClick={handleCoverImageClick}
                     disabled={uploadingCoverImage}
                     className="w-full sm:w-auto"
                   >
