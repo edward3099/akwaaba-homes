@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,53 +97,85 @@ export default function AgentProfilePage() {
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
 
+  // Callback refs to ensure event handlers are attached
+  const setProfileImageRef = useCallback((node: HTMLInputElement | null) => {
+    if (node) {
+      profileImageInputRef.current = node;
+      console.log('Setting profile image ref and attaching handler');
+      node.onchange = (event) => {
+        const target = event.target as HTMLInputElement;
+        const mockEvent = {
+          target: {
+            files: target.files
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        handleImageUpload(mockEvent);
+      };
+    }
+  }, []);
+
+  const setCoverImageRef = useCallback((node: HTMLInputElement | null) => {
+    if (node) {
+      coverImageInputRef.current = node;
+      console.log('Setting cover image ref and attaching handler');
+      node.onchange = (event) => {
+        const target = event.target as HTMLInputElement;
+        const mockEvent = {
+          target: {
+            files: target.files
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        handleCoverImageUpload(mockEvent);
+      };
+    }
+  }, []);
+
   useEffect(() => {
     fetchProfile();
   }, []);
 
   // Ensure file input event handlers are properly attached
   useEffect(() => {
-    const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
-    const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
-    
-    const handleProfileChange = (event: Event) => {
-      const target = event.target as HTMLInputElement;
-      const mockEvent = {
-        target: {
-          files: target.files
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleImageUpload(mockEvent);
+    const attachEventHandlers = () => {
+      const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
+      const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
+      
+      if (profileInput && !profileInput.onchange) {
+        console.log('Attaching profile image upload handler');
+        profileInput.onchange = (event) => {
+          const target = event.target as HTMLInputElement;
+          const mockEvent = {
+            target: {
+              files: target.files
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+          handleImageUpload(mockEvent);
+        };
+      }
+      
+      if (coverInput && !coverInput.onchange) {
+        console.log('Attaching cover image upload handler');
+        coverInput.onchange = (event) => {
+          const target = event.target as HTMLInputElement;
+          const mockEvent = {
+            target: {
+              files: target.files
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+          handleCoverImageUpload(mockEvent);
+        };
+      }
     };
     
-    const handleCoverChange = (event: Event) => {
-      const target = event.target as HTMLInputElement;
-      const mockEvent = {
-        target: {
-          files: target.files
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleCoverImageUpload(mockEvent);
-    };
+    // Attach handlers immediately
+    attachEventHandlers();
     
-    if (profileInput) {
-      console.log('Attaching profile image upload handler');
-      profileInput.addEventListener('change', handleProfileChange);
-    }
-    
-    if (coverInput) {
-      console.log('Attaching cover image upload handler');
-      coverInput.addEventListener('change', handleCoverChange);
-    }
+    // Also attach after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(attachEventHandlers, 100);
     
     // Cleanup function
     return () => {
-      if (profileInput) {
-        profileInput.removeEventListener('change', handleProfileChange);
-      }
-      if (coverInput) {
-        coverInput.removeEventListener('change', handleCoverChange);
-      }
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -621,13 +653,13 @@ export default function AgentProfilePage() {
                 </div>
                 <div className="w-full sm:w-auto text-center sm:text-left">
                   <input
-                    ref={profileImageInputRef}
+                    ref={setProfileImageRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleImageUpload}
                     className="hidden"
                     disabled={uploadingImage}
                     id="profile-photo-upload"
+                    data-testid="profile-photo-upload"
                   />
                   <Button
                     type="button"
@@ -688,13 +720,13 @@ export default function AgentProfilePage() {
                 </div>
                 <div className="text-center sm:text-left">
                   <input
-                    ref={coverImageInputRef}
+                    ref={setCoverImageRef}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleCoverImageUpload}
                     className="hidden"
                     disabled={uploadingCoverImage}
                     id="cover-image-upload"
+                    data-testid="cover-image-upload"
                   />
                   <Button
                     type="button"
