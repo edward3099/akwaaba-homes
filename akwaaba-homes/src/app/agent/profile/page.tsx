@@ -101,6 +101,52 @@ export default function AgentProfilePage() {
     fetchProfile();
   }, []);
 
+  // Ensure file input event handlers are properly attached
+  useEffect(() => {
+    const profileInput = document.getElementById('profile-photo-upload') as HTMLInputElement;
+    const coverInput = document.getElementById('cover-image-upload') as HTMLInputElement;
+    
+    const handleProfileChange = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const mockEvent = {
+        target: {
+          files: target.files
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleImageUpload(mockEvent);
+    };
+    
+    const handleCoverChange = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const mockEvent = {
+        target: {
+          files: target.files
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleCoverImageUpload(mockEvent);
+    };
+    
+    if (profileInput) {
+      console.log('Attaching profile image upload handler');
+      profileInput.addEventListener('change', handleProfileChange);
+    }
+    
+    if (coverInput) {
+      console.log('Attaching cover image upload handler');
+      coverInput.addEventListener('change', handleCoverChange);
+    }
+    
+    // Cleanup function
+    return () => {
+      if (profileInput) {
+        profileInput.removeEventListener('change', handleProfileChange);
+      }
+      if (coverInput) {
+        coverInput.removeEventListener('change', handleCoverChange);
+      }
+    };
+  }, []);
+
   const checkCompletion = async () => {
     try {
       const response = await fetch('/api/user/profile/completion');
@@ -183,8 +229,13 @@ export default function AgentProfilePage() {
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleImageUpload called with event:', event);
     const file = event.target.files?.[0];
-    if (!file) return;
+    console.log('Selected file:', file);
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
