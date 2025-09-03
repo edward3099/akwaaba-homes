@@ -106,6 +106,11 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
+  // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
+  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
+  console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - COMPONENT LOADED 🚀🚀🚀');
+  
   const { user, session } = useAuth();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [currentStep, setCurrentStep] = useState(1);
@@ -448,6 +453,11 @@ export default function PropertyListingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD 🚀🚀🚀
+    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
+    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
+    console.log('🚀🚀🚀 CACHE BUST - FORCE VERCEL REBUILD - NEW VERSION DEPLOYED 🚀🚀🚀');
     
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];
