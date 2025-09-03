@@ -1,4 +1,5 @@
 'use client';
+// Version: 2025-01-02 - Mobile responsiveness fixes
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -557,7 +558,7 @@ export default function AgentProfilePage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
-          {/* Mobile: Stack vertically, Desktop: Horizontal layout - MANUAL DEPLOYMENT TRIGGER */}
+          {/* Mobile: Stack vertically, Desktop: Horizontal layout - FORCE VERCEL DEPLOYMENT */}
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             {/* Left side: Back button and title */}
             <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
