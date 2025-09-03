@@ -143,6 +143,7 @@ export default function AgentProfilePage() {
       if (profileInput && !profileInput.onchange) {
         console.log('Attaching profile image upload handler');
         profileInput.onchange = (event) => {
+          console.log('Profile image change event triggered!');
           const target = event.target as HTMLInputElement;
           const mockEvent = {
             target: {
@@ -156,6 +157,7 @@ export default function AgentProfilePage() {
       if (coverInput && !coverInput.onchange) {
         console.log('Attaching cover image upload handler');
         coverInput.onchange = (event) => {
+          console.log('Cover image change event triggered!');
           const target = event.target as HTMLInputElement;
           const mockEvent = {
             target: {
@@ -173,9 +175,20 @@ export default function AgentProfilePage() {
     // Also attach after a short delay to ensure DOM is ready
     const timeoutId = setTimeout(attachEventHandlers, 100);
     
+    // Use MutationObserver to watch for DOM changes and re-attach handlers
+    const observer = new MutationObserver(() => {
+      attachEventHandlers();
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
     // Cleanup function
     return () => {
       clearTimeout(timeoutId);
+      observer.disconnect();
     };
   }, []);
 
