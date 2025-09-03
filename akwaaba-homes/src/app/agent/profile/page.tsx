@@ -556,20 +556,20 @@ export default function AgentProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
               {profileCompletion?.isComplete && (
                 <Link href="/agent-dashboard">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full sm:w-auto">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Dashboard
                   </Button>
                 </Link>
               )}
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900">Profile Settings</h1>
-                <p className="text-slate-600 mt-1">
+              <div className="flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Profile Settings</h1>
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
                   {profileCompletion?.isComplete 
                     ? "Manage your agent profile and preferences"
                     : "Complete your profile to access the agent dashboard"
@@ -577,10 +577,10 @@ export default function AgentProfilePage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center sm:justify-end">
               <Badge 
                 variant={isVerified ? 'default' : isRejected ? 'destructive' : 'secondary'}
-                className="text-xs"
+                className="text-xs px-3 py-1"
               >
                 {isVerified ? (
                   <>
@@ -604,21 +604,21 @@ export default function AgentProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-4 sm:py-8">
         {/* Profile Completion Status */}
         {profileCompletion && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+          <Card className="mb-6 sm:mb-8">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                 <span className="flex items-center space-x-2">
                   <CheckCircle className="w-5 h-5" />
-                  <span>Profile Completion</span>
+                  <span className="text-lg sm:text-xl">Profile Completion</span>
                 </span>
-                <Badge variant={profileCompletion.isComplete ? "default" : "secondary"}>
+                <Badge variant={profileCompletion.isComplete ? "default" : "secondary"} className="w-fit">
                   {profileCompletion.completionPercentage}% Complete
                 </Badge>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm sm:text-base">
                 Complete all required fields to access your agent dashboard
               </CardDescription>
             </CardHeader>
@@ -639,14 +639,14 @@ export default function AgentProfilePage() {
               )}
 
               {profileCompletion.isComplete && (
-                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <span className="text-green-800 font-medium">Profile Complete!</span>
                   </div>
                   <Button 
                     onClick={handleGoToDashboard}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
                   >
                     <Home className="w-4 h-4 mr-2" />
                     Go to Dashboard
@@ -657,7 +657,7 @@ export default function AgentProfilePage() {
           </Card>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Profile Image Section */}
           <Card>
             <CardHeader>
@@ -669,21 +669,21 @@ export default function AgentProfilePage() {
                 Add a professional photo to help clients recognize you
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+            <CardContent className="pt-4">
+              <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-6">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   {profile.profile_image ? (
                     <img 
                       key={profile.profile_image}
                       src={profile.profile_image} 
                       alt="Profile" 
-                      className="w-24 h-24 object-cover"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-blue-600" />
+                    <User className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" />
                   )}
                 </div>
-                <div className="w-full sm:w-auto text-center sm:text-left">
+                <div className="w-full text-center sm:text-left">
                   <input
                     ref={profileImageInputRef}
                     type="file"
@@ -699,7 +699,7 @@ export default function AgentProfilePage() {
                     variant="outline"
                     onClick={handleProfileImageClick}
                     disabled={uploadingImage}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[44px]"
                   >
                     {uploadingImage ? (
                       <>
@@ -713,7 +713,7 @@ export default function AgentProfilePage() {
                       </>
                     )}
                   </Button>
-                  <p className="text-sm text-slate-500 mt-2">
+                  <p className="text-xs sm:text-sm text-slate-500 mt-2">
                     {uploadingImage ? 'Uploading your photo...' : 'Tap the button above to select a professional photo (max 5MB)'}
                   </p>
                 </div>
@@ -732,9 +732,9 @@ export default function AgentProfilePage() {
                 Add a cover image that will be displayed on your agent profile page
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               <div className="space-y-4">
-                <div className="w-full h-48 sm:h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
+                <div className="w-full h-40 sm:h-48 md:h-64 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 relative">
                   {profile.cover_image ? (
                     <div className="w-full h-full relative">
                       <img 
@@ -746,8 +746,8 @@ export default function AgentProfilePage() {
                     </div>
                   ) : (
                     <div className="text-center text-slate-500">
-                      <Camera className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2" />
-                      <p className="text-sm sm:text-base">No cover image uploaded</p>
+                      <Camera className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2" />
+                      <p className="text-xs sm:text-sm md:text-base">No cover image uploaded</p>
                     </div>
                   )}
                 </div>
@@ -767,7 +767,7 @@ export default function AgentProfilePage() {
                     variant="outline"
                     onClick={handleCoverImageClick}
                     disabled={uploadingCoverImage}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[44px]"
                   >
                     {uploadingCoverImage ? (
                       <>
@@ -781,7 +781,7 @@ export default function AgentProfilePage() {
                       </>
                     )}
                   </Button>
-                  <p className="text-sm text-slate-500 mt-2">
+                  <p className="text-xs sm:text-sm text-slate-500 mt-2">
                     {uploadingCoverImage ? 'Uploading your cover image...' : 'Tap the button above to select a cover image (max 10MB)'}
                   </p>
                 </div>
@@ -800,39 +800,41 @@ export default function AgentProfilePage() {
                 Your basic personal details and contact information
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name *</Label>
+                <Label htmlFor="full_name" className="text-sm font-medium">Full Name *</Label>
                 <Input
                   id="full_name"
                   value={formData.full_name}
                   onChange={(e) => handleInputChange('full_name', e.target.value)}
                   placeholder="Enter your full name"
                   required
+                  className="min-h-[44px]"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                   <Input
                     id="email"
                     value={profile.email}
                     disabled
-                    className="bg-slate-50"
+                    className="bg-slate-50 min-h-[44px]"
                   />
-                  <p className="text-sm text-slate-500">
+                  <p className="text-xs sm:text-sm text-slate-500">
                     Email cannot be changed. Contact support if needed.
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Enter your phone number"
                     required
+                    className="min-h-[44px]"
                   />
                 </div>
               </div>
@@ -840,43 +842,47 @@ export default function AgentProfilePage() {
               {/* Address Information */}
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-slate-700">Address Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
+                    <Label htmlFor="address" className="text-sm font-medium">Address</Label>
                     <Input
                       id="address"
                       value={formData.address || ''}
                       onChange={(e) => handleInputChange('address', e.target.value)}
                       placeholder="Enter your business address"
+                      className="min-h-[44px]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city" className="text-sm font-medium">City</Label>
                     <Input
                       id="city"
                       value={formData.city || ''}
                       onChange={(e) => handleInputChange('city', e.target.value)}
                       placeholder="Enter your city"
+                      className="min-h-[44px]"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="region">Region</Label>
+                    <Label htmlFor="region" className="text-sm font-medium">Region</Label>
                     <Input
                       id="region"
                       value={formData.region || ''}
                       onChange={(e) => handleInputChange('region', e.target.value)}
                       placeholder="Enter your region"
+                      className="min-h-[44px]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="postal_code">Postal Code</Label>
+                    <Label htmlFor="postal_code" className="text-sm font-medium">Postal Code</Label>
                     <Input
                       id="postal_code"
                       value={formData.postal_code || ''}
                       onChange={(e) => handleInputChange('postal_code', e.target.value)}
                       placeholder="Enter your postal code"
+                      className="min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -895,31 +901,33 @@ export default function AgentProfilePage() {
                 Your business details and professional credentials
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="company_name">Company Name *</Label>
+                <Label htmlFor="company_name" className="text-sm font-medium">Company Name *</Label>
                 <Input
                   id="company_name"
                   value={formData.company_name}
                   onChange={(e) => handleInputChange('company_name', e.target.value)}
                   placeholder="Enter your company name"
                   required
+                  className="min-h-[44px]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="license_number">License Number *</Label>
+                <Label htmlFor="license_number" className="text-sm font-medium">License Number *</Label>
                 <Input
                   id="license_number"
                   value={formData.license_number}
                   onChange={(e) => handleInputChange('license_number', e.target.value)}
                   placeholder="Enter your real estate license number"
                   required
+                  className="min-h-[44px]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="experience_years">Years of Experience *</Label>
+                <Label htmlFor="experience_years" className="text-sm font-medium">Years of Experience *</Label>
                 <Input
                   id="experience_years"
                   type="number"
@@ -929,19 +937,21 @@ export default function AgentProfilePage() {
                   min="0"
                   max="50"
                   required
+                  className="min-h-[44px]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Professional Bio</Label>
+                <Label htmlFor="bio" className="text-sm font-medium">Professional Bio</Label>
                 <Textarea
                   id="bio"
                   value={formData.bio}
                   onChange={(e) => handleInputChange('bio', e.target.value)}
                   placeholder="Tell clients about your expertise, achievements, and approach to real estate..."
                   rows={4}
+                  className="min-h-[100px] resize-none"
                 />
-                <p className="text-sm text-slate-500">
+                <p className="text-xs sm:text-sm text-slate-500">
                   This will be displayed on your public profile
                 </p>
               </div>
@@ -962,12 +972,12 @@ export default function AgentProfilePage() {
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {formData.specializations.map((spec, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm">
+                  <Badge key={index} variant="secondary" className="text-xs sm:text-sm px-2 py-1">
                     {spec}
                     <button
                       type="button"
                       onClick={() => removeSpecialization(spec)}
-                      className="ml-2 hover:text-red-600"
+                      className="ml-2 hover:text-red-600 text-sm"
                     >
                       ×
                     </button>
@@ -975,24 +985,26 @@ export default function AgentProfilePage() {
                 ))}
               </div>
               
-              <div className="flex space-x-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                 <Input
                   value={newSpecialization}
                   onChange={(e) => setNewSpecialization(e.target.value)}
                   placeholder="Add a specialization"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
+                  className="min-h-[44px]"
                 />
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={addSpecialization}
                   disabled={!newSpecialization.trim()}
+                  className="w-full sm:w-auto min-h-[44px]"
                 >
                   Add
                 </Button>
               </div>
               
-              <p className="text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-slate-500">
                 Examples: Residential, Commercial, Luxury Homes, Investment Properties, First-time Buyers
               </p>
             </CardContent>
@@ -1028,16 +1040,16 @@ export default function AgentProfilePage() {
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-4">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-4">
             {profileCompletion?.isComplete && (
               <Link href="/agent-dashboard">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full sm:w-auto min-h-[44px]">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Dashboard
                 </Button>
               </Link>
             )}
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving} className="w-full sm:w-auto min-h-[44px]">
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
