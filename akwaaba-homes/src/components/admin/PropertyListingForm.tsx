@@ -482,7 +482,7 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    // Only require bedrooms and bathrooms for residential property types
+    // Only require bedrooms and bathrooms for residential property types (land and commercial are excluded)
     if (formData.type && !['land', 'commercial'].includes(formData.type)) {
       if (!formData.bedrooms || formData.bedrooms <= 0) {
         validationErrors.push('Number of bedrooms must be greater than 0.');
