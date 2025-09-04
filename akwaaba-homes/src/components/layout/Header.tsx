@@ -30,7 +30,7 @@ export function Header() {
             <div className="flex flex-col min-w-0">
               {/* Always show main logo text on mobile, with responsive sizing */}
               <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold gradient-text truncate">
-                AkwaabaHomes
+                Akwaaba Homes
               </span>
               {/* Show tagline on larger screens */}
               <span className="text-xs text-muted-foreground hidden sm:block">Ghana Real Estate</span>
@@ -135,12 +135,12 @@ export function Header() {
                   <div className="hidden sm:flex items-center space-x-2">
                     <Link href="/login">
                       <Button variant="outline" size="sm">
-                        Agent Sign In
+                        Sign In
                       </Button>
                     </Link>
                     <Link href="/signup">
                       <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                        Apply as Agent
+                        Sign Up
                       </Button>
                     </Link>
                   </div>
@@ -306,12 +306,12 @@ export function Header() {
                 <div className="px-3 sm:px-4 py-2 space-y-3">
                   <Link href="/login" className="block">
                     <Button variant="outline" className="w-full">
-                      Agent Sign In
+                      Sign In
                     </Button>
                   </Link>
                   <Link href="/signup" className="block">
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                      Apply as Agent
+                      Sign Up
                     </Button>
                   </Link>
                 </div>

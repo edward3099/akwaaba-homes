@@ -31,7 +31,7 @@ export default function AdminLayout({ children, currentPage }: AdminLayoutProps)
               <div className="flex items-center space-x-3">
                 <img
                   className="w-8 h-8 rounded-full"
-                  src={user?.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80'}
+                  src={user?.user_metadata?.avatar_url || '/placeholder-property.svg'}
                   alt="Admin"
                 />
                 <div className="text-sm">

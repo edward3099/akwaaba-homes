@@ -5,7 +5,6 @@ import {
   BuildingOfficeIcon, 
   EyeIcon, 
   HomeIcon,
-  CogIcon,
   PlusIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/lib/auth/authContext';
@@ -18,7 +17,6 @@ const tabs = [
   { id: 'properties', name: 'My Properties', icon: BuildingOfficeIcon },
   { id: 'add-property', name: 'Add Property', icon: BuildingOfficeIcon },
   { id: 'profile', name: 'Profile', icon: EyeIcon },
-  { id: 'settings', name: 'Settings', icon: CogIcon },
 ];
 
 export default function AgentDashboard() {
@@ -427,131 +425,6 @@ export default function AgentDashboard() {
           </div>
         );
 
-      case 'settings':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Settings & Preferences</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Account Settings */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900">Account Settings</h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Email Notifications</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">SMS Notifications</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Two-Factor Auth</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Business Settings */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900">Business Settings</h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Business Hours</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Auto-Reply Messages</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Commission Rates</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Privacy & Security */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900">Privacy & Security</h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Data Export</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Account Deletion</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">API Access</span>
-                    <span className="text-xs text-gray-400">Coming Soon</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Support & Help */}
-            <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900">Support & Help</h3>
-                </div>
-                <div className="space-y-3">
-                  <a href="/contact" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
-                    <span>Contact Support</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                  <a href="/help" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
-                    <span>Help Center</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                  <a href="/docs" className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-800">
-                    <span>Documentation</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
 
       default:
         return null;

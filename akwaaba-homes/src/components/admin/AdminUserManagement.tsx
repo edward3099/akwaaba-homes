@@ -490,7 +490,7 @@ export default function AdminUserManagement() {
                 <Input
                   id="create-phone"
                   {...register('phone')}
-                  placeholder="+233 20 123 4567"
+                  placeholder="+44 7949 4321 95"
                   className={errors.phone ? 'border-red-500' : ''}
                 />
                 {errors.phone && (

@@ -16,8 +16,8 @@ const mockAgent = {
   experience: '8+ years',
   specializations: ['Residential', 'Commercial', 'Luxury Properties'],
   bio: 'Kwame Asante is a seasoned real estate professional with over 8 years of experience in the Ghanaian property market. Specializing in residential and commercial properties, Kwame has helped hundreds of families find their dream homes and investors secure profitable real estate opportunities.',
-  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  coverImage: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+  avatar: null,
+  coverImage: null,
   stats: {
     totalProperties: 47,
     propertiesSold: 23,
@@ -57,7 +57,7 @@ const mockAgentProperties: Property[] = [
       yearBuilt: 2018
     },
     images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'
+      '/placeholder-property.svg'
     ],
     features: ['Modern Kitchen', 'Garden', 'Parking'],
     amenities: ['Air Conditioning', 'Swimming Pool', 'Garden', 'Parking', 'WiFi', 'Security'],
@@ -108,7 +108,7 @@ const mockAgentProperties: Property[] = [
       yearBuilt: 2020
     },
     images: [
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+      '/placeholder-property.svg'
     ],
     features: ['City View', 'Balcony', 'Modern Kitchen'],
     amenities: ['Air Conditioning', 'Gym', 'Pool', 'Security', 'WiFi'],
@@ -159,7 +159,7 @@ const mockAgentProperties: Property[] = [
       yearBuilt: 2019
     },
     images: [
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+      '/placeholder-property.svg'
     ],
     features: ['Large Garden', 'Family Room', 'Modern Kitchen'],
     amenities: ['Air Conditioning', 'Swimming Pool', 'Garden', 'Parking', 'WiFi', 'Security'],

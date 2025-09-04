@@ -222,7 +222,7 @@ export default function HelpPage() {
                   <Phone className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="font-medium text-gray-900">Phone</p>
-                    <p className="text-sm text-gray-600">+233 24 123 4567</p>
+                    <p className="text-sm text-gray-600">+44 7949 4321 95</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">

@@ -69,6 +69,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create profile in the profiles table
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: data.user.id,
+        full_name: fullName,
+        email: email,
+        company_name: company || null,
+        phone: phone || null,
+        user_role: userType, // 'agent' or 'developer'
+        is_verified: false,
+        verification_status: 'pending',
+        bio: null,
+        profile_image: null,
+        cover_image: null,
+        specializations: userType === 'developer' ? ['Web Development'] : ['General'],
+        experience_years: null,
+        address: null,
+        city: null,
+        region: null,
+        created_at: new Date().toISOString()
+      });
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      // Don't fail the signup if profile creation fails, but log it
+    }
+
     // Supabase will automatically send the confirmation email with the correct URL
     return NextResponse.json({
       success: true,

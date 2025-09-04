@@ -132,7 +132,7 @@ export default function PrivacyPage() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
                   <strong>Email:</strong> privacy@akwaabahomes.com<br />
-                  <strong>Phone:</strong> +233 24 412 3456<br />
+                  <strong>Phone:</strong> +44 7949 4321 95<br />
                   <strong>Address:</strong> Accra, Ghana
                 </p>
               </div>

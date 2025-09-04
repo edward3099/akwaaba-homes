@@ -128,7 +128,7 @@ export default function ContactPage() {
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• We&apos;ll review your message within 2-4 hours</li>
                 <li>• Our team will respond via your preferred contact method</li>
-                <li>• For urgent matters, call us directly at +233 24 123 4567</li>
+                <li>• For urgent matters, call us directly at +44 7949 4321 95</li>
               </ul>
             </div>
             <Button 
@@ -293,9 +293,9 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-slate-900">Phone Numbers</h4>
                     <p className="text-slate-600">
-                      Main: +233 24 123 4567<br />
-                      Support: +233 24 123 4568<br />
-                      WhatsApp: +233 24 123 4569
+                      Main: +44 7949 4321 95<br />
+                      Support: +44 7949 4321 95<br />
+                      WhatsApp: +44 7949 4321 95
                     </p>
                   </div>
                 </div>
@@ -365,7 +365,7 @@ export default function ContactPage() {
                   For urgent matters outside business hours, please call our emergency line:
                 </p>
                 <div className="text-center">
-                  <p className="text-lg font-bold text-orange-800">+233 24 123 4569</p>
+                  <p className="text-lg font-bold text-orange-800">+44 7949 4321 95</p>
                   <p className="text-sm text-orange-600">Available 24/7</p>
                 </div>
               </CardContent>

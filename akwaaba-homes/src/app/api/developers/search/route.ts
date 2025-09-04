@@ -5,7 +5,7 @@ import { z } from 'zod';
 // Search query schema for URL parameters
 const searchQuerySchema = z.object({
   query: z.string().optional(),
-  user_role: z.enum(['agent', 'seller']).optional(),
+  specialization: z.string().optional(),
   city: z.string().optional(),
   region: z.string().optional(),
   is_verified: z.string().transform(val => val === 'true').optional(),
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     // Validate query parameters
     const validatedData = searchQuerySchema.parse(queryParams);
 
-    // Build search query
+    // Build search query for developers
     let query = supabase
       .from('profiles')
       .select(`
@@ -52,15 +52,17 @@ export async function GET(request: NextRequest) {
         region,
         created_at
       `)
-      .in('user_role', ['agent', 'seller']);
+      .eq('user_role', 'developer');
+
+    console.log('Query built for developers:', query);
 
     // Apply search filters
     if (validatedData.query) {
       query = query.or(`full_name.ilike.%${validatedData.query}%,company_name.ilike.%${validatedData.query}%,bio.ilike.%${validatedData.query}%`);
     }
     
-    if (validatedData.user_role) {
-      query = query.eq('user_role', validatedData.user_role);
+    if (validatedData.specialization && validatedData.specialization !== 'all') {
+      query = query.contains('specializations', [validatedData.specialization]);
     }
     
     if (validatedData.city) {
@@ -89,42 +91,43 @@ export async function GET(request: NextRequest) {
     const { count } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .in('user_role', ['agent', 'seller']);
+      .eq('user_role', 'developer');
 
     // Execute query
-    const { data: agents, error } = await query;
+    const { data: developers, error } = await query;
+
+    console.log('Developers query result:', { developers, error, count });
 
     if (error) {
-      console.error('Error searching agents:', error);
-      return NextResponse.json({ error: 'Failed to search agents' }, { status: 500 });
+      console.error('Error searching developers:', error);
+      return NextResponse.json({ error: 'Failed to search developers' }, { status: 500 });
     }
 
     // Transform data to match frontend expectations
-    const transformedAgents = agents?.map(agent => ({
-      id: agent.user_id,
-      name: agent.full_name || 'Unnamed Agent',
-      type: agent.user_role,
-      phone: agent.phone || 'No phone',
-      email: agent.email,
-      isVerified: agent.is_verified,
-      company: agent.company_name || 'Independent',
-      experience: agent.experience_years ? `${agent.experience_years}+ years` : 'Experience not specified',
-      specializations: agent.specializations || ['General'],
-      bio: agent.bio || 'No bio available',
-      avatar: agent.profile_image || null,
-      coverImage: agent.cover_image || null,
-      address: agent.address || '',
-      city: agent.city || '',
-      region: agent.region || '',
+    const transformedDevelopers = developers?.map(developer => ({
+      id: developer.user_id,
+      name: developer.full_name || 'Unnamed Developer',
+      type: developer.user_role,
+      phone: developer.phone || 'No phone',
+      email: developer.email,
+      isVerified: developer.is_verified,
+      company: developer.company_name || 'Independent',
+      experience: developer.experience_years ? `${developer.experience_years}+ years` : 'Experience not specified',
+      specializations: developer.specializations || ['General'],
+      bio: developer.bio || 'No bio available',
+      avatar: developer.profile_image || null,
+      coverImage: developer.cover_image || null,
+      address: developer.address || '',
+      city: developer.city || '',
+      region: developer.region || '',
       stats: {
-        totalProperties: 0, // Will need to query properties table
-        propertiesSold: 0, // Will need to query properties table
-        propertiesRented: 0, // Will need to query properties table
+        totalProjects: 0, // Will need to query projects table
+        projectsCompleted: 0, // Will need to query projects table
         clientSatisfaction: 4.5, // Default rating
         responseTime: '2 hours' // Default response time
       },
       contactInfo: {
-        address: agent.address || 'Address not specified',
+        address: developer.address || 'Address not specified',
         workingHours: 'Working hours not specified', // Default working hours
         languages: ['English'] // Default languages
       }
@@ -132,7 +135,7 @@ export async function GET(request: NextRequest) {
 
     // Return search results
     return NextResponse.json({
-      agents: transformedAgents,
+      agents: transformedDevelopers, // Keep same structure as agents API for compatibility
       pagination: {
         page: validatedData.page,
         limit: validatedData.limit,
@@ -158,7 +161,7 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
     
-    console.error('Error in agents search:', error);
+    console.error('Error in developers search:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

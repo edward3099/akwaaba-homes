@@ -96,7 +96,7 @@ export default function SignupPage() {
           password: formData.password,
           company: formData.company,
           phone: formData.phone,
-          userType: 'agent'
+          userType: formData.userType
         }),
       });
 
@@ -181,13 +181,14 @@ export default function SignupPage() {
               <Select
                 value={formData.userType}
                 onValueChange={(value) => handleInputChange('userType', value)}
-                disabled={true}
+                disabled={isLoading}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select account type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="agent">Real Estate Agent</SelectItem>
+                  <SelectItem value="developer">Developers</SelectItem>
                 </SelectContent>
               </Select>
             </div>

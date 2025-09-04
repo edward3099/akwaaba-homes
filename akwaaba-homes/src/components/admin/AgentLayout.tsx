@@ -57,7 +57,7 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <img
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
-                src={profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80'}
+                src={profileImage || '/placeholder-property.svg'}
                 alt="Agent"
               />
               <div className="hidden sm:block text-sm">

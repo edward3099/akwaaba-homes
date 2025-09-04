@@ -38,7 +38,7 @@ export function MockAuthProvider({ children }: { children: ReactNode }) {
         name: 'Admin User',
         email: email,
         role: 'ADMIN',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80',
+        avatar: '/placeholder-property.svg',
         company: 'Akwaaba Homes'
       };
     } else {
@@ -48,7 +48,7 @@ export function MockAuthProvider({ children }: { children: ReactNode }) {
         name: 'Kwame Asante',
         email: email,
         role: 'AGENT',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&q=80',
+        avatar: '/placeholder-property.svg',
         company: 'AkwaabaHomes Real Estate'
       };
     }

@@ -365,7 +365,7 @@ export default function MobileMoneyPayment({
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="0241234567 or +233241234567"
+              placeholder="07949432195 or +447949432195"
               className="mt-1"
             />
             <p className="text-xs text-gray-500 mt-1">

@@ -77,7 +77,7 @@ const defaultSettings: PlatformSettings = {
     description: 'Ghana\'s premier real estate marketplace for diaspora buyers',
     version: '1.0.0',
     contact_email: 'admin@akwaabahomes.com',
-    support_phone: '+233 20 123 4567',
+    support_phone: '+44 7949 4321 95',
     address: 'Accra, Ghana',
     business_hours: 'Monday - Friday: 8:00 AM - 6:00 PM GMT'
   },

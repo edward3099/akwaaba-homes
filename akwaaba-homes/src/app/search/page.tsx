@@ -50,8 +50,8 @@ const mockProperties: Property[] = [
       parkingSpaces: 2,
     },
     images: [
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      '/placeholder-property.svg',
+      '/placeholder-property.svg',
     ],
     features: ['Swimming Pool', 'Garden', 'Security', 'Parking'],
     amenities: ['24/7 Security', 'Backup Generator', 'Borehole Water'],
@@ -101,8 +101,8 @@ const mockProperties: Property[] = [
       parkingSpaces: 1,
     },
     images: [
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1560448204-6033e33cec8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      '/placeholder-property.svg',
+      '/placeholder-property.svg',
     ],
     features: ['Balcony', 'Security', 'Parking', 'Elevator'],
     amenities: ['24/7 Security', 'Backup Generator', 'Swimming Pool'],
@@ -152,7 +152,7 @@ const mockProperties: Property[] = [
       parkingSpaces: 0,
     },
     images: [
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      '/placeholder-property.svg',
     ],
     features: ['Flat Terrain', 'Road Access', 'Drainage', 'Security'],
     amenities: ['24/7 Security', 'Fenced Perimeter'],

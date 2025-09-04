@@ -80,7 +80,7 @@ export default function AgentsPageClient() {
     const fetchAgents = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/agents/search');
+        const response = await fetch('/api/developers/search');
         if (!response.ok) {
           throw new Error('Failed to fetch agents');
         }
