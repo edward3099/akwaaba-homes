@@ -491,13 +491,26 @@ export function FeaturedProperties() {
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
 
-        {/* Full Search Form */}
+        {/* Full Search Form with Background Image */}
         <div className="mb-6">
-          <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 border border-border/50">
-            {/* Header */}
-            <div className="text-center mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-foreground">Find your new property</h2>
-            </div>
+          <div 
+            className="relative rounded-lg shadow-lg p-3 sm:p-4 border border-border/50 overflow-hidden"
+            style={{
+              backgroundImage: 'url(/placeholder-house-1.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Semi-transparent overlay for better text readability */}
+            <div className="absolute inset-0 bg-white/90 backdrop-blur-sm"></div>
+            
+            {/* Content with relative positioning to appear above overlay */}
+            <div className="relative z-10">
+              {/* Header */}
+              <div className="text-center mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground">Find your new property</h2>
+              </div>
 
             {/* Search Form */}
             <form className="space-y-4" onSubmit={handleFormSubmit}>
@@ -815,6 +828,7 @@ export function FeaturedProperties() {
                 </div>
               </div>
             </form>
+            </div>
           </div>
         </div>
 
