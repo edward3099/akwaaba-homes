@@ -494,7 +494,7 @@ export function FeaturedProperties() {
         {/* Full Search Form with Background Image */}
         <div className="mb-6">
                         <div 
-                className="relative rounded-lg shadow-lg p-2 sm:p-3 border border-border/50 overflow-hidden max-w-2xl mx-auto"
+                className="relative rounded-lg shadow-lg p-2 sm:p-3 overflow-hidden max-w-2xl mx-auto"
                 style={{
                   backgroundImage: 'url(/placeholder-house-1.jpg)',
                   backgroundSize: 'cover',
