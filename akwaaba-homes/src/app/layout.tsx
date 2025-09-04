@@ -36,7 +36,7 @@ export default function RootLayout({
       <head>
         {/* Accessibility meta tags */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#3b82f6" />
+        <meta name="theme-color" content="#f8fafc" />
         <meta name="color-scheme" content="light dark" />
         
         {/* Accessibility CSS is imported in the component */}

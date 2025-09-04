@@ -17,13 +17,25 @@ html, body {
 
 /* Fix Safari overscroll bounce showing blue background */
 html {
-  background-color: #f8fafc;
+  background-color: #f8fafc !important;
   overscroll-behavior: none;
+  min-height: 100vh;
 }
 
 body {
-  background-color: #f8fafc;
+  background-color: #f8fafc !important;
   overscroll-behavior: none;
+  min-height: 100vh;
+}
+
+/* Additional viewport background fixes */
+#__next {
+  background-color: #f8fafc !important;
+  min-height: 100vh;
+}
+
+[data-nextjs-scroll-focus-boundary] {
+  background-color: #f8fafc !important;
 }
 
 /* Ensure proper viewport behavior on mobile */
