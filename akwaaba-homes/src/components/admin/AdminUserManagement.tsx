@@ -329,7 +329,7 @@ export default function AdminUserManagement() {
 
       {/* Users Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 items-start">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="pb-3">
@@ -351,13 +351,13 @@ export default function AdminUserManagement() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 items-start">
           {filteredUsers.map((user) => (
-            <Card key={user.id} className="hover:shadow-lg transition-shadow">
+            <Card key={user.id} className="hover:shadow-lg transition-shadow w-full h-fit">
               <CardHeader className="pb-3">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
+                    <Avatar className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                       <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.full_name}`} />
                       <AvatarFallback className="bg-ghana-green text-white text-sm">
                         {user.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
