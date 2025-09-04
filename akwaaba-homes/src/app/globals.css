@@ -12,6 +12,18 @@ html, body {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  background-color: #f8fafc; /* Light gray background to prevent blue overscroll */
+}
+
+/* Fix Safari overscroll bounce showing blue background */
+html {
+  background-color: #f8fafc;
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: #f8fafc;
+  overscroll-behavior: none;
 }
 
 /* Ensure proper viewport behavior on mobile */
@@ -465,6 +477,30 @@ html, body {
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
+  background-color: #f8fafc; /* Ensure consistent background */
+}
+
+/* Additional Safari overscroll fixes */
+html {
+  background-color: #f8fafc !important;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  background-color: #f8fafc !important;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for Safari's elastic scroll showing blue background */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all containers have proper background */
+main, #__next, [data-nextjs-scroll-focus-boundary] {
+  background-color: #f8fafc;
 }
 
 * {
