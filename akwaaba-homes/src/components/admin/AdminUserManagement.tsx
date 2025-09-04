@@ -285,58 +285,63 @@ export default function AdminUserManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin User Management</h1>
-          <p className="text-gray-600">Manage admin accounts and permissions</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Admin User Management</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Manage admin accounts and permissions</p>
+          </div>
+          <Button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-ghana-green hover:bg-ghana-green-dark text-white w-full sm:w-auto shrink-0"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            <span className="hidden xs:inline">Create Admin</span>
+            <span className="xs:hidden">Create</span>
+          </Button>
         </div>
-        <Button 
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-ghana-green hover:bg-ghana-green-dark text-white"
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Create Admin
-        </Button>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search admins..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search admins..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-10"
+            />
+          </div>
+          <Select value={filterRole} onValueChange={setFilterRole}>
+            <SelectTrigger className="w-full sm:w-48 h-10">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="super_admin">Super Admin</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={filterRole} onValueChange={setFilterRole}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter by role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="super_admin">Super Admin</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Users Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                  <div className="space-y-2">
+              <CardHeader className="pb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full"></div>
+                  <div className="space-y-2 flex-1 min-w-0">
                     <div className="h-4 bg-gray-200 rounded w-24"></div>
                     <div className="h-3 bg-gray-200 rounded w-32"></div>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-full"></div>
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
@@ -346,59 +351,60 @@ export default function AdminUserManagement() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredUsers.map((user) => (
             <Card key={user.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Avatar>
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                       <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.full_name}`} />
-                      <AvatarFallback className="bg-ghana-green text-white">
+                      <AvatarFallback className="bg-ghana-green text-white text-sm">
                         {user.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <CardTitle className="text-lg">{user.full_name}</CardTitle>
-                      <CardDescription className="flex items-center">
-                        <Mail className="w-3 h-3 mr-1" />
-                        {user.email}
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base sm:text-lg truncate">{user.full_name}</CardTitle>
+                      <CardDescription className="flex items-center text-xs sm:text-sm">
+                        <Mail className="w-3 h-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{user.email}</span>
                       </CardDescription>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant={user.user_type === 'super_admin' ? 'destructive' : 'default'}>
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                    <Badge variant={user.user_type === 'super_admin' ? 'destructive' : 'default'} className="text-xs">
                       <Shield className="w-3 h-3 mr-1" />
-                      {user.user_type?.replace('_', ' ') || 'Unknown'}
+                      <span className="hidden xs:inline">{user.user_type?.replace('_', ' ') || 'Unknown'}</span>
+                      <span className="xs:hidden">{user.user_type?.replace('_', ' ').split(' ')[0] || 'Unknown'}</span>
                     </Badge>
                     {user.is_verified && (
-                      <Badge variant="secondary" className="bg-ghana-gold text-ghana-red">
+                      <Badge variant="secondary" className="bg-ghana-gold text-ghana-red text-xs">
                         Verified
                       </Badge>
                     )}
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="w-3 h-3 mr-2" />
-                  {user.phone || 'No phone'}
+              <CardContent className="space-y-2 sm:space-y-3 pt-0">
+                <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                  <Phone className="w-3 h-3 mr-2 flex-shrink-0" />
+                  <span className="truncate">{user.phone || 'No phone'}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Building className="w-3 h-3 mr-2" />
-                  {user.company_name || 'No company'}
+                <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                  <Building className="w-3 h-3 mr-2 flex-shrink-0" />
+                  <span className="truncate">{user.company_name || 'No company'}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="w-3 h-3 mr-2" />
-                  Joined {new Date(user.created_at).toLocaleDateString()}
+                <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                  <Calendar className="w-3 h-3 mr-2 flex-shrink-0" />
+                  <span className="truncate">Joined {new Date(user.created_at).toLocaleDateString()}</span>
                 </div>
                 
-                <div className="flex justify-end space-x-2 pt-2">
+                <div className="flex flex-col sm:flex-row gap-2 pt-3">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => openEditModal(user)}
-                    className="border-ghana-gold text-ghana-gold hover:bg-ghana-gold hover:text-white"
+                    className="border-ghana-gold text-ghana-gold hover:bg-ghana-gold hover:text-white w-full sm:w-auto"
                   >
                     <Edit className="w-3 h-3 mr-1" />
                     Edit
@@ -407,7 +413,7 @@ export default function AdminUserManagement() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteAdmin(user.id)}
-                    className="border-ghana-red text-ghana-red hover:bg-ghana-red hover:text-white"
+                    className="border-ghana-red text-ghana-red hover:bg-ghana-red hover:text-white w-full sm:w-auto"
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
                     Delete
@@ -421,93 +427,93 @@ export default function AdminUserManagement() {
 
       {/* Create Admin Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
           <DialogHeader>
-            <DialogTitle>Create New Admin Account</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Create New Admin Account</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               Create a new admin account with appropriate permissions and verification status.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit(onSubmitCreate)} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <Label htmlFor="create-email">Email *</Label>
+                <Label htmlFor="create-email" className="text-sm font-medium">Email *</Label>
                 <Input
                   id="create-email"
                   type="email"
                   {...register('email')}
                   placeholder="admin@example.com"
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.email ? 'border-red-500' : ''}`}
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                  <p className="text-xs text-red-500">{errors.email.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="create-password">Password *</Label>
+                <Label htmlFor="create-password" className="text-sm font-medium">Password *</Label>
                 <Input
                   id="create-password"
                   type="password"
                   {...register('password')}
                   placeholder="••••••••"
-                  className={errors.password ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.password ? 'border-red-500' : ''}`}
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-xs text-red-500">{errors.password.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="create-first-name">First Name *</Label>
+                <Label htmlFor="create-first-name" className="text-sm font-medium">First Name *</Label>
                 <Input
                   id="create-first-name"
                   {...register('first_name')}
                   placeholder="John"
-                  className={errors.first_name ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.first_name ? 'border-red-500' : ''}`}
                 />
                 {errors.first_name && (
-                  <p className="text-sm text-red-500">{errors.first_name.message}</p>
+                  <p className="text-xs text-red-500">{errors.first_name.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="create-last-name">Last Name *</Label>
+                <Label htmlFor="create-last-name" className="text-sm font-medium">Last Name *</Label>
                 <Input
                   id="create-last-name"
                   {...register('last_name')}
                   placeholder="Doe"
-                  className={errors.last_name ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.last_name ? 'border-red-500' : ''}`}
                 />
                 {errors.last_name && (
-                  <p className="text-sm text-red-500">{errors.last_name.message}</p>
+                  <p className="text-xs text-red-500">{errors.last_name.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="create-phone">Phone *</Label>
+                <Label htmlFor="create-phone" className="text-sm font-medium">Phone *</Label>
                 <Input
                   id="create-phone"
                   {...register('phone')}
                   placeholder="+44 7949 4321 95"
-                  className={errors.phone ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.phone ? 'border-red-500' : ''}`}
                 />
                 {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone.message}</p>
+                  <p className="text-xs text-red-500">{errors.phone.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="create-company-name">Company Name *</Label>
+                <Label htmlFor="create-company-name" className="text-sm font-medium">Company Name *</Label>
                 <Input
                   id="create-company-name"
                   {...register('company_name')}
                   placeholder="Company Ltd."
-                  className={errors.company_name ? 'border-red-500' : ''}
+                  className={`h-10 ${errors.company_name ? 'border-red-500' : ''}`}
                 />
                 {errors.company_name && (
-                  <p className="text-sm text-red-500">{errors.company_name.message}</p>
+                  <p className="text-xs text-red-500">{errors.company_name.message}</p>
                 )}
               </div>
               
@@ -572,18 +578,19 @@ export default function AdminUserManagement() {
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={handleCloseCreateModal}
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={isSubmitting || createAdminMutation.isLoading}
-                className="bg-ghana-green hover:bg-ghana-green-dark text-white"
+                className="bg-ghana-green hover:bg-ghana-green-dark text-white w-full sm:w-auto order-1 sm:order-2"
               >
                 {createAdminMutation.isLoading ? 'Creating...' : 'Create Admin'}
               </Button>
@@ -594,17 +601,17 @@ export default function AdminUserManagement() {
 
       {/* Edit Admin Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
           <DialogHeader>
-            <DialogTitle>Edit Admin Account</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Edit Admin Account</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               Update admin account information and permissions.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit(onSubmitUpdate)} className="space-y-4">
             {/* Same form fields as create modal, but with edit values */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-first-name">First Name *</Label>
                 <Input
@@ -711,18 +718,19 @@ export default function AdminUserManagement() {
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={handleCloseEditModal}
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={isSubmitting || updateAdminMutation.isLoading}
-                className="bg-ghana-green hover:bg-ghana-green-dark text-white"
+                className="bg-ghana-green hover:bg-ghana-green-dark text-white w-full sm:w-auto order-1 sm:order-2"
               >
                 {updateAdminMutation.isLoading ? 'Updating...' : 'Update Admin'}
               </Button>
