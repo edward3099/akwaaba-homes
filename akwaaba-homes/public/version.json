@@ -1,6 +1,6 @@
 {
-  "version": "vercel-cache-purge-fix-1756945000000",
-  "timestamp": "2025-01-27T16:00:00.000Z",
-  "buildId": "build-1756945000000-cache-purge",
-  "description": "Vercel cache purge fix - cleared both Data Cache and CDN Cache to resolve module resolution issues"
+  "version": "supabase-env-vars-updated-1756946000000",
+  "timestamp": "2025-01-27T16:10:00.000Z",
+  "buildId": "build-1756946000000-supabase-env",
+  "description": "Updated environment variables with real Supabase credentials to fix 401 and 500 errors"
 }
