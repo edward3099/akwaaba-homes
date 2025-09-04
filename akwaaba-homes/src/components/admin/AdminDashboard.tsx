@@ -81,9 +81,13 @@ interface PremiumPricing {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-export default function AdminDashboard() {
+interface AdminDashboardProps {
+  initialTab?: string;
+}
+
+export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashboardProps) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [propertySubTab, setPropertySubTab] = useState('overview');
   const [agentsSubTab, setAgentsSubTab] = useState('overview');
   const [analyticsSubTab, setAnalyticsSubTab] = useState('overview');
@@ -105,29 +109,25 @@ export default function AdminDashboard() {
       setError(null);
 
       // Fetch stats
-      const statsResponse = await fetch('/api/admin/dashboard/stats');
+      const statsResponse = await fetch('/api/admin/stats');
       if (!statsResponse.ok) throw new Error('Failed to fetch stats');
       const statsData = await statsResponse.json();
 
-      // Fetch chart data
-      const chartResponse = await fetch('/api/admin/dashboard/chart-data?period=30d&metric=properties');
+      // Fetch chart data (using analytics endpoint)
+      const chartResponse = await fetch('/api/admin/analytics?timeRange=30d');
       if (!chartResponse.ok) throw new Error('Failed to fetch chart data');
       const chartData = await chartResponse.json();
 
-      // Fetch recent activity
-      const activityResponse = await fetch('/api/admin/dashboard/recent-activity?limit=10');
-      if (!activityResponse.ok) throw new Error('Failed to fetch recent activity');
-      const activityData = await activityResponse.json();
+      // Fetch recent activity (mock data for now)
+      const activityData = { activities: [] };
 
       // Fetch pending properties
-      const propertiesResponse = await fetch('/api/properties?status=pending&limit=5');
+      const propertiesResponse = await fetch('/api/admin/properties?status=pending&limit=5');
       if (!propertiesResponse.ok) throw new Error('Failed to fetch pending properties');
       const propertiesData = await propertiesResponse.json();
 
-      // Fetch premium pricing
-      const pricingResponse = await fetch('/api/admin/premium-pricing');
-      if (!pricingResponse.ok) throw new Error('Failed to fetch premium pricing');
-      const pricingData = await pricingResponse.json();
+      // Fetch premium pricing (mock data for now)
+      const pricingData = { pricing: [] };
 
       setStats(statsData);
       setChartData(chartData.data || []);
