@@ -493,30 +493,30 @@ export function FeaturedProperties() {
 
         {/* Full Search Form with Background Image */}
         <div className="mb-6">
-          <div 
-            className="relative rounded-lg shadow-lg p-3 sm:p-4 border border-border/50 overflow-hidden"
-            style={{
-              backgroundImage: 'url(/placeholder-house-1.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
+                        <div 
+                className="relative rounded-lg shadow-lg p-2 sm:p-3 border border-border/50 overflow-hidden max-w-2xl mx-auto"
+                style={{
+                  backgroundImage: 'url(/placeholder-house-1.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
             {/* Semi-transparent overlay for better text readability */}
             <div className="absolute inset-0 bg-white/90 backdrop-blur-sm"></div>
             
             {/* Content with relative positioning to appear above overlay */}
             <div className="relative z-10">
               {/* Header */}
-              <div className="text-center mb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-foreground">Find your new property</h2>
+              <div className="text-center mb-2">
+                <h2 className="text-sm sm:text-base font-bold text-foreground">Find your new property</h2>
               </div>
 
             {/* Search Form */}
-            <form className="space-y-4" onSubmit={handleFormSubmit}>
+            <form className="space-y-2" onSubmit={handleFormSubmit}>
               {/* Property Type Tabs */}
               <div className="form-group">
-                <ul className="flex justify-center space-x-1" id="">
+                <ul className="flex justify-center space-x-0.5" id="">
                   <li id="li-cid-for-sale" className="flex-1">
                     <input 
                       type="radio" 
@@ -529,7 +529,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-for-sale" 
-                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      className={`block w-full px-2 py-1 text-center text-xs font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                         selectedPropertyType === 'for-sale'
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
@@ -550,7 +550,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-for-rent" 
-                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      className={`block w-full px-2 py-1 text-center text-xs font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                         selectedPropertyType === 'for-rent'
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
@@ -571,7 +571,7 @@ export function FeaturedProperties() {
                     />
                     <label 
                       htmlFor="cid-short-let" 
-                      className={`block w-full px-3 py-2 text-center text-sm font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      className={`block w-full px-2 py-1 text-center text-xs font-medium rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                         selectedPropertyType === 'short-let'
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'bg-white text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50'
@@ -584,9 +584,9 @@ export function FeaturedProperties() {
               </div>
 
               {/* Search Filters */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
+              <div className="flex flex-col sm:flex-row gap-2 mb-4 justify-center">
                 <div className="flex-1 max-w-xs">
-                  <label htmlFor="searchRegion" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="searchRegion" className="block text-xs font-medium text-gray-700 mb-1">
                     Search by Location
                   </label>
                   <input
@@ -596,22 +596,22 @@ export function FeaturedProperties() {
                     placeholder="e.g., Accra, Kumasi, East Legon, Cantonments"
                     value={searchRegion}
                     onChange={(e) => handleSearchRegionChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
               </div>
 
               {/* Filter Panel */}
               <div className="filter-panel">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-1">Type</label>
+                    <label className="block text-xs font-medium text-foreground mb-0.5">Type</label>
                     <select 
                       name="tid" 
                       id="tid" 
                       value={selectedType}
                       onChange={(e) => handleTypeChange(e.target.value)}
-                      className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     >
                       <option value="0">All Types</option>
                       <option value="1">Apartment</option>
@@ -621,13 +621,13 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-1">Bedrooms</label>
+                    <label className="block text-xs font-medium text-foreground mb-0.5">Bedrooms</label>
                     <select 
                       name="bedrooms" 
                       id="bedrooms" 
                       value={selectedBedrooms}
                       onChange={(e) => handleBedroomsChange(e.target.value)}
-                      className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     >
                       <option value="0">Any</option>
                       <option value="1">1</option>
@@ -639,13 +639,13 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-1">Min price</label>
+                    <label className="block text-xs font-medium text-foreground mb-0.5">Min price</label>
                     <select 
                       name="minprice" 
                       id="minprice" 
                       value={selectedMinPrice}
                       onChange={(e) => handleMinPriceChange(e.target.value)}
-                      className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     >
                       <option value="0">No Min</option>
                       <option value="250">GH₵ 250</option>
@@ -687,13 +687,13 @@ export function FeaturedProperties() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="block text-sm font-medium text-foreground mb-1">Max price</label>
+                    <label className="block text-xs font-medium text-foreground mb-0.5">Max price</label>
                     <select 
                       name="maxprice" 
                       id="maxprice" 
                       value={selectedMaxPrice}
                       onChange={(e) => handleMaxPriceChange(e.target.value)}
-                      className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     >
                       <option value="0">No Max</option>
                       <option value="250">GH₵ 250</option>
@@ -783,7 +783,7 @@ export function FeaturedProperties() {
             <Button
                           type="submit" 
                           size="default"
-                          className="w-full sm:w-auto px-6 py-2 text-sm font-medium"
+                          className="w-full sm:w-auto px-4 py-1.5 text-xs font-medium"
                         >
                           Search
             </Button>
@@ -792,16 +792,16 @@ export function FeaturedProperties() {
                   </div>
 
                   {/* Advanced Search Content */}
-                  <div id="advanced-search" className="hidden p-3 bg-muted/30">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div id="advanced-search" className="hidden p-2 bg-muted/30">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-1">Added to site</label>
+                        <label className="block text-xs font-medium text-foreground mb-0.5">Added to site</label>
                         <select 
                           name="added" 
                           id="added" 
                           value={addedToSite}
                           onChange={(e) => handleAddedToSiteChange(e.target.value)}
-                          className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                          className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         >
                           <option value="0">Anytime</option>
                           <option value="1">Last 24 hours</option>
@@ -812,13 +812,13 @@ export function FeaturedProperties() {
                         </select>
                       </div>
                       <div className="form-group">
-                        <label className="block text-sm font-medium text-foreground mb-1">Keywords</label>
+                        <label className="block text-xs font-medium text-foreground mb-0.5">Keywords</label>
                         <input 
                           name="keywords" 
                           id="keywords" 
                           value={expandedKeywords}
                           onChange={(e) => handleExpandedKeywordsChange(e.target.value)}
-                          className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
+                          className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" 
                           placeholder="e.g. 'pool' or 'jacuzzi'" 
                           autoComplete="off"
                         />
