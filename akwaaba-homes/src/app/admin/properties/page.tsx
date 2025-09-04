@@ -1,32 +1,16 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Building2, 
-  MapPin, 
-  Bed, 
-  Bath, 
-  Square, 
-  DollarSign,
-  Eye,
-  Edit,
-  Trash2,
-  Plus,
-  Search,
-  Filter
-} from 'lucide-react'
-import Link from 'next/link'
-import { PropertySearchFilters, PropertyFilters } from '@/components/properties/PropertySearchFilters'
-import { PropertyPagination } from '@/components/properties/PropertyPagination'
-import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal'
-import { AgentSelector } from '@/components/ui/AgentSelector'
-import { useApiMutation, useDestructiveMutation } from '@/lib/hooks/useApiMutation'
-import { toast } from 'sonner'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import React from 'react'
+
+// Temporary simplified version to test Vercel deployment
+export default function AdminPropertiesPage() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Admin Properties</h1>
+      <p>This page is temporarily simplified to test Vercel deployment.</p>
+    </div>
+  )
+}
 
 interface Property {
   id: string
