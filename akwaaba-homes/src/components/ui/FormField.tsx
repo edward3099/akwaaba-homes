@@ -71,6 +71,15 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
               helperText ? `${fieldId}-helper` : 
               undefined
             }
+            autoComplete={
+              props.type === 'email' ? 'email' :
+              props.type === 'password' ? 'current-password' :
+              props.type === 'tel' ? 'tel' :
+              props.name === 'firstName' ? 'given-name' :
+              props.name === 'lastName' ? 'family-name' :
+              props.name === 'company' ? 'organization' :
+              'on'
+            }
             className={cn(
               'transition-colors duration-200',
               showError && 'border-red-500 focus:border-red-500 focus:ring-red-500',
@@ -178,6 +187,10 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
           ref={ref}
           type={showPassword ? 'text' : 'password'}
           inputClassName={cn('pr-12', inputClassName)}
+          autoComplete={
+            props.name === 'newPassword' || props.name === 'confirmPassword' ? 'new-password' :
+            'current-password'
+          }
           {...props}
         />
         
