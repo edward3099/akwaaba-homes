@@ -12,8 +12,7 @@ import { toast } from 'sonner';
 interface Agent {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  full_name: string;
   phone: string;
   user_role: string;
   verification_status: string;
@@ -24,7 +23,7 @@ interface Agent {
   company_name?: string;
   experience_years?: number;
   license_number?: string;
-  email_verified?: boolean;
+  is_verified?: boolean;
 }
 
 export default function AgentManagement() {
@@ -147,7 +146,7 @@ export default function AgentManagement() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-2">
-                        <h3 className="font-semibold text-lg">{agent.first_name} {agent.last_name}</h3>
+                        <h3 className="font-semibold text-lg">{agent.full_name}</h3>
                         {getVerificationBadge(agent.verification_status)}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
@@ -187,7 +186,7 @@ export default function AgentManagement() {
                           <DialogHeader>
                             <DialogTitle>Agent Details</DialogTitle>
                             <DialogDescription>
-                              Complete information for {agent.first_name} {agent.last_name}
+                              Complete information for {agent.full_name}
                             </DialogDescription>
                           </DialogHeader>
                           {selectedAgent && (
@@ -195,7 +194,7 @@ export default function AgentManagement() {
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
                                   <label className="text-sm font-medium text-gray-700">Full Name</label>
-                                  <p className="text-sm text-gray-900">{selectedAgent.first_name} {selectedAgent.last_name}</p>
+                                  <p className="text-sm text-gray-900">{selectedAgent.full_name}</p>
                                 </div>
                                 <div>
                                   <label className="text-sm font-medium text-gray-700">Email</label>
@@ -269,8 +268,8 @@ export default function AgentManagement() {
                         size="sm"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         onClick={() => {
-                          if (confirm(`Are you sure you want to delete ${agent.first_name} ${agent.last_name}? This action cannot be undone.`)) {
-                            handleDeleteAgent(agent.id, `${agent.first_name} ${agent.last_name}`);
+                          if (confirm(`Are you sure you want to delete ${agent.full_name}? This action cannot be undone.`)) {
+                            handleDeleteAgent(agent.id, agent.full_name);
                           }
                         }}
                         disabled={deleteLoading === agent.id}

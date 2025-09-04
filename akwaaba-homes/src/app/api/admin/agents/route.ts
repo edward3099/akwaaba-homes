@@ -52,8 +52,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         email,
-        first_name,
-        last_name,
+        full_name,
         phone,
         user_role,
         verification_status,
@@ -64,7 +63,7 @@ export async function GET(request: NextRequest) {
         company_name,
         experience_years,
         license_number,
-        email_verified
+        is_verified
       `)
       .in('user_role', ['agent', 'seller'])
       .order('created_at', { ascending: false });
