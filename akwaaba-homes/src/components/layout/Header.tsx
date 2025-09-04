@@ -47,6 +47,13 @@ export function Header() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
             </Link>
             <Link
+              href="/agent-2"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
+            >
+              Agent 2
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </Link>
+            <Link
               href="/privacy"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors relative group"
             >
@@ -205,6 +212,13 @@ export function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Agents
+              </Link>
+              <Link
+                href="/agent-2"
+                className="block px-3 sm:px-4 py-3 text-sm sm:text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Agent 2
               </Link>
               <Link
                 href="/privacy"
