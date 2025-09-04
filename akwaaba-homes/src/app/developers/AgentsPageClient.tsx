@@ -138,7 +138,7 @@ export default function AgentsPageClient() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-gray-600">Loading agents...</p>
+          <p className="text-gray-600">Loading developers...</p>
         </div>
       </div>
     );
@@ -149,7 +149,7 @@ export default function AgentsPageClient() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Building className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">Error loading agents</h3>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">Error loading developers</h3>
           <p className="text-gray-500 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()} variant="outline">
             Try Again
@@ -161,6 +161,14 @@ export default function AgentsPageClient() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold text-gray-900">Find Developers</h1>
+          <p className="text-gray-600 mt-2">Connect with skilled developers for your projects</p>
+        </div>
+      </div>
+      
       {/* Search and Filters */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -171,7 +179,7 @@ export default function AgentsPageClient() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search agents by name, company, or specialization..."
+                  placeholder="Search developers by name, company, or specialization..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -211,7 +219,7 @@ export default function AgentsPageClient() {
           </div>
         </div>
 
-        {/* Agents Grid */}
+        {/* Developers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {safeFilteredAgents.map((agent) => (
             <Card key={agent.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -314,7 +322,7 @@ export default function AgentsPageClient() {
         {safeFilteredAgents.length === 0 && (
           <div className="text-center py-12">
             <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No agents found</h3>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No developers found</h3>
             <p className="text-gray-500 mb-4">
               Try adjusting your search criteria or filters
             </p>

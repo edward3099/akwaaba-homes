@@ -1,5 +1,5 @@
 import AgentsPageClient from './AgentsPageClient';
 
-export default function Agent2Page() {
+export default function DevelopersPage() {
   return <AgentsPageClient />;
 }
