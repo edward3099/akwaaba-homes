@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
     // Return only the payment-related settings that agents need
     const paymentSettings = {
       payment_processing_enabled: settings.platform?.payment_processing_enabled || false,
-      premium_listing_price: settings.platform?.premium_listing_price || 50
+      premium_listing_price: settings.platform?.premium_listing_price || 50,
+      premium_listings_enabled: settings.platform?.premium_listings_enabled ?? true
     };
 
     return NextResponse.json({ 

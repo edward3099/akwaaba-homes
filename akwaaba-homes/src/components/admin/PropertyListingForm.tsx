@@ -146,7 +146,8 @@ export default function PropertyListingForm() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState({
     paymentProcessingEnabled: false,
-    premiumListingPrice: 50
+    premiumListingPrice: 50,
+    premiumListingsEnabled: true
   });
 
   // File input ref
@@ -174,7 +175,8 @@ export default function PropertyListingForm() {
           if (settings) {
             setPaymentSettings({
               paymentProcessingEnabled: settings.payment_processing_enabled || false,
-              premiumListingPrice: settings.premium_listing_price || 50
+              premiumListingPrice: settings.premium_listing_price || 50,
+              premiumListingsEnabled: settings.premium_listings_enabled ?? true
             });
           }
         }
@@ -185,6 +187,13 @@ export default function PropertyListingForm() {
 
     fetchPaymentSettings();
   }, []);
+
+  // Reset tier to normal if premium listings are disabled
+  useEffect(() => {
+    if (!paymentSettings.premiumListingsEnabled && formData.tier === 'premium') {
+      updateFormData('tier', 'normal');
+    }
+  }, [paymentSettings.premiumListingsEnabled, formData.tier]);
 
   const updateFormData = (field: keyof PropertyFormData, value: PropertyFormData[keyof PropertyFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -897,11 +906,13 @@ export default function PropertyListingForm() {
             required
           >
             <option value="normal">Normal (Free)</option>
-            <option value="premium">
-              Premium {paymentSettings.paymentProcessingEnabled ? `(GHS ${paymentSettings.premiumListingPrice})` : '(Paid)'}
-            </option>
+            {paymentSettings.premiumListingsEnabled && (
+              <option value="premium">
+                Premium {paymentSettings.paymentProcessingEnabled ? `(GHS ${paymentSettings.premiumListingPrice})` : '(Paid)'}
+              </option>
+            )}
           </select>
-          {formData.tier === 'premium' && paymentSettings.paymentProcessingEnabled && (
+          {formData.tier === 'premium' && paymentSettings.premiumListingsEnabled && paymentSettings.paymentProcessingEnabled && (
             <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-sm text-blue-800">
                 <strong>Premium Listing Benefits:</strong>

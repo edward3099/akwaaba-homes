@@ -45,6 +45,7 @@ interface PlatformSettings {
     payment_processing: boolean
     analytics_dashboard: boolean
     mobile_app: boolean
+    premium_listings: boolean
   }
   security: {
     two_factor_auth: boolean
@@ -87,7 +88,8 @@ const defaultSettings: PlatformSettings = {
     agent_verification: true,
     payment_processing: false,
     analytics_dashboard: true,
-    mobile_app: false
+    mobile_app: false,
+    premium_listings: true
   },
   security: {
     two_factor_auth: false,
@@ -159,7 +161,8 @@ export default function AdminSettings() {
               agent_verification: backendSettings.platform?.agent_verification_enabled ?? defaultSettings.features.agent_verification,
               payment_processing: backendSettings.platform?.payment_processing_enabled ?? defaultSettings.features.payment_processing,
               analytics_dashboard: backendSettings.platform?.analytics_dashboard_enabled ?? defaultSettings.features.analytics_dashboard,
-              mobile_app: backendSettings.platform?.mobile_app_enabled ?? defaultSettings.features.mobile_app
+              mobile_app: backendSettings.platform?.mobile_app_enabled ?? defaultSettings.features.mobile_app,
+              premium_listings: backendSettings.platform?.premium_listings_enabled ?? defaultSettings.features.premium_listings
             },
             security: {
               two_factor_auth: backendSettings.platform?.two_factor_auth ?? defaultSettings.security.two_factor_auth,
@@ -237,6 +240,7 @@ export default function AdminSettings() {
           payment_processing_enabled: settings.features.payment_processing,
           analytics_dashboard_enabled: settings.features.analytics_dashboard,
           mobile_app_enabled: settings.features.mobile_app,
+          premium_listings_enabled: settings.features.premium_listings,
           two_factor_auth: settings.security.two_factor_auth,
           session_timeout: settings.security.session_timeout,
           max_login_attempts: settings.security.max_login_attempts,

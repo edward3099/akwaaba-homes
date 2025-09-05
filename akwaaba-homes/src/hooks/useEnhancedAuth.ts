@@ -148,7 +148,8 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
 
         const isVerified = user.email_verified === true && 
                           (userProfile?.is_verified || user.user_metadata?.verification_status === 'verified');
-        const isAgent = userProfile?.user_type === 'agent' || user.user_metadata?.user_type === 'agent';
+        const isAgent = userProfile?.user_type === 'agent' || user.user_metadata?.user_type === 'agent' || 
+                       userProfile?.user_type === 'developer' || user.user_metadata?.user_type === 'developer';
         const isAdmin = userProfile?.user_type === 'admin' || user.user_metadata?.user_type === 'admin';
 
         setAuthState(prev => ({

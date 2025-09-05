@@ -114,12 +114,12 @@ export function Header() {
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 transition-all group-hover:w-full"></span>
                   </Link>
                 )}
-                {userProfile.user_type === 'agent' && (
+                {(userProfile.user_type === 'agent' || userProfile.user_type === 'developer') && (
                   <Link
                     href="/agent-dashboard"
                     className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors relative group"
                   >
-                    Agent Dashboard
+                    User Dashboard
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
                   </Link>
                 )}
@@ -152,10 +152,10 @@ export function Header() {
                           Admin Dashboard
                         </Button>
                       </Link>
-                    ) : userProfile?.user_type === 'agent' ? (
+                    ) : (userProfile?.user_type === 'agent' || userProfile?.user_type === 'developer') ? (
                       <Link href="/agent-dashboard">
                         <Button variant="outline" size="sm">
-                          Agent Dashboard
+                          User Dashboard
                         </Button>
                       </Link>
                     ) : (
@@ -169,7 +169,7 @@ export function Header() {
                         ) : userProfile?.user_type === 'agent' ? (
                           <Link href="/agent-dashboard">
                             <Button variant="outline" size="sm">
-                              Agent Dashboard
+                              User Dashboard
                             </Button>
                           </Link>
                         ) : (
@@ -281,13 +281,13 @@ export function Header() {
                       Admin Dashboard
                     </Link>
                   )}
-                  {userProfile.user_type === 'agent' && (
+                  {(userProfile.user_type === 'agent' || userProfile.user_type === 'developer') && (
                     <Link
                       href="/agent-dashboard"
                       className="block px-3 sm:px-4 py-3 text-sm sm:text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Agent Dashboard
+                      User Dashboard
                     </Link>
                   )}
                   {userProfile.user_type === 'seller' && (

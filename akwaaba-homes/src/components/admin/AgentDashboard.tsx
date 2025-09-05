@@ -156,7 +156,7 @@ export default function AgentDashboard() {
   });
 
   // Calculate dynamic stats based on real properties
-  const agentStats = [
+  const userStats = [
     { 
       name: 'Total Listings', 
       value: properties.length.toString(), 
@@ -228,7 +228,7 @@ export default function AgentDashboard() {
           <div className="space-y-6">
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {agentStats.map((stat, index) => (
+              {userStats.map((stat, index) => (
                 <div key={index} className="bg-white rounded-lg shadow p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
@@ -356,7 +356,7 @@ export default function AgentDashboard() {
                     ))}
               </div>
             ) : (
-              <EmptyState userType="agent" />
+              <EmptyState userType="user" />
             )}
           </div>
         );
@@ -383,7 +383,7 @@ export default function AgentDashboard() {
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">Profile Management</h2>
               <a
-                href="/agent/profile"
+                href="/profile"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Go to Full Profile
@@ -398,7 +398,7 @@ export default function AgentDashboard() {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Profile Management</h3>
                 <p className="text-gray-600 mb-4">
-                  Manage your agent profile, update personal information, and maintain your professional credentials.
+                  Manage your profile, update personal information, and maintain your professional credentials.
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
@@ -436,9 +436,9 @@ export default function AgentDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Agent Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="mt-2 text-gray-600">
-            Welcome back, {user?.user_metadata?.full_name || 'Agent'}! Manage your properties and grow your business.
+            Welcome back, {user?.user_metadata?.full_name || 'User'}! Manage your properties and grow your business.
           </p>
         </div>
 

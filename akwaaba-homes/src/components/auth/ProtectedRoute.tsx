@@ -45,6 +45,11 @@ export default function ProtectedRoute({
         hasRequiredRole = true;
       } else if (allowedRoles.includes('admin') && isAdmin) {
         hasRequiredRole = true;
+      } else if (allowedRoles.includes('developer')) {
+        const userRole = userProfile?.user_type || user?.user_metadata?.user_type;
+        if (userRole === 'developer') {
+          hasRequiredRole = true;
+        }
       } else if (allowedRoles.includes('seller')) {
         const userRole = userProfile?.user_type || user?.user_metadata?.user_type;
         if (userRole === 'seller') {

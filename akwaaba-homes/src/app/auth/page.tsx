@@ -21,13 +21,6 @@ export default function AuthPage() {
   // Redirect if already authenticated
   React.useEffect(() => {
     if (user && !loading) {
-      // Wait for userProfile to load before redirecting
-      // This prevents redirect loops when profile data is still loading
-      if (userProfile === null && !loading) {
-        // Profile is still loading, wait a bit more
-        return;
-      }
-      
       // Check if there's a redirect parameter in the URL
       const urlParams = new URLSearchParams(window.location.search);
       const redirectTo = urlParams.get('redirect');
@@ -39,38 +32,27 @@ export default function AuthPage() {
       }
       
       // Redirect based on user role from profile or metadata
+      // Prioritize userProfile if available, otherwise use user metadata
       const userRole = userProfile?.user_type || user.user_metadata?.user_type;
       
-      // Use window.location.href for mobile devices to ensure proper navigation
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('Auth redirect - User role:', userRole, 'Profile:', userProfile, 'Metadata:', user.user_metadata);
       
+      // Use window.location.href for all redirects to ensure proper navigation
       if (userRole === 'admin') {
-        if (isMobile) {
-          window.location.href = '/admin';
-        } else {
-          router.push('/admin');
-        }
-      } else if (userRole === 'agent') {
-        if (isMobile) {
-          window.location.href = '/agent-dashboard';
-        } else {
-          router.push('/agent-dashboard');
-        }
+        console.log('Redirecting to admin dashboard');
+        window.location.href = '/admin';
+      } else if (userRole === 'agent' || userRole === 'developer') {
+        console.log('Redirecting to agent dashboard for role:', userRole);
+        window.location.href = '/agent-dashboard';
       } else if (userRole === 'seller') {
-        if (isMobile) {
-          window.location.href = '/seller-dashboard';
-        } else {
-          router.push('/seller-dashboard');
-        }
+        console.log('Redirecting to seller dashboard');
+        window.location.href = '/seller-dashboard';
       } else {
-        if (isMobile) {
-          window.location.href = '/dashboard';
-        } else {
-          router.push('/dashboard');
-        }
+        console.log('Redirecting to default dashboard');
+        window.location.href = '/agent-dashboard'; // Default to agent dashboard
       }
     }
-  }, [user, userProfile, loading, router]);
+  }, [user, loading, router]); // Removed userProfile from dependencies
 
   if (loading) {
     return (

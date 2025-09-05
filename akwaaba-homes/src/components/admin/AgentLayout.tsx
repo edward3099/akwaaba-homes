@@ -47,7 +47,7 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
       <div className="sticky top-0 z-40 bg-white shadow-sm border-b">
         <div className="flex items-center justify-between h-16 px-3 sm:px-6">
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">Agent Portal</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900">Portal</h1>
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -58,11 +58,11 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
               <img
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
                 src={profileImage || '/placeholder-property.svg'}
-                alt="Agent"
+                alt="User"
               />
               <div className="hidden sm:block text-sm">
                 <p className="font-medium text-gray-700">{user?.user_metadata?.full_name || user?.email}</p>
-                <p className="text-gray-500">Agent</p>
+                <p className="text-gray-500">User</p>
               </div>
               <button
                 onClick={signOut}

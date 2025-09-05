@@ -6,7 +6,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function AgentDashboardPage() {
   return (
-    <ProtectedRoute allowedRoles={['agent']} redirectTo="/auth">
+    <ProtectedRoute allowedRoles={['agent', 'developer']} redirectTo="/auth">
       <ProfileCompletionGuard>
         <ErrorBoundary>
           <AgentLayout>

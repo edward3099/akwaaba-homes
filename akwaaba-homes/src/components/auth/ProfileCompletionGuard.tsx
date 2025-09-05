@@ -20,14 +20,18 @@ export default function ProfileCompletionGuard({
   children, 
   redirectTo = '/agent/profile' 
 }: ProfileCompletionGuardProps) {
-  const { user, isAuthenticated, isAgent } = useAuth();
+  const { user, isAuthenticated, isAgent, userProfile } = useAuth();
   const router = useRouter();
   const [profileStatus, setProfileStatus] = useState<ProfileCompletionStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkProfile = async () => {
-      if (!isAuthenticated || !isAgent || !user) {
+      // Check if user is agent or developer
+      const userRole = userProfile?.user_type || user?.user_metadata?.user_type;
+      const isDeveloper = userRole === 'developer';
+      
+      if (!isAuthenticated || (!isAgent && !isDeveloper) || !user) {
         setLoading(false);
         return;
       }
@@ -55,7 +59,7 @@ export default function ProfileCompletionGuard({
     };
 
     checkProfile();
-  }, [user, isAuthenticated, isAgent, router, redirectTo]);
+  }, [user, isAuthenticated, isAgent, userProfile, router, redirectTo]);
 
   if (loading) {
     return (
@@ -68,7 +72,11 @@ export default function ProfileCompletionGuard({
     );
   }
 
-  if (!isAuthenticated || !isAgent) {
+  // Check if user is agent or developer
+  const userRole = userProfile?.user_type || user?.user_metadata?.user_type;
+  const isDeveloper = userRole === 'developer';
+  
+  if (!isAuthenticated || (!isAgent && !isDeveloper)) {
     return null;
   }
 
