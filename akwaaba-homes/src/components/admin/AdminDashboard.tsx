@@ -92,6 +92,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
   const [agentsSubTab, setAgentsSubTab] = useState('overview');
   const [analyticsSubTab, setAnalyticsSubTab] = useState('overview');
   const [paymentsSubTab, setPaymentsSubTab] = useState('overview');
+
+  // Helper function to safely format numbers
+  const safeFormatNumber = (value: any, fallback: number = 0): string => {
+    const num = Number(value);
+    return isNaN(num) ? fallback.toLocaleString() : num.toLocaleString();
+  };
   
   // State for real data
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -262,7 +268,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
               <>
                 {/* Stats grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {stats && (
+                  {stats && stats.properties && (
                     <>
                       <div className="bg-white rounded-lg shadow p-6">
                         <div className="flex items-center">
@@ -271,12 +277,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Total Properties</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.properties.total}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.properties?.total || 0}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                            {stats.properties.active} Active
+                            {stats.properties?.active || 0} Active
                           </span>
                         </div>
                       </div>
@@ -288,12 +294,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Total Users</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.users.total}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.users?.total || 0}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                            {stats.users.agents} Agents
+                            {stats.users?.agents || 0} Agents
                           </span>
                         </div>
                       </div>
@@ -305,12 +311,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Total Revenue</p>
-                            <p className="text-2xl font-semibold text-gray-900">${stats.revenue.total.toLocaleString()}</p>
+                            <p className="text-2xl font-semibold text-gray-900">${safeFormatNumber(stats.revenue?.total)}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                            ${stats.revenue.monthly.toLocaleString()}/month
+                            ${safeFormatNumber(stats.revenue?.monthly)}/month
                           </span>
                         </div>
                       </div>
@@ -322,12 +328,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Premium Listings</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.properties.featured}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.properties?.featured || 0}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                            ${stats.revenue.premium.toLocaleString()}
+                            ${safeFormatNumber(stats.revenue?.premium)}
                           </span>
                         </div>
                       </div>
@@ -444,32 +450,32 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Property Management</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Property Management</h2>
             </div>
             
             <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Property Approval Queue</h3>
+              <div className="px-2 sm:px-4 lg:px-6 py-4 border-b border-gray-200">
+                <h3 className="text-base sm:text-lg font-medium text-gray-900">Property Approval Queue</h3>
               </div>
-              <div className="p-6">
+              <div className="p-2 sm:p-4 lg:p-6">
                 {pendingProperties.length > 0 ? (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto -mx-2 sm:mx-0">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Property
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Owner
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Price
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
@@ -477,37 +483,37 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                       <tbody className="bg-white divide-y divide-gray-200">
                         {pendingProperties.map((property) => (
                           <tr key={property.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-2 sm:px-4 lg:px-6 py-4">
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{property.title}</div>
+                                <div className="text-sm font-medium text-gray-900 break-words">{property.title}</div>
                                 <div className="text-sm text-gray-500">
                                   {new Date(property.created_at).toLocaleDateString()}
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900 break-words">
                               {property.owner_name}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              ${property.price.toLocaleString()} {property.currency}
+                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900">
+                              ${safeFormatNumber(property.price)} {property.currency}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-2 sm:px-4 lg:px-6 py-4">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <ClockIcon className="h-4 w-4 mr-1" />
                                 Pending
                               </span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex space-x-2">
+                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm font-medium">
+                              <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
                                 <button
                                   onClick={() => handlePropertyAction(property.id, 'approve')}
-                                  className="text-green-600 hover:text-green-900"
+                                  className="text-green-600 hover:text-green-900 text-xs sm:text-sm"
                                 >
                                   Approve
                                 </button>
                                 <button
                                   onClick={() => handlePropertyAction(property.id, 'reject')}
-                                  className="text-red-600 hover:text-red-900"
+                                  className="text-red-600 hover:text-red-900 text-xs sm:text-sm"
                                 >
                                   Reject
                                 </button>
@@ -690,7 +696,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
-        <nav className="flex space-x-8 px-6" aria-label="Tabs">
+        <nav className="flex space-x-2 sm:space-x-4 lg:space-x-8 px-2 sm:px-4 lg:px-6 overflow-x-auto" aria-label="Tabs">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -699,18 +705,21 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+              } whitespace-nowrap py-3 sm:py-4 px-1 sm:px-2 border-b-2 font-medium text-xs sm:text-sm transition-colors flex-shrink-0`}
             >
-              <tab.icon className="h-5 w-5 inline mr-2" />
-              {tab.name}
+              <tab.icon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{tab.name}</span>
+              <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
             </button>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {renderTabContent()}
+      <div className="w-full py-6 px-2 sm:px-4 lg:px-6 xl:px-8">
+        <div className="max-w-full mx-auto">
+          {renderTabContent()}
+        </div>
       </div>
     </div>
   );

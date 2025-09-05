@@ -8,6 +8,18 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearchState } from '@/hooks/useSearchState';
 import { DatabaseProperty, DatabasePropertyImage } from '@/lib/types/database';
 
+// Ghana images for slideshow
+const ghanaImages = [
+  '/Landmarks-in-Ghana-Black-Star-Square.jpg',
+  '/Landmarks-in-Ghana-Larabanga-Mosque.jpg',
+  '/Statue_of_Nii_Tackie_Tawiah_III_located_in_Accra_Ghana_market.jpg',
+  '/71089263-2023-apr-11-11-41-12-000000-accra-gfaa0de8b5_1920.jpg',
+  '/view-from-kejetia-market-kumasi-1.jpg',
+  '/gh_eka_mensah_g.jpg',
+  '/the-nkyinkyim-museum.jpg',
+  '/ashanti-empire-human-sacrifice-featured.png'
+];
+
 // Extended interface for API response that includes property_images
 interface PropertyWithImages extends DatabaseProperty {
   property_images?: DatabasePropertyImage[];
@@ -115,6 +127,9 @@ export function FeaturedProperties() {
   const [selectedBedrooms, setSelectedBedrooms] = useState<string>('0');
   const [selectedMinPrice, setSelectedMinPrice] = useState<string>('0');
   const [selectedMaxPrice, setSelectedMaxPrice] = useState<string>('0');
+  
+  // Slideshow state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [searchKeywords, setSearchKeywords] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchRegion, setSearchRegion] = useState<string>('');
@@ -166,6 +181,17 @@ export function FeaturedProperties() {
 
     }
   }, [isInitialized, filters.status]);
+
+  // Slideshow effect - change image every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % ghanaImages.length
+      );
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Handlers for form inputs
   const handlePropertyTypeChange = (value: string) => {
@@ -491,10 +517,26 @@ export function FeaturedProperties() {
     <section className="py-6 bg-muted/30">
       <div className="container mx-auto px-3">
 
-        {/* Full Search Form with Background Image */}
+        {/* Search Form Card Section */}
         <div className="mb-6">
-                        <div 
-                className="relative rounded-lg shadow-lg p-2 sm:p-3 overflow-hidden max-w-2xl mx-auto"
+          {/* Larger Card Container */}
+          <div className="max-w-6xl mx-auto">
+            <div 
+              className="relative rounded-xl shadow-2xl p-8 sm:p-12 lg:p-16 overflow-hidden"
+              style={{
+                backgroundImage: `url(${ghanaImages[currentImageIndex]})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+              {/* Light overlay for better readability */}
+              <div className="absolute inset-0 bg-white/20"></div>
+              
+              {/* Content with relative positioning to appear above overlay */}
+              <div className="relative z-10">
+              {/* Search Form with Background Image */}
+              <div className="relative rounded-lg shadow-lg p-2 sm:p-3 overflow-hidden max-w-2xl mx-auto"
                 style={{
                   backgroundImage: 'url(/placeholder-house-1.jpg)',
                   backgroundSize: 'cover',
@@ -828,6 +870,9 @@ export function FeaturedProperties() {
                 </div>
               </div>
             </form>
+              </div>
+            </div>
+              </div>
             </div>
           </div>
         </div>

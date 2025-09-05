@@ -74,39 +74,30 @@ export default function ContactPage() {
       return;
     }
 
-    setLoading(true);
+    // Create WhatsApp message with form data
+    const message = `Hello! I'm interested in your properties.
 
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Subject: ${formData.subject}
+Property Interest: ${formData.propertyInterest || 'Not specified'}
+Preferred Contact: ${formData.preferredContact}
 
-      const data = await response.json();
+Message: ${formData.message}`;
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
-      }
-
-      setSuccess(true);
-      toast({
-        title: "Message Sent!",
-        description: data.message || "Thank you for your message. We'll get back to you soon.",
-      });
-
-    } catch (error) {
-      console.error('Contact form error:', error);
-      toast({
-        title: "Message Failed",
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Open WhatsApp with the message
+    const whatsappUrl = `https://wa.me/447470880710?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Show success message
+    toast({
+      title: "Opening WhatsApp!",
+      description: "Your message is being prepared for WhatsApp.",
+    });
   };
 
   if (success) {
@@ -128,7 +119,7 @@ export default function ContactPage() {
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• We&apos;ll review your message within 2-4 hours</li>
                 <li>• Our team will respond via your preferred contact method</li>
-                <li>• For urgent matters, call us directly at +44 7949 4321 95</li>
+                <li>• For urgent matters, call us directly at +44 7470 880 710</li>
               </ul>
             </div>
             <Button 
@@ -161,7 +152,7 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle className="text-2xl">Send us a Message</CardTitle>
                 <CardDescription>
-                  Fill out the form below and we&apos;ll get back to you within 24 hours.
+                  Fill out the form below and send your message directly via WhatsApp.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -257,10 +248,10 @@ export default function ContactPage() {
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending Message...
+                        Opening WhatsApp...
                       </>
                     ) : (
-                      'Send Message'
+                      'Send via WhatsApp'
                     )}
                   </Button>
                 </form>
@@ -293,9 +284,9 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-slate-900">Phone Numbers</h4>
                     <p className="text-slate-600">
-                      Main: +44 7949 4321 95<br />
-                      Support: +44 7949 4321 95<br />
-                      WhatsApp: +44 7949 4321 95
+                      Main: +44 7470 880 710<br />
+                      Support: +44 7949 432 195<br />
+                      WhatsApp: +44 7470 880 710
                     </p>
                   </div>
                 </div>
@@ -317,9 +308,8 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-slate-900">Business Hours</h4>
                     <p className="text-slate-600">
-                      Monday - Friday: 8:00 AM - 6:00 PM<br />
-                      Saturday: 9:00 AM - 4:00 PM<br />
-                      Sunday: Closed
+                      Available 24/7<br />
+                      We're here to help you anytime
                     </p>
                   </div>
                 </div>
@@ -365,7 +355,7 @@ export default function ContactPage() {
                   For urgent matters outside business hours, please call our emergency line:
                 </p>
                 <div className="text-center">
-                  <p className="text-lg font-bold text-orange-800">+44 7949 4321 95</p>
+                  <p className="text-lg font-bold text-orange-800">+44 7470 880 710</p>
                   <p className="text-sm text-orange-600">Available 24/7</p>
                 </div>
               </CardContent>
