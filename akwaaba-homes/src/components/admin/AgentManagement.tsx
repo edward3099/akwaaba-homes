@@ -153,7 +153,7 @@ export default function AgentManagement() {
                         <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4" />
                           {agent.email}
-                          {agent.email_verified && (
+                          {agent.is_verified && (
                             <Shield className="h-4 w-4 text-green-500" />
                           )}
                         </div>
