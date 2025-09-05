@@ -107,7 +107,7 @@ export function AuthErrorDisplay({
             {/* Technical Details Toggle */}
             {error.technical && (
               <Collapsible>
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger>
                   <Button
                     size="sm"
                     variant="ghost"
