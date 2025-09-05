@@ -10,7 +10,7 @@ import { AuthError, parseAuthError } from '@/lib/utils/authErrorHandler';
 interface EnhancedUser extends User {
   verification_status?: string;
   user_type?: string;
-  email_verified?: boolean;
+  is_verified?: boolean;
 }
 
 interface AuthState {
@@ -146,7 +146,7 @@ export function useEnhancedAuth(): UseEnhancedAuthReturn {
           console.warn('Failed to fetch user profile:', profileError);
         }
 
-        const isVerified = user.email_verified === true && 
+        const isVerified = user.is_verified === true && 
                           (userProfile?.is_verified || user.user_metadata?.verification_status === 'verified');
         const isAgent = userProfile?.user_type === 'agent' || user.user_metadata?.user_type === 'agent' || 
                        userProfile?.user_type === 'developer' || user.user_metadata?.user_type === 'developer';

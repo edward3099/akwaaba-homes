@@ -200,7 +200,7 @@ export default function AgentManagement() {
                                   <label className="text-sm font-medium text-gray-700">Email</label>
                                   <p className="text-sm text-gray-900 flex items-center gap-2">
                                     {selectedAgent.email}
-                                    {selectedAgent.email_verified && (
+                                    {selectedAgent.is_verified && (
                                       <Shield className="h-4 w-4 text-green-500" />
                                     )}
                                   </p>
