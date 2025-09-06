@@ -194,7 +194,7 @@ export default function AgentDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
+        if (data.message) {
           setProperties(properties.filter(p => p.id !== propertyId));
           toast.success('Property deleted successfully');
         } else {
