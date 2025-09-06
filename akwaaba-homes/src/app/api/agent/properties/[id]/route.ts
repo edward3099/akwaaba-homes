@@ -65,7 +65,7 @@ async function verifyPropertyOwnership(supabase: any, agentUser: any, propertyId
 // PUT /api/agent/properties/[id] - Update a property
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createApiRouteSupabaseClient()
@@ -74,7 +74,8 @@ export async function PUT(
     const agentUser = await requireAgent(supabase)
     
     // Verify property ownership
-    await verifyPropertyOwnership(supabase, agentUser, params.id)
+    const { id } = await params;
+    await verifyPropertyOwnership(supabase, agentUser, id)
 
     const body = await request.json()
     const validatedData = updatePropertySchema.parse(body)
@@ -99,7 +100,7 @@ export async function PUT(
     const { data: updatedProperty, error: updateError } = await supabase
       .from('properties')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -125,7 +126,7 @@ export async function PUT(
         const { error: locationError } = await supabase
           .from('properties_location')
           .update(locationUpdateData)
-          .eq('property_id', params.id)
+          .eq('property_id', id)
 
         if (locationError) {
           console.error('Error updating property location:', locationError)
@@ -140,7 +141,7 @@ export async function PUT(
       const { error: deleteImagesError } = await supabase
         .from('property_images')
         .delete()
-        .eq('property_id', params.id)
+        .eq('property_id', id)
 
       if (deleteImagesError) {
         console.error('Error deleting existing images:', deleteImagesError)
@@ -150,7 +151,7 @@ export async function PUT(
       // Insert new images if provided
       if (validatedData.images.length > 0) {
         const imageRecords = validatedData.images.map((imageUrl, index) => ({
-          property_id: params.id,
+          property_id: id,
           image_url: imageUrl,
           is_primary: index === 0, // First image is primary
           created_at: new Date().toISOString()
@@ -175,7 +176,7 @@ export async function PUT(
         location:properties_location(*),
         images:property_images(*)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError) {
@@ -213,7 +214,7 @@ export async function PUT(
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
+        { error: 'Invalid request data', details: error.issues },
         { status: 400 }
       )
     }
@@ -228,7 +229,7 @@ export async function PUT(
 // DELETE /api/agent/properties/[id] - Delete a property
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createApiRouteSupabaseClient()
@@ -237,7 +238,8 @@ export async function DELETE(
     const agentUser = await requireAgent(supabase)
     
     // Verify property ownership
-    await verifyPropertyOwnership(supabase, agentUser, params.id)
+    const { id } = await params;
+    await verifyPropertyOwnership(supabase, agentUser, id)
 
     // Delete related records first (due to foreign key constraints)
     
@@ -245,7 +247,7 @@ export async function DELETE(
     const { error: deleteImagesError } = await supabase
       .from('property_images')
       .delete()
-      .eq('property_id', params.id)
+      .eq('property_id', id)
 
     if (deleteImagesError) {
       console.error('Error deleting property images:', deleteImagesError)
@@ -256,7 +258,7 @@ export async function DELETE(
     const { error: deleteLocationError } = await supabase
       .from('properties_location')
       .delete()
-      .eq('property_id', params.id)
+      .eq('property_id', id)
 
     if (deleteLocationError) {
       console.error('Error deleting property location:', deleteLocationError)
@@ -267,7 +269,7 @@ export async function DELETE(
     const { error: deletePropertyError } = await supabase
       .from('properties')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (deletePropertyError) {
       console.error('Error deleting property:', deletePropertyError)
