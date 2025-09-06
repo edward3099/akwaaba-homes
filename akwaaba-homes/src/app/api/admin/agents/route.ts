@@ -80,6 +80,100 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
+
+    // Check if user is authenticated and is admin
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user profile to check if they're admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('user_role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || !profile || profile.user_role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const agentId = searchParams.get('id');
+
+    if (!agentId) {
+      return NextResponse.json({ error: 'Agent ID is required' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const { 
+      full_name, 
+      phone, 
+      company_name, 
+      business_type, 
+      bio, 
+      experience_years, 
+      license_number, 
+      verification_status 
+    } = body;
+
+    // Update the agent's profile
+    const { data: updatedAgent, error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        full_name,
+        phone,
+        company_name,
+        business_type,
+        bio,
+        experience_years,
+        license_number,
+        verification_status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', agentId)
+      .in('user_role', ['agent', 'seller'])
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error updating agent:', updateError);
+      return NextResponse.json({ error: 'Failed to update agent' }, { status: 500 });
+    }
+
+    return NextResponse.json({ agent: updatedAgent });
+  } catch (error) {
+    console.error('Error in update agent API:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const cookieStore = await cookies();
