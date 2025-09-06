@@ -262,14 +262,14 @@ export default async function AgentPage({ params }: AgentPageProps) {
       address: property.address || '',
       city: property.city || '',
       region: property.region || '',
-      country: 'Ghana',
+      country: 'Ghana' as const,
       coordinates: property.latitude && property.longitude ? { lat: property.latitude, lng: property.longitude } : null
     },
     specifications: {
       bedrooms: property.bedrooms || 0,
       bathrooms: property.bathrooms || 0,
       size: property.square_feet ? parseFloat(property.square_feet) : 0,
-      sizeUnit: 'sqft',
+      sizeUnit: 'sqft' as const,
       yearBuilt: property.year_built
     },
     images: property.images || ['/placeholder-property.svg'],
