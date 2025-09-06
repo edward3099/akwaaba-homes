@@ -21,10 +21,18 @@ const ghanaImages = [
   '/ashanti-empire-human-sacrifice-featured.png'
 ];
 
-// Extended interface for API response that includes property_images
+// Extended interface for API response that includes property_images and seller info
 interface PropertyWithImages extends DatabaseProperty {
   property_images?: DatabasePropertyImage[];
   image_urls?: string[]; // Add image_urls field
+  users?: {
+    id: string;
+    full_name: string;
+    phone?: string;
+    email?: string;
+    user_type: string;
+    is_verified: boolean;
+  };
 }
 
   // Transform database property to frontend property format
@@ -84,10 +92,11 @@ const transformDatabaseProperty = (dbProperty: PropertyWithImages) => {
     amenities: dbProperty.amenities,
     seller: {
       id: dbProperty.seller_id,
-      name: 'Property Seller', // Will be populated from user service
-      type: 'agent' as const,
-      phone: '',
-      isVerified: true,
+      name: (dbProperty as any).users?.full_name || 'Property Seller',
+      type: (dbProperty as any).users?.user_type === 'agent' ? 'agent' : 'individual',
+      phone: (dbProperty as any).users?.phone || '',
+      email: (dbProperty as any).users?.email,
+      isVerified: (dbProperty as any).users?.is_verified || false,
     },
     verification: {
       isVerified: true,
