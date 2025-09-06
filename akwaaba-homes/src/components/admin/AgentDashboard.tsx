@@ -61,6 +61,11 @@ export default function AgentDashboard() {
     city: '',
     region: ''
   });
+
+  // Image management state
+  const [propertyImages, setPropertyImages] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [coverPhoto, setCoverPhoto] = useState(null);
@@ -240,13 +245,30 @@ export default function AgentDashboard() {
     if (!editingProperty) return;
     
     try {
+      setIsUploadingImages(true);
+      
+      // Upload new images if any
+      let uploadedImageUrls: string[] = [];
+      if (newImages.length > 0) {
+        uploadedImageUrls = await uploadImages(editingProperty.id, newImages);
+      }
+      
+      // Combine existing images with new ones
+      const allImages = [...propertyImages, ...uploadedImageUrls];
+      
+      // Update property data with images
+      const updateData = {
+        ...editFormData,
+        images: allImages
+      };
+      
       const response = await fetch(`/api/properties/${editingProperty.id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify(updateData),
       });
       
       if (response.ok) {
@@ -255,11 +277,13 @@ export default function AgentDashboard() {
           // Update the property in the list
           setProperties(properties.map(p => 
             p.id === editingProperty.id 
-              ? { ...p, ...editFormData }
+              ? { ...p, ...updateData }
               : p
           ));
           setShowEditModal(false);
           setEditingProperty(null);
+          setPropertyImages([]);
+          setNewImages([]);
           toast.success('Property updated successfully');
         } else {
           toast.error(data.error || 'Failed to update property');
@@ -272,6 +296,8 @@ export default function AgentDashboard() {
     } catch (error) {
       console.error('Error updating property:', error);
       toast.error('Network error. Please check your connection.');
+    } finally {
+      setIsUploadingImages(false);
     }
   };
 
@@ -291,8 +317,87 @@ export default function AgentDashboard() {
         city: editingProperty.location?.city || '',
         region: editingProperty.location?.region || ''
       });
+      
+      // Load existing property images
+      if (editingProperty.images && editingProperty.images.length > 0) {
+        setPropertyImages(editingProperty.images);
+      } else {
+        setPropertyImages([]);
+      }
+      setNewImages([]);
     }
   }, [editingProperty]);
+
+  // Handle image file selection
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length > 0) {
+      setNewImages(prev => [...prev, ...files]);
+    }
+  };
+
+  // Remove image from new images list
+  const removeNewImage = (index: number) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove existing property image
+  const removePropertyImage = async (imageUrl: string) => {
+    try {
+      // Extract the file path from the URL
+      const urlParts = imageUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      const filePath = `property-images/${editingProperty?.id}/${fileName}`;
+      
+      const response = await fetch(`/api/storage/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ filePath }),
+      });
+
+      if (response.ok) {
+        setPropertyImages(prev => prev.filter(img => img !== imageUrl));
+        toast.success('Image deleted successfully');
+      } else {
+        toast.error('Failed to delete image');
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Failed to delete image');
+    }
+  };
+
+  // Upload new images
+  const uploadImages = async (propertyId: string, files: File[]) => {
+    const uploadedUrls: string[] = [];
+    
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('propertyId', propertyId);
+      formData.append('folder', 'property-images');
+
+      try {
+        const response = await fetch('/api/storage/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          uploadedUrls.push(data.url);
+        } else {
+          console.error('Failed to upload image:', file.name);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', file.name, error);
+      }
+    }
+
+    return uploadedUrls;
+  };
 
   // Render dashboard content based on active tab
   const renderTabContent = () => {
@@ -678,6 +783,78 @@ export default function AgentDashboard() {
                   </div>
                 </div>
 
+                {/* Property Images Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property Images</label>
+                  
+                  {/* Existing Images */}
+                  {propertyImages.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-600 mb-2">Current Images</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {propertyImages.map((imageUrl, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={imageUrl}
+                              alt={`Property ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-md border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removePropertyImage(imageUrl)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* New Images Preview */}
+                  {newImages.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-600 mb-2">New Images to Upload</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {newImages.map((file, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`New image ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-md border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeNewImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add Images Button */}
+                  <div className="flex items-center space-x-4">
+                    <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                      <span className="text-sm font-medium">Add Images</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </label>
+                    <span className="text-xs text-gray-500">
+                      Select multiple images (JPG, PNG, WebP)
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     type="button"
@@ -688,9 +865,13 @@ export default function AgentDashboard() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    disabled={isUploadingImages}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    Save Changes
+                    {isUploadingImages && (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    )}
+                    <span>{isUploadingImages ? 'Uploading Images...' : 'Save Changes'}</span>
                   </button>
                 </div>
               </form>
