@@ -262,7 +262,7 @@ export function useUserRole(): {
   const { profile } = useAuth();
   
   const isAdmin = profile?.user_type === 'admin' || profile?.user_type === 'super_admin' || profile?.user_type === 'moderator';
-  const isSeller = profile?.user_type === 'seller' || profile?.user_type === 'agent' || profile?.user_type === 'developer';
+  const isSeller = profile?.user_type === 'seller' || profile?.user_type === 'agent';
   const isBuyer = profile?.user_type === 'buyer';
   
   const hasRole = (role: string | string[]): boolean => {
