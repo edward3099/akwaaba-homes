@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
       .from('properties')
       .select(`
         *,
+        property_images (
+          *
+        ),
         users!properties_seller_id_fkey (
           id,
           full_name,
@@ -148,13 +151,20 @@ export async function GET(request: NextRequest) {
               property.listing_type === 'rent' ? 'for-rent' : 
               property.listing_type === 'lease' ? 'short-let' : 'for-sale',
       type: property.property_type || 'house',
-      // Transform image_urls to images for frontend compatibility
-      images: (property.image_urls || []).filter(url => 
-        url && typeof url === 'string' && url.trim() !== '' && 
-        (url.startsWith('http') || url.startsWith('/') || url.startsWith('blob:'))
-      ),
+      // Transform property_images to images for frontend compatibility
+      images: (property.property_images || [])
+        .map((img: any) => img.image_url)
+        .filter(url => 
+          url && typeof url === 'string' && url.trim() !== '' && 
+          (url.startsWith('http') || url.startsWith('/') || url.startsWith('blob:'))
+        ),
       // Keep original image_urls for backward compatibility
-      image_urls: property.image_urls || [],
+      image_urls: (property.property_images || [])
+        .map((img: any) => img.image_url)
+        .filter(url => 
+          url && typeof url === 'string' && url.trim() !== '' && 
+          (url.startsWith('http') || url.startsWith('/') || url.startsWith('blob:'))
+        ),
       specifications: {
         bedrooms: property.bedrooms || 0,
         bathrooms: property.bathrooms || 0,

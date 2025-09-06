@@ -37,22 +37,22 @@ interface PropertyWithImages extends DatabaseProperty {
 
   // Transform database property to frontend property format
 const transformDatabaseProperty = (dbProperty: PropertyWithImages) => {
-  // Get valid images from image_urls field (primary) or property_images (fallback)
-  const validImages = (dbProperty.image_urls || [])
+  // Get valid images from property_images field (primary) or image_urls (fallback)
+  const validImages = (dbProperty.property_images
+    ?.map((img: DatabasePropertyImage) => img.image_url)
     .filter((url): url is string => 
       Boolean(url) && 
       typeof url === 'string' && 
       url.trim() !== '' && 
       (url.startsWith('http') || url.startsWith('/'))
-    ) || 
-    (dbProperty.property_images
-      ?.map((img: DatabasePropertyImage) => img.image_url)
+    ) || []) || 
+    (dbProperty.image_urls || [])
       .filter((url): url is string => 
         Boolean(url) && 
         typeof url === 'string' && 
         url.trim() !== '' && 
         (url.startsWith('http') || url.startsWith('/'))
-      ) || []);
+      );
   
   // Use placeholder if no valid images
   const transformedImages = validImages.length > 0 ? validImages : ['/placeholder-property.svg'];
