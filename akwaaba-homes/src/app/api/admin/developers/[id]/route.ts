@@ -64,7 +64,7 @@ export async function PUT(
         phone,
         company_name,
         bio,
-        location,
+        address: location, // Map location to address field
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
