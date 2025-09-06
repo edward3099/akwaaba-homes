@@ -256,8 +256,8 @@ export default async function AgentPage({ params }: AgentPageProps) {
     description: property.description || '',
     price: property.price,
     currency: 'GHS' as const,
-    status: property.status === 'active' ? 'for-sale' : property.status,
-    type: property.property_type,
+    status: (property.status === 'active' ? 'for-sale' : property.status) as 'for-sale' | 'for-rent' | 'short-let' | 'sold' | 'rented',
+    type: property.property_type as 'house' | 'apartment' | 'land' | 'commercial' | 'townhouse' | 'condo',
     location: {
       address: property.address || '',
       city: property.city || '',
@@ -291,7 +291,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
     createdAt: property.created_at,
     updatedAt: property.updated_at,
     expiresAt: null,
-    tier: property.is_featured ? 'premium' : 'normal',
+    tier: (property.is_featured ? 'premium' : 'normal') as 'premium' | 'normal',
     approval_status: property.approval_status,
     diasporaFeatures: {
       multiCurrencyDisplay: true,
