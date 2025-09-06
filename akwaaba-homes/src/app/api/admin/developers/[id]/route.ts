@@ -34,7 +34,10 @@ export async function PUT(
     // Get current user to verify admin access
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
+    console.log('Auth check - user:', user?.id, 'error:', authError);
+    
     if (authError || !user) {
+      console.log('Auth failed - no user or auth error');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -114,7 +117,10 @@ export async function DELETE(
     // Get current user to verify admin access
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
+    console.log('Auth check - user:', user?.id, 'error:', authError);
+    
     if (authError || !user) {
+      console.log('Auth failed - no user or auth error');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
