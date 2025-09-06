@@ -16,10 +16,13 @@ import {
   MessageCircle, 
   Star, 
   Shield, 
-  Verified 
+  Verified,
+  Home,
+  User
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
+import { useCurrencyRates } from '@/lib/hooks/useCurrencyRates';
 import { toast } from 'sonner';
 
 interface PropertyCardProps {
@@ -39,6 +42,9 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const searchParams = useSearchParams();
+  const { rates, error, isLoading } = useCurrencyRates();
+  
+  console.log('PropertyCard (properties/) - rates:', rates, 'error:', error, 'isLoading:', isLoading);
 
   // Ensure images array exists and has valid URLs
   const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
@@ -95,8 +101,8 @@ export function PropertyCard({
     window.open(whatsappUrl, '_blank');
   };
 
-  // Format price with diaspora display
-  const priceDisplay = formatDiasporaPrice(property.price, showCurrency);
+  // Format price with diaspora display using admin-configured rates
+  const priceDisplay = formatDiasporaPrice(property.price, showCurrency, rates);
 
   // Get status badge variant
   const getStatusBadge = () => {
@@ -148,22 +154,22 @@ export function PropertyCard({
 
   if (viewMode === 'list') {
     return (
-      <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 ${className} ${
+      <Card className={`group hover:shadow-2xl transition-all duration-500 border-0 bg-white overflow-hidden ${className} ${
         property.tier === 'premium' ? 'premium-card-glow' : ''
       }`}>
         <CardContent className="p-0">
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-row h-full">
             {/* Image Section - Clickable Link */}
-            <Link href={createReturnURL()} className="block">
-              <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0 overflow-hidden">
+            <Link href={createReturnURL()} className="block group-hover:opacity-95 transition-opacity duration-300">
+              <div className="relative w-32 md:w-64 lg:w-72 h-full flex-shrink-0 overflow-hidden rounded-l-lg">
                 {currentImage ? (
                   <Image
                     src={currentImage}
                     alt={property.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
-                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 1280px) 100vw, 448px"
+                    className="property-image object-cover group-hover:scale-105 transition-transform duration-700"
+                    style={{ objectFit: 'cover', objectPosition: 'center', width: '100%', height: '100%' }}
                     priority={currentImageIndex === 0}
                     unoptimized
                     onError={(e) => {
@@ -173,13 +179,15 @@ export function PropertyCard({
                       if (target) {
                         target.style.display = 'none';
                         const fallbackDiv = document.createElement('div');
-                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none';
+                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center';
                         fallbackDiv.innerHTML = `
-                          <div class="text-center text-slate-600">
-                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                          <div class="text-center text-slate-500">
+                            <div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                             </svg>
-                            <p class="text-sm">Image unavailable</p>
+                            </div>
+                            <p class="text-sm font-medium">Image unavailable</p>
                           </div>
                         `;
                         target.parentNode?.insertBefore(fallbackDiv, target);
@@ -187,19 +195,19 @@ export function PropertyCard({
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
-                    <div className="text-center text-slate-600">
-                      <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                      </svg>
-                      <p className="text-sm">No image available</p>
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center rounded-l-lg">
+                    <div className="text-center text-slate-500">
+                      <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Home className="w-8 h-8" />
+                      </div>
+                      <p className="text-xs font-medium">No image available</p>
                     </div>
                   </div>
                 )}
                 
                 {/* Image Navigation - Only show if there are multiple valid images */}
                 {validImages.length > 1 && (
-                  <div className="absolute bottom-2 left-2 flex space-x-1">
+                  <div className="absolute bottom-3 left-3 flex space-x-2">
                     {validImages.slice(0, 4).map((_, index) => (
                       <button
                         key={index}
@@ -208,39 +216,40 @@ export function PropertyCard({
                           e.stopPropagation();
                           setCurrentImageIndex(index);
                         }}
-                        className={`w-2 h-2 rounded-full transition-colors ${
-                          index === safeImageIndex ? 'bg-white' : 'bg-white/50'
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                          index === safeImageIndex ? 'bg-white shadow-lg' : 'bg-white/60 hover:bg-white/80'
                         }`}
                       />
                     ))}
                     {validImages.length > 4 && (
-                      <span className="text-white text-xs bg-black/50 px-1 rounded">
+                      <span className="text-white text-xs bg-black/60 px-2 py-1 rounded-full font-medium">
                         +{validImages.length - 4}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Badges */}
-                <div className="absolute top-2 left-2 flex flex-col gap-1">
-                  <Badge className={`${statusBadge.className} text-xs px-2 py-1`}>
+                {/* Status Badge */}
+                <div className="absolute top-4 left-4">
+                  <Badge className={`${statusBadge.className} text-xs px-4 py-2 font-semibold shadow-lg`}>
                     {statusBadge.text}
                   </Badge>
+                </div>
+
+                {/* Premium Badge */}
                   {tierBadge && (
-                    <Badge className={`${tierBadge.className} text-xs px-2 py-1`}>
+                  <div className="absolute top-4 right-4">
+                    <Badge className={`${tierBadge.className} text-xs px-4 py-2 font-semibold shadow-lg`}>
                       <Star className="w-3 h-3 mr-1" />
                       {tierBadge.text}
                     </Badge>
+                  </div>
                   )}
-                </div>
-
-                {/* Save Button */}
-                {/* Removed Save Button */}
 
                 {/* Verification Badge */}
                 {property.verification.isVerified && (
-                  <div className="absolute bottom-2 right-2">
-                    <Badge className="verification-badge">
+                  <div className="absolute bottom-4 right-4">
+                    <Badge className="verification-badge shadow-lg">
                       <Shield className="w-3 h-3" />
                     </Badge>
                   </div>
@@ -248,86 +257,89 @@ export function PropertyCard({
               </div>
             </Link>
 
-            {/* Content Section - Clickable Link */}
+            {/* Content Section */}
+            <div className="flex-1 flex flex-col">
+              {/* Main Content - Clickable Link */}
             <Link href={createReturnURL()} className="block flex-1">
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+                <div className="p-2 md:p-4 flex-1 flex flex-col">
+                  {/* Header with Title and Price */}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                    <div className="flex-1 mb-2 lg:mb-0 lg:mr-4">
+                      <h3 className="text-sm md:text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors mb-1 line-clamp-2 leading-tight">
                       {property.title}
                     </h3>
-                    <div className="flex items-center text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {property.location.address}, {property.location.city}
-                    </div>
+                      <div className="flex items-center text-gray-600">
+                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0 text-gray-400" />
+                        <span className="text-xs md:text-sm font-medium">{property.location.address}, {property.location.city}</span>
+                      </div>
                   </div>
                   
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-left sm:text-right">
+                      <div className="text-sm md:text-xl font-bold text-gray-900 mb-1">
                       {priceDisplay.primary}
                       {pricingContext && (
-                        <span className="text-sm font-normal text-muted-foreground ml-1">
+                          <span className="text-sm font-normal text-gray-500 ml-1">
                           {pricingContext}
                         </span>
                       )}
                     </div>
                     {priceDisplay.alternatives.length > 0 && (
-                      <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-gray-600 font-medium">
                         {priceDisplay.alternatives[0].formatted}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Property Details */}
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-                  {property.specifications.bedrooms && (
-                    <div className="flex items-center">
-                      <Bed className="h-4 w-4 mr-1" />
-                      {property.specifications.bedrooms} bed
-                    </div>
-                  )}
-                  {property.specifications.bathrooms && (
-                    <div className="flex items-center">
-                      <Bath className="h-4 w-4 mr-1" />
-                      {property.specifications.bathrooms} bath
-                    </div>
-                  )}
-                  <div className="flex items-center">
-                    <Square className="h-4 w-4 mr-1" />
-                    {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+                  {/* Property Specifications */}
+                  <div className="flex flex-wrap items-center gap-1 mb-2">
+                    {property.specifications.bedrooms && property.specifications.bedrooms > 0 && (
+                      <Badge variant="secondary" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200 text-xs">
+                        <Bed className="w-3 h-3" /> {property.specifications.bedrooms}
+                      </Badge>
+                    )}
+                    {property.specifications.bathrooms && property.specifications.bathrooms > 0 && (
+                      <Badge variant="secondary" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200 text-xs">
+                        <Bath className="w-3 h-3" /> {property.specifications.bathrooms}
+                      </Badge>
+                    )}
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                      <Square className="w-3 h-3" /> {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+                    </Badge>
                   </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {property.description}
-                </p>
 
                 {/* Seller Info */}
-                <div className="flex items-center space-x-2">
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Listed by </span>
-                    <span className="font-medium">{property.seller.name}</span>
+                  <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
+                    <User className="w-3 h-3" />
+                    <span>Listed by {property.seller.name}</span>
                     {property.seller.isVerified && (
-                      <Verified className="inline w-3 h-3 ml-1 text-verified" />
+                      <Verified className="w-3 h-3 text-green-500" />
                     )}
-                  </div>
                 </div>
               </div>
             </Link>
 
             {/* Actions - Outside of Link to prevent navigation conflicts */}
-            <div className="p-4 pt-0">
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm" onClick={handleContact}>
-                  <Phone className="h-4 w-4 mr-1" />
+              <div className="px-2 md:px-4 pb-2 md:pb-4">
+                <div className="flex gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleContact}
+                    className="flex-1 hover:bg-primary hover:text-white transition-colors text-xs h-7"
+                  >
+                    <Phone className="w-3 h-3 mr-1" />
                   Call
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleWhatsApp}>
-                  <MessageCircle className="h-4 w-4 mr-1" />
+                  <Button 
+                    size="sm"
+                    onClick={handleWhatsApp}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs h-7"
+                  >
+                    <MessageCircle className="w-3 h-3 mr-1" />
                   WhatsApp
                 </Button>
+                </div>
               </div>
             </div>
           </div>

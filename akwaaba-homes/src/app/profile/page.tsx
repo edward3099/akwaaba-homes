@@ -372,7 +372,7 @@ export default function ProfilePage() {
                   <Link href="/agent/profile">
                     <Button variant="outline">
                       <User className="w-4 h-4 mr-2" />
-                      Agent Profile
+                      Developer Profile
                     </Button>
                   </Link>
                 </div>

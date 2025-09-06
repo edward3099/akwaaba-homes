@@ -93,6 +93,18 @@ export default function AdminDashboardLayout({ children, currentTab }: AdminDash
       href: '/admin/users'
     },
     {
+      id: 'developers',
+      label: 'Developer Management',
+      icon: Users,
+      href: '/admin/developers'
+    },
+    {
+      id: 'verifications',
+      label: 'Verifications',
+      icon: Shield,
+      href: '/admin/verifications'
+    },
+    {
       id: 'properties',
       label: 'Properties',
       icon: Building2,

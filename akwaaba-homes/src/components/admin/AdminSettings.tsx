@@ -23,7 +23,10 @@ import {
   AlertTriangle,
   CheckCircle,
   CreditCard,
-  Smartphone
+  Smartphone,
+  DollarSign,
+  PoundSterling,
+  Euro
 } from 'lucide-react'
 import { useApiMutation } from '@/lib/hooks/useApiMutation'
 import { toast } from 'sonner'
@@ -70,6 +73,11 @@ interface PlatformSettings {
     mobile_money_merchant_number: string
     premium_listing_price: number
   }
+  currency_rates: {
+    usd_to_ghs: number
+    gbp_to_ghs: number
+    eur_to_ghs: number
+  }
 }
 
 const defaultSettings: PlatformSettings = {
@@ -113,6 +121,11 @@ const defaultSettings: PlatformSettings = {
   payments: {
     mobile_money_merchant_number: '',
     premium_listing_price: 50
+  },
+  currency_rates: {
+    usd_to_ghs: 16.13, // 1 USD = 16.13 GHS (approximate current rate)
+    gbp_to_ghs: 20.50, // 1 GBP = 20.50 GHS (approximate current rate)
+    eur_to_ghs: 17.25  // 1 EUR = 17.25 GHS (approximate current rate)
   }
 }
 
@@ -186,6 +199,11 @@ export default function AdminSettings() {
             payments: {
               mobile_money_merchant_number: backendSettings.platform?.mobile_money_merchant_number ?? defaultSettings.payments.mobile_money_merchant_number,
               premium_listing_price: backendSettings.platform?.premium_listing_price ?? defaultSettings.payments.premium_listing_price
+            },
+            currency_rates: {
+              usd_to_ghs: backendSettings.currency_rates?.usd_to_ghs ?? defaultSettings.currency_rates.usd_to_ghs,
+              gbp_to_ghs: backendSettings.currency_rates?.gbp_to_ghs ?? defaultSettings.currency_rates.gbp_to_ghs,
+              eur_to_ghs: backendSettings.currency_rates?.eur_to_ghs ?? defaultSettings.currency_rates.eur_to_ghs
             }
           }
           setSettings(mappedSettings)
@@ -258,6 +276,11 @@ export default function AdminSettings() {
           sms_notifications_enabled: settings.notifications.sms_notifications,
           push_notifications_enabled: settings.notifications.push_notifications,
           admin_alerts_enabled: settings.notifications.admin_alerts
+        },
+        currency_rates: {
+          usd_to_ghs: settings.currency_rates.usd_to_ghs,
+          gbp_to_ghs: settings.currency_rates.gbp_to_ghs,
+          eur_to_ghs: settings.currency_rates.eur_to_ghs
         }
       }
 
@@ -678,6 +701,92 @@ export default function AdminSettings() {
               </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Currency Exchange Rates */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <DollarSign className="w-5 h-5 mr-2 text-ghana-green" />
+            Currency Exchange Rates
+          </CardTitle>
+          <CardDescription>
+            Set manual exchange rates for USD, GBP, and EUR to GHS conversion
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="usd-rate" className="flex items-center">
+                <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                USD to GHS Rate
+              </Label>
+              <Input
+                id="usd-rate"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.currency_rates.usd_to_ghs}
+                onChange={(e) => handleSettingChange('currency_rates.usd_to_ghs', parseFloat(e.target.value))}
+                placeholder="16.13"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                1 USD = {settings.currency_rates.usd_to_ghs} GHS
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="gbp-rate" className="flex items-center">
+                <PoundSterling className="w-4 h-4 mr-2 text-blue-600" />
+                GBP to GHS Rate
+              </Label>
+              <Input
+                id="gbp-rate"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.currency_rates.gbp_to_ghs}
+                onChange={(e) => handleSettingChange('currency_rates.gbp_to_ghs', parseFloat(e.target.value))}
+                placeholder="20.50"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                1 GBP = {settings.currency_rates.gbp_to_ghs} GHS
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="eur-rate" className="flex items-center">
+                <Euro className="w-4 h-4 mr-2 text-purple-600" />
+                EUR to GHS Rate
+              </Label>
+              <Input
+                id="eur-rate"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.currency_rates.eur_to_ghs}
+                onChange={(e) => handleSettingChange('currency_rates.eur_to_ghs', parseFloat(e.target.value))}
+                placeholder="17.25"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                1 EUR = {settings.currency_rates.eur_to_ghs} GHS
+              </p>
+            </div>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle className="w-5 h-5 text-blue-600 mr-2" />
+              <div>
+                <h4 className="text-sm font-medium text-blue-800">Exchange Rate Information</h4>
+                <p className="text-sm text-blue-700 mt-1">
+                  These rates are used to convert property prices from GHS to USD, GBP, and EUR for diaspora buyers. 
+                  Update these rates regularly to reflect current market conditions.
+                </p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

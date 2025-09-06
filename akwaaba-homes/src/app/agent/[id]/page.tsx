@@ -214,7 +214,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
     .from('properties')
     .select('*')
     .eq('seller_id', id)
-    .eq('approval_status', 'approved')
+    .in('approval_status', ['approved', 'pending'])
     .order('created_at', { ascending: false });
 
   if (propertiesError) {
@@ -249,5 +249,57 @@ export default async function AgentPage({ params }: AgentPageProps) {
     }
   };
 
-  return <AgentPageClient agent={agent} properties={properties || []} agentId={id} />;
+  // Transform properties to match the expected Property interface
+  const transformedProperties = properties?.map(property => ({
+    id: property.id,
+    title: property.title,
+    description: property.description || '',
+    price: property.price,
+    currency: 'GHS',
+    status: property.status === 'active' ? 'for-sale' : property.status,
+    type: property.property_type,
+    location: {
+      address: property.address || '',
+      city: property.city || '',
+      region: property.region || '',
+      country: 'Ghana',
+      coordinates: property.latitude && property.longitude ? { lat: property.latitude, lng: property.longitude } : null
+    },
+    specifications: {
+      bedrooms: property.bedrooms || 0,
+      bathrooms: property.bathrooms || 0,
+      size: property.square_feet ? parseFloat(property.square_feet) : 0,
+      sizeUnit: 'sqft',
+      yearBuilt: property.year_built
+    },
+    images: property.images || ['/placeholder-property.svg'],
+    features: property.features || [],
+    amenities: property.amenities || [],
+    seller: {
+      id: property.seller_id,
+      name: agent.name,
+      type: agent.type,
+      phone: agent.phone,
+      email: agent.email,
+      isVerified: agent.isVerified
+    },
+    verification: {
+      isVerified: property.approval_status === 'approved',
+      documentsUploaded: true,
+      verificationDate: property.created_at
+    },
+    createdAt: property.created_at,
+    updatedAt: property.updated_at,
+    expiresAt: null,
+    tier: property.is_featured ? 'premium' : 'normal',
+    approval_status: property.approval_status,
+    diasporaFeatures: {
+      multiCurrencyDisplay: true,
+      inspectionScheduling: true,
+      virtualTourAvailable: false,
+      familyRepresentativeContact: agent.phone
+    }
+  })) || [];
+
+  return <AgentPageClient agent={agent} properties={transformedProperties} agentId={id} />;
 }

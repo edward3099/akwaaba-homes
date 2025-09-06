@@ -66,8 +66,8 @@ export async function authenticateSeller(request: NextRequest): Promise<SellerAu
       return null;
     }
 
-    // Check if user is a seller type
-    if (!['seller', 'agent'].includes(profile.user_type)) {
+    // Check if user is a seller type (including developers)
+    if (!['seller', 'agent', 'developer'].includes(profile.user_type)) {
       return null;
     }
 
@@ -133,6 +133,17 @@ async function getSellerPermissions(userType: string, supabase: any): Promise<st
         'view:own_statistics',
         'manage:own_profile',
         'limited:property_deletion' // Agents can't delete properties
+      ];
+    
+    case 'developer':
+      return [
+        ...basePermissions,
+        'create:properties',
+        'update:own_properties',
+        'manage:own_images',
+        'view:own_statistics',
+        'manage:own_profile',
+        'limited:property_deletion' // Developers can't delete properties
       ];
     
     default:

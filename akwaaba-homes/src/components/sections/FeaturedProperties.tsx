@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/properties/PropertyCard';
+import { ViewToggle } from '@/components/search/ViewToggle';
 import { MapPin, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -138,6 +139,7 @@ export function FeaturedProperties() {
   // Additional state for expanded search options
   const [addedToSite, setAddedToSite] = useState<string>('0'); // 0 = Anytime, 1 = Last 24h, 2 = Last 3d, etc.
   const [expandedKeywords, setExpandedKeywords] = useState<string>('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   
   // Sync local state with search state hook when it's initialized
   useEffect(() => {
@@ -397,17 +399,8 @@ export function FeaturedProperties() {
     }
   }, [isInitialized, filters, currentPage]);
 
-  // Transform database properties to frontend format with better safety
-  const transformedProperties = useMemo(() => {
-    if (!properties || !Array.isArray(properties)) {
-      return [];
-    }
-    return properties.map(transformDatabaseProperty);
-  }, [properties]);
-
-  // Since we're filtering on the API side, we don't need frontend filtering
-  // The properties returned are already filtered by the selected type
-  const currentPageProperties = transformedProperties;
+  // Use properties directly from API (already transformed)
+  const currentPageProperties = properties || [];
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -550,8 +543,12 @@ export function FeaturedProperties() {
             {/* Content with relative positioning to appear above overlay */}
             <div className="relative z-10">
               {/* Header */}
-              <div className="text-center mb-2">
-                <h2 className="text-sm sm:text-base font-bold text-foreground">Find your new property</h2>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1"></div>
+                <h2 className="text-xs sm:text-sm md:text-base font-bold text-foreground text-center flex-1">Find your new property</h2>
+                <div className="flex-1 flex justify-end">
+                  <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+                </div>
               </div>
 
             {/* Search Form */}
@@ -879,7 +876,11 @@ export function FeaturedProperties() {
 
         {/* Properties Display */}
         {currentPageProperties && currentPageProperties.length > 0 ? (
-          <div className="grid gap-2 sm:gap-3 mb-12 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+          <div className={`gap-2 sm:gap-3 mb-12 ${
+            viewMode === 'grid' 
+              ? 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3' 
+              : 'space-y-4'
+          }`}>
             {currentPageProperties.map((property: any, index: number) => (
               <div 
                 key={property.id}
@@ -888,7 +889,7 @@ export function FeaturedProperties() {
               >
                 <PropertyCard 
                   property={property} 
-                  viewMode="grid"
+                  viewMode={viewMode}
                   onContact={(property) => {
                     // Handle contact for property - this will open the contact form
                     // The PropertyCard component handles the actual contact logic

@@ -146,7 +146,7 @@ export async function PUT(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { platform, notification_settings, email_templates } = body;
+    const { platform, notification_settings, email_templates, currency_rates } = body;
 
     // Validate the settings structure
     if (platform && typeof platform !== 'object') {
@@ -167,6 +167,12 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 });
     }
 
+    if (currency_rates && typeof currency_rates !== 'object') {
+      return NextResponse.json({
+        error: 'Invalid currency rates format'
+      }, { status: 400 });
+    }
+
     // Update platform settings
     const updateData: any = {
       updated_at: new Date().toISOString(),
@@ -183,6 +189,10 @@ export async function PUT(request: NextRequest) {
 
     if (email_templates) {
       updateData.email_templates = email_templates;
+    }
+
+    if (currency_rates) {
+      updateData.currency_rates = currency_rates;
     }
 
     const { data: updatedSettings, error: updateError } = await supabase

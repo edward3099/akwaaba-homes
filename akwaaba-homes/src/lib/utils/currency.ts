@@ -222,25 +222,118 @@ export function formatDiasporaPrice(
 }
 
 /**
- * Hook to fetch real-time currency rates (placeholder for API integration)
+ * Fetch admin-configured currency rates from platform settings
+ */
+export async function fetchAdminCurrencyRates(): Promise<Record<CurrencyCode, CurrencyRate>> {
+  try {
+    const response = await fetch('/api/admin/settings');
+    
+    if (!response.ok) {
+      console.warn('Failed to fetch admin currency rates, using defaults');
+      return DEFAULT_CURRENCY_RATES;
+    }
+    
+    const data = await response.json();
+    const currencyRates = data.settings?.currency_rates;
+    
+    if (!currencyRates) {
+      console.warn('No currency rates found in admin settings, using defaults');
+      return DEFAULT_CURRENCY_RATES;
+    }
+    
+    // Convert admin rates to our format (admin stores rates as foreign_currency_to_ghs)
+    const rates: Record<CurrencyCode, CurrencyRate> = {
+      GHS: {
+        code: 'GHS',
+        rate: 1,
+        symbol: '₵',
+        name: 'Ghana Cedi'
+      },
+      USD: {
+        code: 'USD',
+        rate: 1 / currencyRates.usd_to_ghs, // Convert from USD->GHS to GHS->USD
+        symbol: '$',
+        name: 'US Dollar'
+      },
+      GBP: {
+        code: 'GBP',
+        rate: 1 / currencyRates.gbp_to_ghs, // Convert from GBP->GHS to GHS->GBP
+        symbol: '£',
+        name: 'British Pound'
+      },
+      EUR: {
+        code: 'EUR',
+        rate: 1 / currencyRates.eur_to_ghs, // Convert from EUR->GHS to GHS->EUR
+        symbol: '€',
+        name: 'Euro'
+      }
+    };
+    
+    console.log('✅ Using admin-configured currency rates:', {
+      USD: `1 GHS = ${rates.USD.rate.toFixed(4)} USD`,
+      GBP: `1 GHS = ${rates.GBP.rate.toFixed(4)} GBP`,
+      EUR: `1 GHS = ${rates.EUR.rate.toFixed(4)} EUR`
+    });
+    
+    return rates;
+  } catch (error) {
+    console.error('❌ Failed to fetch admin currency rates, using defaults:', error);
+    return DEFAULT_CURRENCY_RATES;
+  }
+}
+
+/**
+ * Fetch real-time currency rates from ExchangeRate-API
+ * Free tier: 1,500 requests/month, no API key required
  */
 export async function fetchCurrencyRates(): Promise<Record<CurrencyCode, CurrencyRate>> {
-  // In production, this would fetch from a real API like:
-  // - Bank of Ghana API
-  // - ExchangeRate-API
-  // - Fixer.io
-  // - CurrencyAPI
-  
   try {
-    // Placeholder for API call
-    // const response = await fetch('/api/currency-rates');
-    // const data = await response.json();
-    // return data.rates;
+    // Fetch rates from ExchangeRate-API (GHS as base currency)
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/GHS');
     
-    // For now, return default rates
-    return DEFAULT_CURRENCY_RATES;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Convert API response to our format
+    const rates: Record<CurrencyCode, CurrencyRate> = {
+      GHS: {
+        code: 'GHS',
+        rate: 1,
+        symbol: '₵',
+        name: 'Ghana Cedi'
+      },
+      USD: {
+        code: 'USD',
+        rate: data.rates.USD || 0.062,
+        symbol: '$',
+        name: 'US Dollar'
+      },
+      GBP: {
+        code: 'GBP',
+        rate: data.rates.GBP || 0.049,
+        symbol: '£',
+        name: 'British Pound'
+      },
+      EUR: {
+        code: 'EUR',
+        rate: data.rates.EUR || 0.058,
+        symbol: '€',
+        name: 'Euro'
+      }
+    };
+    
+    console.log('✅ Fetched live currency rates:', {
+      USD: `1 GHS = ${rates.USD.rate} USD`,
+      GBP: `1 GHS = ${rates.GBP.rate} GBP`,
+      EUR: `1 GHS = ${rates.EUR.rate} EUR`
+    });
+    
+    return rates;
   } catch (error) {
-    console.error('Failed to fetch currency rates:', error);
+    console.error('❌ Failed to fetch currency rates, using defaults:', error);
     return DEFAULT_CURRENCY_RATES;
   }
 }

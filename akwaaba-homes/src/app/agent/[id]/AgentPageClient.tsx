@@ -82,7 +82,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
             </button>
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-            Agent Profile
+            Developer Profile
           </h1>
         </div>
       </div>
@@ -257,8 +257,11 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                                   }
                                 }}
                               />
-                              <div className="absolute top-1 right-1">
+                              <div className="absolute top-1 right-1 flex flex-col gap-1">
                                 <Badge variant={property.tier === 'premium' ? 'default' : 'secondary'} className="text-xs">{property.tier}</Badge>
+                                {property.approval_status === 'pending' && (
+                                  <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800 border-yellow-300">Pending</Badge>
+                                )}
                               </div>
                             </div>
                             <div className="p-2">

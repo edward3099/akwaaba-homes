@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
         email: property.users?.email || undefined,
         whatsapp: property.users?.phone || undefined, // Use phone as WhatsApp
         isVerified: property.users?.is_verified || false,
-        company: undefined, // Not stored in users table
+        company: undefined, // Will be added later when we join with profiles table
         licenseNumber: undefined // Not stored in users table
       },
       verification: {
@@ -257,8 +257,8 @@ export async function POST(request: NextRequest) {
 
     console.log('Authenticated user:', { id: user.id, email: user.email });
 
-    // Check if user is an agent - check both profiles and users tables
-    let isAgent = false;
+    // Check if user is an agent or developer - check both profiles and users tables
+    let isAuthorized = false;
     let userRole = null;
     let userType = null;
 
@@ -271,12 +271,12 @@ export async function POST(request: NextRequest) {
 
     if (profile && !profileError) {
       userRole = profile.user_role;
-      isAgent = userRole === 'agent';
-      console.log('Profile found:', { userRole, isAgent });
+      isAuthorized = ['agent', 'developer'].includes(userRole);
+      console.log('Profile found:', { userRole, isAuthorized });
     }
 
     // If not found in profiles, check users table
-    if (!isAgent) {
+    if (!isAuthorized) {
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('user_type')
@@ -285,45 +285,45 @@ export async function POST(request: NextRequest) {
 
       if (userData && !userError) {
         userType = userData.user_type;
-        isAgent = userType === 'agent';
-        console.log('User data found:', { userType, isAgent });
+        isAuthorized = ['agent', 'developer'].includes(userType);
+        console.log('User data found:', { userType, isAuthorized });
       }
     }
 
-    // If still not an agent, check if user email matches known agent emails
-    if (!isAgent) {
-      const { data: knownAgent, error: agentError } = await supabase
+    // If still not authorized, check if user email matches known agent/developer emails
+    if (!isAuthorized) {
+      const { data: knownUser, error: userError } = await supabase
         .from('users')
         .select('id, user_type')
         .eq('email', user.email)
-        .eq('user_type', 'agent')
+        .in('user_type', ['agent', 'developer'])
         .single();
 
-      if (knownAgent && !agentError) {
-        isAgent = true;
-        console.log('Known agent found by email:', { email: user.email, isAgent });
+      if (knownUser && !userError) {
+        isAuthorized = true;
+        console.log('Known user found by email:', { email: user.email, userType: knownUser.user_type, isAuthorized });
       }
     }
 
-    if (!isAgent) {
-      console.error('User is not an agent:', { 
+    if (!isAuthorized) {
+      console.error('User is not authorized to create properties:', { 
         userId: user.id, 
         email: user.email, 
         userRole, 
         userType 
       });
       return NextResponse.json(
-        { error: 'Unauthorized - Only agents can create properties' },
+        { error: 'Unauthorized - Only agents and developers can create properties' },
         { status: 403 }
       );
     }
 
-    console.log('Agent verification successful:', { 
+    console.log('Authorization successful:', { 
       userId: user.id, 
       email: user.email, 
       userRole, 
       userType, 
-      isAgent 
+      isAuthorized 
     });
 
     // Parse request body
@@ -371,14 +371,36 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Map form data to database fields
+    const mapStatusToListingType = (status: string) => {
+      switch (status) {
+        case 'for-sale': return 'sale';
+        case 'for-rent': return 'rent';
+        case 'short-let': return 'lease';
+        default: return 'sale';
+      }
+    };
+
+    const mapTypeToPropertyType = (type: string) => {
+      switch (type) {
+        case 'house': return 'house';
+        case 'apartment': return 'apartment';
+        case 'land': return 'land';
+        case 'commercial': return 'commercial';
+        case 'townhouse': return 'house'; // Map townhouse to house
+        case 'condo': return 'apartment'; // Map condo to apartment
+        default: return 'house';
+      }
+    };
+
     // Prepare property data
     const propertyData = {
       title: body.title,
       description: body.description,
       price: parseFloat(body.price),
       currency: body.currency || 'GHS',
-      property_type: body.property_type || body.type || 'house',
-      listing_type: body.listing_type || 'sale',
+      property_type: mapTypeToPropertyType(body.property_type || body.type || 'house'),
+      listing_type: mapStatusToListingType(body.status || body.listing_type || 'for-sale'),
       bedrooms: parseInt(body.bedrooms) || 0,
       bathrooms: parseInt(body.bathrooms) || 0,
       square_feet: parseFloat(body.square_feet) || parseFloat(body.size) || 0,

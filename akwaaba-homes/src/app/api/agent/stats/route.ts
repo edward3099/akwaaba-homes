@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!profile || (profile.user_type !== 'agent' && profile.user_type !== 'admin')) {
+    if (!profile || !['agent', 'admin', 'developer'].includes(profile.user_type)) {
       console.error('Access denied for user:', user.id, 'user_type:', profile?.user_type);
       return NextResponse.json(
-        { error: 'Access denied. Only agents and admins can access stats.' },
+        { error: 'Access denied. Only agents, developers, and admins can access stats.' },
         { status: 403 }
       );
     }

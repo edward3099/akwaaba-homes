@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
+import { useCurrencyRates } from '@/lib/hooks/useCurrencyRates';
 import { toast } from 'sonner';
 
 interface PropertyCardProps {
@@ -39,6 +40,9 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const searchParams = useSearchParams();
+  const { rates, error, isLoading } = useCurrencyRates();
+  
+  console.log('PropertyCard - rates:', rates, 'error:', error, 'isLoading:', isLoading);
 
   // Ensure images array exists and has valid URLs
   const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
@@ -84,13 +88,13 @@ export function PropertyCard({
       return;
     }
     
-    const message = `Hi, I'm interested in this property: ${property.title} - ${formatCurrency(property.price, showCurrency)}`;
+    const message = `Hi, I'm interested in this property: ${property.title} - ${formatCurrency(property.price, showCurrency, rates)}`;
     const whatsappUrl = `https://wa.me/${property.seller.phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  // Format price with diaspora display
-  const priceDisplay = formatDiasporaPrice(property.price, showCurrency);
+  // Format price with diaspora display using admin-configured rates
+  const priceDisplay = formatDiasporaPrice(property.price, showCurrency, rates);
 
   // Get status badge variant
   const getStatusBadge = () => {

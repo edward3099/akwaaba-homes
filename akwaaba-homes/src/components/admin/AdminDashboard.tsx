@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '@/lib/auth/authContext';
+import DeveloperManagement from './DeveloperManagement';
 
 // Types for our API responses
 interface DashboardStats {
@@ -226,6 +227,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
     { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
     { id: 'properties', name: 'Properties', icon: BuildingOfficeIcon },
     { id: 'agents', name: 'Agents', icon: UsersIcon },
+    { id: 'developers', name: 'Developers', icon: UsersIcon },
     { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
     { id: 'payments', name: 'Payments', icon: CurrencyDollarIcon },
   ];
@@ -277,12 +279,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Total Properties</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.properties?.total || 0}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{safeFormatNumber(stats.properties?.total)}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                            {stats.properties?.active || 0} Active
+                            {safeFormatNumber(stats.properties?.active)} Active
                           </span>
                         </div>
                       </div>
@@ -294,12 +296,12 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Total Users</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.users?.total || 0}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{safeFormatNumber(stats.users?.total)}</p>
                           </div>
                         </div>
                         <div className="mt-4">
                           <span className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                            {stats.users?.agents || 0} Agents
+                            {safeFormatNumber(stats.users?.agents)} Agents
                           </span>
                         </div>
                       </div>
@@ -328,7 +330,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                           </div>
                           <div className="ml-4 w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500 truncate">Premium Listings</p>
-                            <p className="text-2xl font-semibold text-gray-900">{stats.properties?.featured || 0}</p>
+                            <p className="text-2xl font-semibold text-gray-900">{safeFormatNumber(stats.properties?.featured)}</p>
                           </div>
                         </div>
                         <div className="mt-4">
@@ -679,6 +681,13 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                 </div>
               </div>
             </div>
+          </div>
+        );
+
+      case 'developers':
+        return (
+          <div className="space-y-6">
+            <DeveloperManagement />
           </div>
         );
 

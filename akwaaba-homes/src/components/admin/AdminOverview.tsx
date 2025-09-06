@@ -41,6 +41,12 @@ export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Helper function to safely format numbers
+  const safeFormatNumber = (value: any, fallback: number = 0): string => {
+    const num = Number(value);
+    return isNaN(num) ? fallback.toLocaleString() : num.toLocaleString();
+  };
+
   useEffect(() => {
     fetchAdminStats();
   }, []);
@@ -105,7 +111,7 @@ export default function AdminOverview() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            <div className="text-2xl font-bold">{safeFormatNumber(stats.totalUsers)}</div>
             <p className="text-xs text-muted-foreground">
               All registered users
             </p>
@@ -118,7 +124,7 @@ export default function AdminOverview() {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalAgents}</div>
+            <div className="text-2xl font-bold">{safeFormatNumber(stats.totalAgents)}</div>
             <p className="text-xs text-muted-foreground">
               Verified real estate agents
             </p>
@@ -131,7 +137,7 @@ export default function AdminOverview() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProperties}</div>
+            <div className="text-2xl font-bold">{safeFormatNumber(stats.totalProperties)}</div>
             <p className="text-xs text-muted-foreground">
               All property listings
             </p>
@@ -144,7 +150,7 @@ export default function AdminOverview() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalInquiries}</div>
+            <div className="text-2xl font-bold">{safeFormatNumber(stats.totalInquiries)}</div>
             <p className="text-xs text-muted-foreground">
               Buyer inquiries
             </p>
@@ -166,7 +172,7 @@ export default function AdminOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-yellow-600 mb-4">
-              {stats.pendingVerifications}
+              {safeFormatNumber(stats.pendingVerifications)}
             </div>
             <Button 
               onClick={() => router.push('/admin/verifications')}
@@ -189,7 +195,7 @@ export default function AdminOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-orange-600 mb-4">
-              {stats.pendingApprovals}
+              {safeFormatNumber(stats.pendingApprovals)}
             </div>
             <Button 
               onClick={() => router.push('/admin/properties/approvals')}
@@ -224,7 +230,7 @@ export default function AdminOverview() {
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-green-600">
-                {stats.totalProperties - stats.pendingApprovals}
+                {safeFormatNumber(stats.totalProperties - stats.pendingApprovals)}
               </div>
               <p className="text-sm text-green-700">Active Properties</p>
             </div>
@@ -232,7 +238,7 @@ export default function AdminOverview() {
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-blue-600">
-                {stats.totalUsers}
+                {safeFormatNumber(stats.totalUsers)}
               </div>
               <p className="text-sm text-blue-700">Total Users</p>
             </div>
@@ -240,7 +246,7 @@ export default function AdminOverview() {
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-purple-600">
-                {stats.totalInquiries}
+                {safeFormatNumber(stats.totalInquiries)}
               </div>
               <p className="text-sm text-purple-700">Total Inquiries</p>
             </div>
