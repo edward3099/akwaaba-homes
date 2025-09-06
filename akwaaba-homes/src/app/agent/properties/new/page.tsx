@@ -32,6 +32,8 @@ interface PropertyFormData {
   address: string;
   city: string;
   region: string;
+  coordinates?: { lat: number; lng: number };
+  plusCode?: string;
   bedrooms: string;
   bathrooms: string;
   area: string;
