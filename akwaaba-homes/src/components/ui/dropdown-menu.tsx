@@ -23,7 +23,6 @@ const DropdownMenuTrigger = React.forwardRef<
 >(({ className, asChild = false, children, ...props }, ref) => {
   if (asChild) {
     return React.cloneElement(children as React.ReactElement, {
-      ref,
       ...props,
     })
   }
