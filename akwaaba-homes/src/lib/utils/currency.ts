@@ -229,7 +229,12 @@ export async function fetchAdminCurrencyRates(): Promise<Record<CurrencyCode, Cu
     const response = await fetch('/api/admin/settings');
     
     if (!response.ok) {
-      console.warn('Failed to fetch admin currency rates, using defaults');
+      // If it's a 403 (Forbidden), the user doesn't have admin access, which is normal
+      if (response.status === 403) {
+        console.log('User does not have admin access, using default currency rates');
+      } else {
+        console.warn('Failed to fetch admin currency rates, using defaults');
+      }
       return DEFAULT_CURRENCY_RATES;
     }
     
@@ -277,7 +282,7 @@ export async function fetchAdminCurrencyRates(): Promise<Record<CurrencyCode, Cu
     
     return rates;
   } catch (error) {
-    console.error('❌ Failed to fetch admin currency rates, using defaults:', error);
+    console.warn('Error fetching admin currency rates, using defaults:', error);
     return DEFAULT_CURRENCY_RATES;
   }
 }
