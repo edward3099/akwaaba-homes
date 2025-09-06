@@ -79,6 +79,9 @@ export interface Property {
     virtualTourAvailable: boolean;
     familyRepresentativeContact?: string;
   };
+
+  // Approval Status
+  approval_status?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface SearchFilters {
