@@ -255,7 +255,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
     title: property.title,
     description: property.description || '',
     price: property.price,
-    currency: 'GHS',
+    currency: 'GHS' as const,
     status: property.status === 'active' ? 'for-sale' : property.status,
     type: property.property_type,
     location: {
