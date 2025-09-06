@@ -46,6 +46,21 @@ export default function AgentDashboard() {
     weekdays: '8:00 AM - 6:00 PM',
     weekends: '9:00 AM - 3:00 PM'
   });
+
+  // Edit property form state
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    description: '',
+    price: 0,
+    status: 'active',
+    property_type: 'house',
+    bedrooms: 0,
+    bathrooms: 0,
+    square_feet: 0,
+    address: '',
+    city: '',
+    region: ''
+  });
   
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [coverPhoto, setCoverPhoto] = useState(null);
@@ -219,6 +234,65 @@ export default function AgentDashboard() {
       toast.error('Network error. Please check your connection.');
     }
   };
+
+  // Handle property edit
+  const handleEditProperty = async () => {
+    if (!editingProperty) return;
+    
+    try {
+      const response = await fetch(`/api/properties/${editingProperty.id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editFormData),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.message) {
+          // Update the property in the list
+          setProperties(properties.map(p => 
+            p.id === editingProperty.id 
+              ? { ...p, ...editFormData }
+              : p
+          ));
+          setShowEditModal(false);
+          setEditingProperty(null);
+          toast.success('Property updated successfully');
+        } else {
+          toast.error(data.error || 'Failed to update property');
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to update property:', response.status, errorData);
+        toast.error(errorData.error || 'Failed to update property');
+      }
+    } catch (error) {
+      console.error('Error updating property:', error);
+      toast.error('Network error. Please check your connection.');
+    }
+  };
+
+  // Initialize edit form when property is selected for editing
+  useEffect(() => {
+    if (editingProperty) {
+      setEditFormData({
+        title: editingProperty.title || '',
+        description: editingProperty.description || '',
+        price: editingProperty.price || 0,
+        status: editingProperty.status || 'active',
+        property_type: editingProperty.property_type || 'house',
+        bedrooms: editingProperty.bedrooms || 0,
+        bathrooms: editingProperty.bathrooms || 0,
+        square_feet: editingProperty.square_feet || 0,
+        address: editingProperty.location?.address || '',
+        city: editingProperty.location?.city || '',
+        region: editingProperty.location?.region || ''
+      });
+    }
+  }, [editingProperty]);
 
   // Render dashboard content based on active tab
   const renderTabContent = () => {
@@ -469,24 +543,157 @@ export default function AgentDashboard() {
       {/* Edit Property Modal */}
       {showEditModal && editingProperty && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Property</h3>
-              <p className="text-gray-600 mb-4">Property editing coming soon...</p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Save Changes
-                </button>
-              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-6">Edit Property</h3>
+              
+              <form onSubmit={(e) => { e.preventDefault(); handleEditProperty(); }} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Property Title *</label>
+                    <input
+                      type="text"
+                      value={editFormData.title}
+                      onChange={(e) => setEditFormData({...editFormData, title: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (GHS) *</label>
+                    <input
+                      type="number"
+                      value={editFormData.price}
+                      onChange={(e) => setEditFormData({...editFormData, price: parseFloat(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                    <select
+                      value={editFormData.property_type}
+                      onChange={(e) => setEditFormData({...editFormData, property_type: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="house">House</option>
+                      <option value="apartment">Apartment</option>
+                      <option value="land">Land</option>
+                      <option value="commercial">Commercial</option>
+                      <option value="townhouse">Townhouse</option>
+                      <option value="condo">Condo</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                    <input
+                      type="number"
+                      value={editFormData.bedrooms}
+                      onChange={(e) => setEditFormData({...editFormData, bedrooms: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                    <input
+                      type="number"
+                      value={editFormData.bathrooms}
+                      onChange={(e) => setEditFormData({...editFormData, bathrooms: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Size (sqft)</label>
+                    <input
+                      type="number"
+                      value={editFormData.square_feet}
+                      onChange={(e) => setEditFormData({...editFormData, square_feet: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select
+                      value={editFormData.status}
+                      onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                  <input
+                    type="text"
+                    value={editFormData.address}
+                    onChange={(e) => setEditFormData({...editFormData, address: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={editFormData.city}
+                      onChange={(e) => setEditFormData({...editFormData, city: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                    <input
+                      type="text"
+                      value={editFormData.region}
+                      onChange={(e) => setEditFormData({...editFormData, region: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
