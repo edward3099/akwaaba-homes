@@ -463,10 +463,9 @@ export async function DELETE(
     const { error: archiveError } = await supabase
       .from('properties')
       .update({ 
-        status: 'archived',
+        status: 'inactive',
         updated_at: new Date().toISOString(),
-        archived_at: new Date().toISOString(),
-        archived_by: user.id
+        archived_at: new Date().toISOString()
       })
       .eq('id', propertyId);
 
