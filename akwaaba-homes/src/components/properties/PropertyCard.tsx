@@ -258,7 +258,9 @@ export function PropertyCard({
                 {/* Seller Info */}
                 <div className="flex items-center justify-between mt-auto">
                   <div className="flex items-center text-xs">
-                    <span className="text-muted-foreground">by <span className="font-medium">{property.seller.name}</span></span>
+                    <span className="text-muted-foreground">
+                      by <span className="font-medium truncate">{property.seller.name}</span>
+                    </span>
                     {property.seller.isVerified && (
                       <Verified className="inline w-2 h-2 ml-1 text-verified flex-shrink-0" />
                     )}
@@ -480,24 +482,6 @@ export function PropertyCard({
               </div>
             )}
             
-            {/* Image Navigation - Only show if there are multiple valid images */}
-            {validImages.length > 1 && (
-              <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 flex space-x-1">
-                {validImages.slice(0, 4).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setCurrentImageIndex(index);
-                    }}
-                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors ${
-                      index === safeImageIndex ? 'bg-white' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
 
             {/* Badges */}
             <div className="absolute top-1 sm:top-2 left-1 sm:left-2 flex flex-col gap-1">
