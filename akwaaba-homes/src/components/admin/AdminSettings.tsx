@@ -442,6 +442,105 @@ export default function AdminSettings() {
         </CardContent>
       </Card>
 
+      {/* Premium Listings Control */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CreditCard className="w-5 h-5 mr-2 text-ghana-green" />
+            Premium Listings Control
+          </CardTitle>
+          <CardDescription>
+            Control premium listing visibility and pricing
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-medium text-blue-800">Premium Listings Toggle</h4>
+                <p className="text-sm text-blue-700 mt-1">
+                  {settings.features.premium_listings 
+                    ? 'Premium listings are currently ENABLED - agents can see premium tier option'
+                    : 'Premium listings are currently DISABLED - agents cannot see premium tier option'
+                  }
+                </p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Switch
+                  checked={settings.features.premium_listings}
+                  onCheckedChange={(checked) => handleSettingChange('features.premium_listings', checked)}
+                />
+                <Button
+                  onClick={async () => {
+                    // Save settings first
+                    await saveSettings()
+                    // Then refresh the property form by triggering a custom event
+                    window.dispatchEvent(new CustomEvent('premiumListingsToggle', { 
+                      detail: { enabled: settings.features.premium_listings } 
+                    }))
+                    toast.success('Premium listings setting updated', {
+                      description: 'The property listing form will now reflect this change.'
+                    })
+                  }}
+                  disabled={!hasChanges || saveSettingsMutation.isLoading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Apply to Property Form
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="premium-price">Premium Listing Price (GHS)</Label>
+              <Input
+                id="premium-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={settings.payments.premium_listing_price}
+                onChange={(e) => handleSettingChange('payments.premium_listing_price', parseFloat(e.target.value))}
+                placeholder="50.00"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                This is the price agents pay for premium property listings
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="merchant-number" className="flex items-center">
+                <Smartphone className="w-4 h-4 mr-2" />
+                Mobile Money Merchant Number
+              </Label>
+              <Input
+                id="merchant-number"
+                value={settings.payments.mobile_money_merchant_number}
+                onChange={(e) => handleSettingChange('payments.mobile_money_merchant_number', e.target.value)}
+                placeholder="Enter merchant number (e.g., 0241234567)"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                This is the number agents will send payments to for premium listings
+              </p>
+            </div>
+          </div>
+          
+          {!settings.payments.mobile_money_merchant_number && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+                <div>
+                  <h4 className="text-sm font-medium text-yellow-800">Mobile Money Not Configured</h4>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    Add a merchant number to enable mobile money payments for premium listings.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Feature Toggles */}
       <Card>
         <CardHeader>
@@ -455,7 +554,7 @@ export default function AdminSettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(settings.features).map(([key, value]) => (
+            {Object.entries(settings.features).filter(([key]) => key !== 'premium_listings').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <Label className="text-sm font-medium capitalize">
@@ -643,66 +742,6 @@ export default function AdminSettings() {
         </CardContent>
       </Card>
 
-      {/* Payment Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <CreditCard className="w-5 h-5 mr-2 text-ghana-green" />
-            Payment Settings
-          </CardTitle>
-          <CardDescription>
-            Configure mobile money integration and listing prices
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <Label htmlFor="merchant-number" className="flex items-center">
-                <Smartphone className="w-4 h-4 mr-2" />
-                Mobile Money Merchant Number
-              </Label>
-              <Input
-                id="merchant-number"
-                value={settings.payments.mobile_money_merchant_number}
-                onChange={(e) => handleSettingChange('payments.mobile_money_merchant_number', e.target.value)}
-                placeholder="Enter merchant number (e.g., 0241234567)"
-                className="mt-1"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                This is the number agents will send payments to for premium listings
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="premium-price">Premium Listing Price (GHS)</Label>
-              <Input
-                id="premium-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={settings.payments.premium_listing_price}
-                onChange={(e) => handleSettingChange('payments.premium_listing_price', parseFloat(e.target.value))}
-                placeholder="50.00"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                This is the price agents pay for premium property listings
-              </p>
-            </div>
-          </div>
-          {!settings.payments.mobile_money_merchant_number && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-center">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
-                <div>
-                  <h4 className="text-sm font-medium text-yellow-800">Mobile Money Not Configured</h4>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    Add a merchant number to enable mobile money payments for premium listings.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Currency Exchange Rates */}
       <Card>

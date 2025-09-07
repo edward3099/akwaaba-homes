@@ -46,7 +46,7 @@ export default function AgentDashboard() {
     weekdays: '8:00 AM - 6:00 PM',
     weekends: '9:00 AM - 3:00 PM'
   });
-
+  
   // Edit property form state
   const [editFormData, setEditFormData] = useState({
     title: '',
@@ -847,24 +847,24 @@ export default function AgentDashboard() {
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4">
-                  <button
+                <button
                     type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
                     type="submit"
                     disabled={isUploadingImages}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
+                >
                     {isUploadingImages && (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     )}
                     <span>{isUploadingImages ? 'Uploading Images...' : 'Save Changes'}</span>
-                  </button>
-                </div>
+                </button>
+              </div>
               </form>
             </div>
           </div>

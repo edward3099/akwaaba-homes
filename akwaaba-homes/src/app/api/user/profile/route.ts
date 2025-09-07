@@ -195,6 +195,26 @@ export async function PUT(request: NextRequest) {
         );
       }
 
+      // Also create/update the users table to keep phone numbers in sync
+      const { error: userCreateError } = await supabase
+        .from('users')
+        .upsert({
+          id: user.id,
+          email: user.email!,
+          full_name: validationResult.data.full_name || '',
+          phone: validationResult.data.phone || null,
+          user_type: 'agent', // Default to agent for onboarding
+          is_verified: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (userCreateError) {
+        console.error('User table creation/update error:', userCreateError);
+        // Don't fail the request, just log the error
+        // The profile creation was successful
+      }
+
       profileData = newProfile;
     } else if (fetchError) {
       console.error('Profile fetch error:', fetchError);
@@ -227,6 +247,29 @@ export async function PUT(request: NextRequest) {
           { error: 'Failed to update profile', details: updateError.message },
           { status: 500 }
         );
+      }
+
+      // Also update the users table to keep phone numbers in sync
+      const userUpdateData: Record<string, string | number | boolean | string[] | null> = {
+        full_name: validationResult.data.full_name,
+        phone: validationResult.data.phone,
+        updated_at: new Date().toISOString()
+      };
+
+      // Remove undefined values
+      Object.keys(userUpdateData).forEach(key => 
+        userUpdateData[key] === undefined && delete userUpdateData[key]
+      );
+
+      const { error: userUpdateError } = await supabase
+        .from('users')
+        .update(userUpdateData)
+        .eq('id', user.id);
+
+      if (userUpdateError) {
+        console.error('User table update error:', userUpdateError);
+        // Don't fail the request, just log the error
+        // The profile update was successful
       }
 
       profileData = updatedProfile;

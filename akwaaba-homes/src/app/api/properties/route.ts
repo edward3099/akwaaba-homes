@@ -27,18 +27,29 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const currentPage = parseInt(searchParams.get('page') || '1');
     const propertiesPerPage = parseInt(searchParams.get('limit') || '10');
-    const status = searchParams.get('status') || 'active';
+    const statusParam = searchParams.get('status') || 'for-sale';
+    
+    // Map frontend status values to database status values
+    const statusMapping: { [key: string]: string } = {
+      'for-sale': 'active',
+      'for-rent': 'active', 
+      'sold': 'sold',
+      'rented': 'rented',
+      'inactive': 'inactive'
+    };
+    const status = statusMapping[statusParam] || 'active';
     const propertyType = searchParams.get('property_type');
     const listingType = searchParams.get('listing_type');
-    const minPrice = searchParams.get('min_price');
-    const maxPrice = searchParams.get('max_price');
+    const tid = searchParams.get('tid'); // Add support for tid parameter
+    const minPrice = searchParams.get('min_price') || searchParams.get('minprice');
+    const maxPrice = searchParams.get('max_price') || searchParams.get('maxprice');
     const city = searchParams.get('city');
     const region = searchParams.get('region');
     const bedrooms = searchParams.get('bedrooms');
     const furnishing = searchParams.get('furnishing');
     const serviced = searchParams.get('serviced');
     const shared = searchParams.get('shared');
-    const addedToSite = searchParams.get('added_to_site');
+    const addedToSite = searchParams.get('added_to_site') || searchParams.get('addedToSite');
     const propertyRef = searchParams.get('property_ref');
 
     // Build query - start with basic properties and join with users table for seller info
@@ -71,6 +82,21 @@ export async function GET(request: NextRequest) {
     if (propertyType) {
       query = query.eq('property_type', propertyType);
       countQuery = countQuery.eq('property_type', propertyType);
+    }
+    
+    // Handle tid parameter (type ID) - map to property_type
+    if (tid && tid !== '0') {
+      const tidToPropertyTypeMap: { [key: string]: string } = {
+        '1': 'apartment',
+        '2': 'house', 
+        '3': 'office',
+        '5': 'land'
+      };
+      const mappedPropertyType = tidToPropertyTypeMap[tid];
+      if (mappedPropertyType) {
+        query = query.eq('property_type', mappedPropertyType);
+        countQuery = countQuery.eq('property_type', mappedPropertyType);
+      }
     }
     if (listingType) {
       query = query.eq('listing_type', listingType);

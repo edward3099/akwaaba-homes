@@ -36,8 +36,8 @@ async function requireAgent(supabase: any) {
     .eq('id', user.id)
     .single()
 
-  if (!userProfile || userProfile.user_type !== 'agent') {
-    throw new Error('Insufficient permissions - Agent access required')
+  if (!userProfile || !['agent', 'developer'].includes(userProfile.user_type)) {
+    throw new Error('Insufficient permissions - Agent or Developer access required')
   }
 
   return user

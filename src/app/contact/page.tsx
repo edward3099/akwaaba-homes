@@ -225,19 +225,40 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <Button type="submit" disabled={loading} className="w-full">
-                    {loading ? (
-                      <>
-                        <div className="w-4 h-4 animate-spin mr-2 border-2 border-white border-t-transparent rounded-full"></div>
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 mr-2" />
-                        Send Message
-                      </>
-                    )}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button type="submit" disabled={loading} className="w-full">
+                      {loading ? (
+                        <>
+                          <div className="w-4 h-4 animate-spin mr-2 border-2 border-white border-t-transparent rounded-full"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Send Message
+                        </>
+                      )}
+                    </Button>
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-slate-500">Or</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                      onClick={() => window.open('https://wa.me/447470880710', '_blank')}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Send via WhatsApp
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -258,10 +279,18 @@ export default function ContactPage() {
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                     <Phone className="w-5 h-5 text-blue-600" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium text-slate-900">Phone Support</p>
-                    <p className="text-sm text-slate-600">+233 XX XXX XXXX</p>
+                    <p className="text-sm text-slate-600">+44 7470880710</p>
                   </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => window.open('tel:+447470880710', '_self')}
+                  >
+                    <Phone className="w-4 h-4 mr-1" />
+                    Call
+                  </Button>
                 </div>
                 
                 <div className="flex items-center space-x-3">
@@ -275,13 +304,21 @@ export default function ContactPage() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-green-600" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium text-slate-900">WhatsApp</p>
-                    <p className="text-sm text-slate-600">+233 XX XXX XXXX</p>
+                    <p className="text-sm text-slate-600">+44 7470880710</p>
                   </div>
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => window.open('https://wa.me/447470880710', '_blank')}
+                  >
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Chat
+                  </Button>
                 </div>
               </CardContent>
             </Card>

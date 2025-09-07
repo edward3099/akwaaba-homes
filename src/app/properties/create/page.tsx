@@ -60,8 +60,8 @@ export default function CreatePropertyPage() {
         .eq('user_id', user.id)
         .single()
 
-      if (profileError || !profile || profile.user_role !== 'agent') {
-        toast.error('Only agents can create properties')
+      if (profileError || !profile || !['agent', 'developer'].includes(profile.user_role)) {
+        toast.error('Only agents and developers can create properties')
         return
       }
 

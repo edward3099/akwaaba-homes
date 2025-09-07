@@ -186,6 +186,22 @@ export default function PropertyListingForm() {
     };
 
     fetchPaymentSettings();
+    
+    // Listen for premium listings toggle events from admin settings
+    const handlePremiumListingsToggle = () => {
+      console.log('Premium listings toggle event received, refreshing payment settings...');
+      fetchPaymentSettings();
+    };
+
+    window.addEventListener('premiumListingsToggle', handlePremiumListingsToggle);
+    
+    // Refresh payment settings every 30 seconds to pick up admin changes
+    const interval = setInterval(fetchPaymentSettings, 30000);
+    
+    return () => {
+      window.removeEventListener('premiumListingsToggle', handlePremiumListingsToggle);
+      clearInterval(interval);
+    };
   }, []);
 
   // Reset tier to normal if premium listings are disabled
