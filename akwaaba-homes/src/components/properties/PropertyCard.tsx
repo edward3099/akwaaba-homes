@@ -302,106 +302,106 @@ export function PropertyCard({
               />
               
               {/* Image Navigation */}
-              {validImages.length > 1 && (
-                <div className="absolute bottom-2 left-2 flex space-x-1">
-                  {validImages.slice(0, 4).map((_, index) => (
-                    <button
-                      key={index}
+                {validImages.length > 1 && (
+                  <div className="absolute bottom-2 left-2 flex space-x-1">
+                    {validImages.slice(0, 4).map((_, index) => (
+                      <button
+                        key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === safeImageIndex ? 'bg-white' : 'bg-white/50'
-                      }`}
-                    />
-                  ))}
-                  {validImages.length > 4 && (
-                    <span className="text-white text-xs bg-black/50 px-1 rounded">
-                      +{validImages.length - 4}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {/* Badges */}
-              <div className="absolute top-2 left-2 flex flex-col gap-1">
-                <Badge className={statusBadge.className}>
-                  {statusBadge.text}
-                </Badge>
-                {tierBadge && (
-                  <Badge className={tierBadge.className}>
-                    <Star className="w-3 h-3 mr-1" />
-                    {tierBadge.text}
-                  </Badge>
-                )}
-              </div>
-
-
-              {/* Verification Badge */}
-              {property.verification.isVerified && (
-                <div className="absolute bottom-2 right-2">
-                  <Badge className="verification-badge text-xs px-2 py-1">
-                    <Shield className="w-3 h-3 mr-1" />
-                    Verified
-                  </Badge>
-                </div>
-              )}
-            </div>
-
-            {/* Content Section */}
-            <div className="flex-1 p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
-                    <Link href={createReturnURL()}>
-                      {property.title}
-                    </Link>
-                  </h3>
-                  <div className="flex items-center text-sm text-muted-foreground mt-1">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {property.location.address}, {property.location.city}
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    {priceDisplay.primary}
-                    {pricingContext && (
-                      <span className="text-sm font-normal text-muted-foreground ml-1">
-                        {pricingContext}
+                        className={`w-2 h-2 rounded-full transition-colors ${
+                          index === safeImageIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                    {validImages.length > 4 && (
+                      <span className="text-white text-xs bg-black/50 px-1 rounded">
+                        +{validImages.length - 4}
                       </span>
                     )}
                   </div>
-                  {priceDisplay.alternatives.length > 0 && (
-                    <div className="text-sm text-muted-foreground">
-                      {priceDisplay.alternatives[0].formatted}
-                    </div>
+                )}
+
+                {/* Badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                <Badge className={statusBadge.className}>
+                    {statusBadge.text}
+                  </Badge>
+                  {tierBadge && (
+                  <Badge className={tierBadge.className}>
+                      <Star className="w-3 h-3 mr-1" />
+                      {tierBadge.text}
+                    </Badge>
                   )}
                 </div>
+
+
+                {/* Verification Badge */}
+                {property.verification.isVerified && (
+                  <div className="absolute bottom-2 right-2">
+                  <Badge className="verification-badge text-xs px-2 py-1">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Verified
+                    </Badge>
+                  </div>
+                )}
               </div>
 
-              {/* Property Details */}
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-                {property.specifications.bedrooms && (
-                  <div className="flex items-center">
-                    <Bed className="h-4 w-4 mr-1" />
-                    {property.specifications.bedrooms} bed
+            {/* Content Section */}
+            <div className="flex-1 p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+                    <Link href={createReturnURL()}>
+                      {property.title}
+                    </Link>
+                    </h3>
+                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {property.location.address}, {property.location.city}
+                    </div>
                   </div>
-                )}
-                {property.specifications.bathrooms && (
-                  <div className="flex items-center">
-                    <Bath className="h-4 w-4 mr-1" />
-                    {property.specifications.bathrooms} bath
+                  
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-primary">
+                      {priceDisplay.primary}
+                      {pricingContext && (
+                        <span className="text-sm font-normal text-muted-foreground ml-1">
+                          {pricingContext}
+                        </span>
+                      )}
+                    </div>
+                    {priceDisplay.alternatives.length > 0 && (
+                      <div className="text-sm text-muted-foreground">
+                        {priceDisplay.alternatives[0].formatted}
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="flex items-center">
-                  <Square className="h-4 w-4 mr-1" />
-                  {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
                 </div>
-              </div>
 
-              {/* Description */}
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {property.description}
-              </p>
+                {/* Property Details */}
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
+                  {property.specifications.bedrooms && (
+                    <div className="flex items-center">
+                      <Bed className="h-4 w-4 mr-1" />
+                      {property.specifications.bedrooms} bed
+                    </div>
+                  )}
+                  {property.specifications.bathrooms && (
+                    <div className="flex items-center">
+                      <Bath className="h-4 w-4 mr-1" />
+                      {property.specifications.bathrooms} bath
+                    </div>
+                  )}
+                  <div className="flex items-center">
+                    <Square className="h-4 w-4 mr-1" />
+                    {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {property.description}
+                </p>
 
               {/* Seller Info & Actions */}
               <div className="flex items-center justify-between">
@@ -414,16 +414,16 @@ export function PropertyCard({
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={handleContact}>
-                    <Phone className="h-4 w-4 mr-1" />
-                    Call
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleWhatsApp}>
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    WhatsApp
-                  </Button>
+                <Button variant="outline" size="sm" onClick={handleContact}>
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleWhatsApp}>
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  WhatsApp
+                </Button>
                 </div>
               </div>
             </div>

@@ -308,14 +308,15 @@ export function FeaturedProperties() {
           }
 
           // Apply property type filter (tid)
-          if (filters.type) {
+          if (filters.type && Array.isArray(filters.type) && filters.type.length > 0) {
+            const propertyType = filters.type[0];
+            // Convert property type to tid value
             const typeToTidMap: { [key: string]: string } = {
               'apartment': '1',
               'house': '2',
               'office': '3',
               'land': '5'
             };
-            const propertyType = Array.isArray(filters.type) ? filters.type[0] : filters.type;
             const tid = typeToTidMap[propertyType];
             if (tid) {
               apiFilters.tid = tid;
@@ -651,22 +652,241 @@ export function FeaturedProperties() {
 
               {/* Filter Panel */}
               <div className="filter-panel">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* Mobile Layout: Type buttons, then Bedrooms under, then prices */}
+                <div className="block sm:hidden space-y-2">
+                  {/* Type Row */}
                   <div className="form-group">
-                    <label className="block text-xs font-medium text-foreground mb-0.5">Type</label>
+                    <label className="block text-xs font-medium text-foreground mb-1">Type</label>
+                    <div className="flex gap-1 overflow-x-auto">
+                      <button
+                        onClick={() => handleTypeChange('0')}
+                        className={`px-1.5 py-1 text-xs rounded-md border transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedType === '0'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('1')}
+                        className={`px-1.5 py-1 text-xs rounded-md border transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedType === '1'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Apt
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('2')}
+                        className={`px-1.5 py-1 text-xs rounded-md border transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedType === '2'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        House
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('3')}
+                        className={`px-1.5 py-1 text-xs rounded-md border transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedType === '3'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Office
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('5')}
+                        className={`px-1.5 py-1 text-xs rounded-md border transition-all whitespace-nowrap flex-shrink-0 ${
+                          selectedType === '5'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Land
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Bedrooms Row - positioned under the type buttons */}
+                  <div className="form-group">
+                    <label className="block text-xs font-medium text-foreground mb-0.5">Bedrooms</label>
                     <select 
-                      name="tid" 
-                      id="tid" 
-                      value={selectedType}
-                      onChange={(e) => handleTypeChange(e.target.value)}
+                      name="bedrooms" 
+                      id="bedrooms" 
+                      value={selectedBedrooms}
+                      onChange={(e) => handleBedroomsChange(e.target.value)}
                       className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     >
-                      <option value="0">All Types</option>
-                      <option value="1">Apartment</option>
-                      <option value="2">House</option>
-                      <option value="3">Office</option>
-                      <option value="5">Land</option>
+                      <option value="0">Any</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6+</option>
                     </select>
+                  </div>
+                  {/* Price Row */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="form-group">
+                      <label className="block text-xs font-medium text-foreground mb-0.5">Min price</label>
+                      <select 
+                        name="minprice" 
+                        id="minprice" 
+                        value={selectedMinPrice}
+                        onChange={(e) => handleMinPriceChange(e.target.value)}
+                        className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      >
+                        <option value="0">No Min</option>
+                        <option value="250">GH₵ 250</option>
+                        <option value="300">GH₵ 300</option>
+                        <option value="400">GH₵ 400</option>
+                        <option value="500">GH₵ 500</option>
+                        <option value="600">GH₵ 600</option>
+                        <option value="800">GH₵ 800</option>
+                        <option value="1000">GH₵ 1,000</option>
+                        <option value="1200">GH₵ 1,200</option>
+                        <option value="1400">GH₵ 1,400</option>
+                        <option value="1600">GH₵ 1,600</option>
+                        <option value="1800">GH₵ 1,800</option>
+                        <option value="2000">GH₵ 2,000</option>
+                        <option value="2500">GH₵ 2,500</option>
+                        <option value="5000">GH₵ 5,000</option>
+                        <option value="10000">GH₵ 10,000</option>
+                        <option value="25000">GH₵ 25,000</option>
+                        <option value="50000">GH₵ 50,000</option>
+                        <option value="100000">GH₵ 100,000</option>
+                        <option value="150000">GH₵ 150,000</option>
+                        <option value="200000">GH₵ 200,000</option>
+                        <option value="250000">GH₵ 250,000</option>
+                        <option value="300000">GH₵ 300,000</option>
+                        <option value="350000">GH₵ 350,000</option>
+                        <option value="400000">GH₵ 400,000</option>
+                        <option value="500000">GH₵ 500,000</option>
+                        <option value="600000">GH₵ 600,000</option>
+                        <option value="750000">GH₵ 750,000</option>
+                        <option value="1000000">GH₵ 1 Million</option>
+                        <option value="2000000">GH₵ 2 Million</option>
+                        <option value="5000000">GH₵ 5 Million</option>
+                        <option value="10000000">GH₵ 10 Million</option>
+                        <option value="25000000">GH₵ 25 Million</option>
+                        <option value="50000000">GH₵ 50 Million</option>
+                        <option value="100000000">GH₵ 100 Million</option>
+                        <option value="125000000">GH₵ 125 Million</option>
+                        <option value="150000000">GH₵ 150 Million</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="block text-xs font-medium text-foreground mb-0.5">Max price</label>
+                      <select 
+                        name="maxprice" 
+                        id="maxprice" 
+                        value={selectedMaxPrice}
+                        onChange={(e) => handleMaxPriceChange(e.target.value)}
+                        className="w-full h-7 px-2 text-xs rounded-lg border border-input bg-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                      >
+                        <option value="0">No Max</option>
+                        <option value="250">GH₵ 250</option>
+                        <option value="300">GH₵ 300</option>
+                        <option value="400">GH₵ 400</option>
+                        <option value="500">GH₵ 500</option>
+                        <option value="600">GH₵ 600</option>
+                        <option value="800">GH₵ 800</option>
+                        <option value="1000">GH₵ 1,000</option>
+                        <option value="1200">GH₵ 1,200</option>
+                        <option value="1400">GH₵ 1,400</option>
+                        <option value="1600">GH₵ 1,600</option>
+                        <option value="1800">GH₵ 1,800</option>
+                        <option value="2000">GH₵ 2,000</option>
+                        <option value="2500">GH₵ 2,500</option>
+                        <option value="5000">GH₵ 5,000</option>
+                        <option value="10000">GH₵ 10,000</option>
+                        <option value="25000">GH₵ 25,000</option>
+                        <option value="50000">GH₵ 50,000</option>
+                        <option value="100000">GH₵ 100,000</option>
+                        <option value="150000">GH₵ 150,000</option>
+                        <option value="200000">GH₵ 200,000</option>
+                        <option value="250000">GH₵ 250,000</option>
+                        <option value="300000">GH₵ 300,000</option>
+                        <option value="350000">GH₵ 350,000</option>
+                        <option value="400000">GH₵ 400,000</option>
+                        <option value="500000">GH₵ 500,000</option>
+                        <option value="600000">GH₵ 600,000</option>
+                        <option value="750000">GH₵ 750,000</option>
+                        <option value="1000000">GH₵ 1 Million</option>
+                        <option value="2000000">GH₵ 2 Million</option>
+                        <option value="5000000">GH₵ 5 Million</option>
+                        <option value="10000000">GH₵ 10 Million</option>
+                        <option value="25000000">GH₵ 25 Million</option>
+                        <option value="50000000">GH₵ 50 Million</option>
+                        <option value="100000000">GH₵ 100 Million</option>
+                        <option value="125000000">GH₵ 125 Million</option>
+                        <option value="150000000">GH₵ 150 Million</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout: Original 4-column grid */}
+                <div className="hidden sm:grid grid-cols-4 gap-2">
+                  <div className="form-group">
+                    <label className="block text-xs font-medium text-foreground mb-1">Type</label>
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        onClick={() => handleTypeChange('0')}
+                        className={`px-2 py-1 text-xs rounded-md border transition-all ${
+                          selectedType === '0'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        All Types
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('1')}
+                        className={`px-2 py-1 text-xs rounded-md border transition-all ${
+                          selectedType === '1'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Apartment
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('2')}
+                        className={`px-2 py-1 text-xs rounded-md border transition-all ${
+                          selectedType === '2'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        House
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('3')}
+                        className={`px-2 py-1 text-xs rounded-md border transition-all ${
+                          selectedType === '3'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Office
+                      </button>
+                      <button
+                        onClick={() => handleTypeChange('5')}
+                        className={`px-2 py-1 text-xs rounded-md border transition-all ${
+                          selectedType === '5'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-input hover:bg-muted'
+                        }`}
+                      >
+                        Land
+                      </button>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label className="block text-xs font-medium text-foreground mb-0.5">Bedrooms</label>

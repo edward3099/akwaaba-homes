@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { SearchFilters } from '@/lib/types/index';
 
@@ -21,59 +21,8 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   
   const [filters, setFilters] = useState<SearchFilters>({});
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Initialize filters from URL params or localStorage
-  useEffect(() => {
-    if (isInitialized) return;
-
-    const urlFilters = parseSearchParams(searchParams);
-    
-    if (Object.keys(urlFilters).length > 0) {
-      // URL has filters, use them
-      setFilters(urlFilters);
-    } else if (persistToLocalStorage) {
-      // Try to restore from localStorage
-      try {
-        const savedFilters = localStorage.getItem(localStorageKey);
-        if (savedFilters) {
-          const parsedFilters = JSON.parse(savedFilters);
-          setFilters(parsedFilters);
-        } else {
-          // No saved filters, set default
-          const defaultFilters = { status: 'for-sale' as const };
-          setFilters(defaultFilters);
-        }
-      } catch (error) {
-        console.warn('Failed to restore search filters from localStorage:', error);
-        // Set default filters on error
-        const defaultFilters = { status: 'for-sale' as const };
-        setFilters(defaultFilters);
-      }
-    } else {
-      // No localStorage persistence, set default
-      const defaultFilters = { status: 'for-sale' as const };
-      setFilters(defaultFilters);
-    }
-    
-    setIsInitialized(true);
-  }, [searchParams, isInitialized, persistToLocalStorage, localStorageKey]);
-
-  // Watch for URL parameter changes after initialization
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    const urlFilters = parseSearchParams(searchParams);
-    console.log('🔍 DEBUG useSearchState: URL changed, new urlFilters:', urlFilters);
-    
-    // Only update if the URL filters are different from current filters
-    const currentFiltersString = JSON.stringify(filters);
-    const urlFiltersString = JSON.stringify(urlFilters);
-    
-    if (currentFiltersString !== urlFiltersString) {
-      console.log('🔍 DEBUG useSearchState: updating filters from URL change:', urlFilters);
-      setFilters(urlFilters);
-    }
-  }, [searchParams, isInitialized, filters]);
+  const previousUrlFiltersRef = useRef<string>('');
+  const filtersRef = useRef<SearchFilters>({});
 
   // Parse search params into filters object
   const parseSearchParams = useCallback((params: URLSearchParams): SearchFilters => {
@@ -133,6 +82,64 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     
     return filters;
   }, []);
+
+  // Initialize filters from URL params or localStorage
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const urlFilters = parseSearchParams(searchParams);
+    
+    if (Object.keys(urlFilters).length > 0) {
+      // URL has filters, use them
+      setFilters(urlFilters);
+    } else if (persistToLocalStorage) {
+      // Try to restore from localStorage
+      try {
+        const savedFilters = localStorage.getItem(localStorageKey);
+        if (savedFilters) {
+          const parsedFilters = JSON.parse(savedFilters);
+          setFilters(parsedFilters);
+        } else {
+          // No saved filters, set default
+          const defaultFilters = { status: 'for-sale' as const };
+          setFilters(defaultFilters);
+        }
+      } catch (error) {
+        console.warn('Failed to restore search filters from localStorage:', error);
+        // Set default filters on error
+        const defaultFilters = { status: 'for-sale' as const };
+        setFilters(defaultFilters);
+      }
+    } else {
+      // No localStorage persistence, set default
+      const defaultFilters = { status: 'for-sale' as const };
+      setFilters(defaultFilters);
+    }
+    
+    setIsInitialized(true);
+  }, [searchParams, isInitialized, persistToLocalStorage, localStorageKey]);
+
+  // Watch for URL parameter changes after initialization
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const urlFilters = parseSearchParams(searchParams);
+    const urlFiltersString = JSON.stringify(urlFilters);
+    
+    // Only update if the URL filters are different from the previous URL filters
+    if (previousUrlFiltersRef.current !== urlFiltersString) {
+      console.log('🔍 DEBUG useSearchState: URL changed, new urlFilters:', urlFilters);
+      console.log('🔍 DEBUG useSearchState: updating filters from URL change:', urlFilters);
+      
+      previousUrlFiltersRef.current = urlFiltersString;
+      filtersRef.current = urlFilters;
+      
+      // Use a microtask to defer the state update to avoid render phase updates
+      Promise.resolve().then(() => {
+        setFilters(urlFilters);
+      });
+    }
+  }, [searchParams, isInitialized]);
 
   // Update URL with new filters
   const updateURL = useCallback((newFilters: SearchFilters, replace = false) => {
@@ -205,9 +212,22 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
 
   // Update a single filter
   const updateFilter = useCallback((key: keyof SearchFilters | string, value: any) => {
-    const newFilters = { ...filters, [key]: value };
-    updateFilters(newFilters, false);
-  }, [filters, updateFilters]);
+    setFilters(prevFilters => {
+      const newFilters = { ...prevFilters, [key]: value };
+      updateURL(newFilters, false);
+      
+      // Save to localStorage if enabled
+      if (persistToLocalStorage) {
+        try {
+          localStorage.setItem(localStorageKey, JSON.stringify(newFilters));
+        } catch (error) {
+          console.warn('Failed to save search filters to localStorage:', error);
+        }
+      }
+      
+      return newFilters;
+    });
+  }, [updateURL, persistToLocalStorage, localStorageKey]);
 
   // Get current URL filters
   const getCurrentURLFilters = useCallback(() => {
