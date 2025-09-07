@@ -17,8 +17,7 @@ import {
   Star, 
   Shield, 
   Verified,
-  Home,
-  User
+  Heart
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatCurrency, formatDiasporaPrice } from '@/lib/utils/currency';
@@ -41,10 +40,17 @@ export function PropertyCard({
   className = ''
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
   const searchParams = useSearchParams();
   const { rates, error, isLoading } = useCurrencyRates();
   
   console.log('PropertyCard (properties/) - rates:', rates, 'error:', error, 'isLoading:', isLoading);
+
+  // Handle save property
+  const handleSave = () => {
+    setIsSaved(!isSaved);
+    toast.success(isSaved ? 'Property removed from saved' : 'Property saved successfully');
+  };
 
   // Ensure images array exists and has valid URLs
   const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
@@ -154,103 +160,49 @@ export function PropertyCard({
 
   if (viewMode === 'list') {
     return (
-      <Card className={`group hover:shadow-2xl transition-all duration-500 border-0 bg-white overflow-hidden ${className} ${
+      <Card className={`property-card-shadow hover:shadow-lg transition-all duration-300 ${className} ${
         property.tier === 'premium' ? 'premium-card-glow' : ''
       }`}>
         <CardContent className="p-0">
-          <div className="flex flex-row h-full">
-            {/* Image Section - Clickable Link */}
-            <Link href={createReturnURL()} className="block group-hover:opacity-95 transition-opacity duration-300">
-              <div className="relative w-32 md:w-64 lg:w-72 h-full flex-shrink-0 overflow-hidden rounded-l-lg">
+          {/* Mobile: Compact Horizontal Layout */}
+          <div className="flex md:hidden">
+            {/* Image Section */}
+            <Link href={createReturnURL()} className="block">
+              <div className="relative w-32 h-36 flex-shrink-0 overflow-hidden">
                 {currentImage ? (
                   <Image
                     src={currentImage}
                     alt={property.title}
                     fill
-                    sizes="(max-width: 1280px) 100vw, 448px"
-                    className="property-image object-cover group-hover:scale-105 transition-transform duration-700"
-                    style={{ objectFit: 'cover', objectPosition: 'center', width: '100%', height: '100%' }}
+                    sizes="128px"
+                    className="property-image object-cover"
+                    style={{ objectPosition: 'center' }}
                     priority={currentImageIndex === 0}
                     unoptimized
-                    onError={(e) => {
-                      console.error('Image failed to load:', currentImage);
-                      // Hide the image and show fallback
-                      const target = e.target as HTMLImageElement;
-                      if (target) {
-                        target.style.display = 'none';
-                        const fallbackDiv = document.createElement('div');
-                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center';
-                        fallbackDiv.innerHTML = `
-                          <div class="text-center text-slate-500">
-                            <div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                              <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                            </svg>
-                            </div>
-                            <p class="text-sm font-medium">Image unavailable</p>
-                          </div>
-                        `;
-                        target.parentNode?.insertBefore(fallbackDiv, target);
-                      }
-                    }}
                   />
                 ) : (
-                  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center rounded-l-lg">
-                    <div className="text-center text-slate-500">
-                      <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Home className="w-8 h-8" />
-                      </div>
-                      <p className="text-xs font-medium">No image available</p>
+                  <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                    <div className="text-center text-slate-600">
+                      <svg className="w-4 h-4 mx-auto mb-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                      </svg>
+                      <p className="text-[10px]">No image</p>
                     </div>
                   </div>
                 )}
                 
-                {/* Image Navigation - Only show if there are multiple valid images */}
-                {validImages.length > 1 && (
-                  <div className="absolute bottom-3 left-3 flex space-x-2">
-                    {validImages.slice(0, 4).map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setCurrentImageIndex(index);
-                        }}
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                          index === safeImageIndex ? 'bg-white shadow-lg' : 'bg-white/60 hover:bg-white/80'
-                        }`}
-                      />
-                    ))}
-                    {validImages.length > 4 && (
-                      <span className="text-white text-xs bg-black/60 px-2 py-1 rounded-full font-medium">
-                        +{validImages.length - 4}
-                      </span>
-                    )}
-                  </div>
-                )}
-
                 {/* Status Badge */}
-                <div className="absolute top-4 left-4">
-                  <Badge className={`${statusBadge.className} text-xs px-4 py-2 font-semibold shadow-lg`}>
+                <div className="absolute top-0.5 left-0.5">
+                  <Badge className={`${statusBadge.className} text-[8px] px-1 py-0.5`}>
                     {statusBadge.text}
                   </Badge>
                 </div>
 
-                {/* Premium Badge */}
-                  {tierBadge && (
-                  <div className="absolute top-4 right-4">
-                    <Badge className={`${tierBadge.className} text-xs px-4 py-2 font-semibold shadow-lg`}>
-                      <Star className="w-3 h-3 mr-1" />
-                      {tierBadge.text}
-                    </Badge>
-                  </div>
-                  )}
-
                 {/* Verification Badge */}
                 {property.verification.isVerified && (
-                  <div className="absolute bottom-4 right-4">
-                    <Badge className="verification-badge shadow-lg">
-                      <Shield className="w-3 h-3" />
+                  <div className="absolute bottom-0.5 right-0.5">
+                    <Badge className="verification-badge text-[8px] px-1 py-0.5">
+                      <Shield className="w-2 h-2" />
                     </Badge>
                   </div>
                 )}
@@ -258,87 +210,218 @@ export function PropertyCard({
             </Link>
 
             {/* Content Section */}
-            <div className="flex-1 flex flex-col">
-              {/* Main Content - Clickable Link */}
-            <Link href={createReturnURL()} className="block flex-1">
-                <div className="p-2 md:p-4 flex-1 flex flex-col">
-                  {/* Header with Title and Price */}
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
-                    <div className="flex-1 mb-2 lg:mb-0 lg:mr-4">
-                      <h3 className="text-sm md:text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors mb-1 line-clamp-2 leading-tight">
-                      {property.title}
-                    </h3>
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0 text-gray-400" />
-                        <span className="text-xs md:text-sm font-medium">{property.location.address}, {property.location.city}</span>
-                      </div>
+            <Link href={createReturnURL()} className="block flex-1 min-w-0">
+              <div className="p-3 flex flex-col h-36 overflow-hidden">
+                {/* Header */}
+                <div className="mb-0.5">
+                  <h3 className="text-xs font-semibold text-foreground hover:text-primary transition-colors mb-0.5 line-clamp-1">
+                    {property.title}
+                  </h3>
+                  <div className="flex items-center text-xs text-muted-foreground mb-0.5">
+                    <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                    <span className="truncate">
+                      {property.location.city}
+                    </span>
                   </div>
-                  
-                    <div className="text-left sm:text-right">
-                      <div className="text-sm md:text-xl font-bold text-gray-900 mb-1">
-                      {priceDisplay.primary}
-                      {pricingContext && (
-                          <span className="text-sm font-normal text-gray-500 ml-1">
-                          {pricingContext}
-                        </span>
-                      )}
+                  <div className="text-sm font-bold text-primary">
+                    {priceDisplay.primary}
+                  </div>
+                  {priceDisplay.alternatives.length > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      {priceDisplay.alternatives[0].formatted}
                     </div>
-                    {priceDisplay.alternatives.length > 0 && (
-                        <div className="text-sm text-gray-600 font-medium">
-                        {priceDisplay.alternatives[0].formatted}
-                      </div>
-                    )}
+                  )}
+                </div>
+
+                {/* Property Details */}
+                <div className="flex items-center space-x-2 text-xs text-muted-foreground mb-0.5">
+                  {property.specifications.bedrooms && (
+                    <div className="flex items-center">
+                      <Bed className="h-3 w-3 mr-0.5" />
+                      <span>{property.specifications.bedrooms}</span>
+                    </div>
+                  )}
+                  {property.specifications.bathrooms && (
+                    <div className="flex items-center">
+                      <Bath className="h-3 w-3 mr-0.5" />
+                      <span>{property.specifications.bathrooms}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center">
+                    <Square className="h-3 w-3 mr-0.5" />
+                    <span className="truncate">
+                      {property.specifications.size.toLocaleString()}{property.specifications.sizeUnit}
+                    </span>
                   </div>
                 </div>
 
-                  {/* Property Specifications */}
-                  <div className="flex flex-wrap items-center gap-1 mb-2">
-                    {property.specifications.bedrooms && property.specifications.bedrooms > 0 && (
-                      <Badge variant="secondary" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200 text-xs">
-                        <Bed className="w-3 h-3" /> {property.specifications.bedrooms}
-                      </Badge>
-                    )}
-                    {property.specifications.bathrooms && property.specifications.bathrooms > 0 && (
-                      <Badge variant="secondary" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200 text-xs">
-                        <Bath className="w-3 h-3" /> {property.specifications.bathrooms}
-                      </Badge>
-                    )}
-                    <Badge variant="secondary" className="flex items-center gap-1 bg-purple-50 text-purple-700 border-purple-200 text-xs">
-                      <Square className="w-3 h-3" /> {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
-                    </Badge>
-                  </div>
-
                 {/* Seller Info */}
-                  <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
-                    <User className="w-3 h-3" />
-                    <span>Listed by {property.seller.name}</span>
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center text-xs">
+                    <span className="text-muted-foreground">by <span className="font-medium">{property.seller.name}</span></span>
                     {property.seller.isVerified && (
-                      <Verified className="w-3 h-3 text-green-500" />
+                      <Verified className="inline w-2 h-2 ml-1 text-verified flex-shrink-0" />
                     )}
+                  </div>
                 </div>
               </div>
             </Link>
 
-            {/* Actions - Outside of Link to prevent navigation conflicts */}
-              <div className="px-2 md:px-4 pb-2 md:pb-4">
-                <div className="flex gap-1">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleContact}
-                    className="flex-1 hover:bg-primary hover:text-white transition-colors text-xs h-7"
-                  >
-                    <Phone className="w-3 h-3 mr-1" />
-                  Call
-                </Button>
-                  <Button 
-                    size="sm"
-                    onClick={handleWhatsApp}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs h-7"
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                  WhatsApp
-                </Button>
+            {/* Actions */}
+            <div className="p-2 flex flex-col justify-center space-y-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleContact} 
+                className="text-xs h-6 px-2 w-8"
+              >
+                <Phone className="h-3 w-3" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleWhatsApp} 
+                className="text-xs h-6 px-2 w-8"
+              >
+                <MessageCircle className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Desktop: Original Layout */}
+          <div className="hidden md:flex flex-col md:flex-row">
+            {/* Image Section */}
+            <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0">
+              <Image
+                src={currentImage || '/placeholder-property.jpg'}
+                alt={property.title}
+                fill
+                className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
+              />
+              
+              {/* Image Navigation */}
+              {validImages.length > 1 && (
+                <div className="absolute bottom-2 left-2 flex space-x-1">
+                  {validImages.slice(0, 4).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === safeImageIndex ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                  {validImages.length > 4 && (
+                    <span className="text-white text-xs bg-black/50 px-1 rounded">
+                      +{validImages.length - 4}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Badges */}
+              <div className="absolute top-2 left-2 flex flex-col gap-1">
+                <Badge className={statusBadge.className}>
+                  {statusBadge.text}
+                </Badge>
+                {tierBadge && (
+                  <Badge className={tierBadge.className}>
+                    <Star className="w-3 h-3 mr-1" />
+                    {tierBadge.text}
+                  </Badge>
+                )}
+              </div>
+
+
+              {/* Verification Badge */}
+              {property.verification.isVerified && (
+                <div className="absolute bottom-2 right-2">
+                  <Badge className="verification-badge text-xs px-2 py-1">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            {/* Content Section */}
+            <div className="flex-1 p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+                    <Link href={createReturnURL()}>
+                      {property.title}
+                    </Link>
+                  </h3>
+                  <div className="flex items-center text-sm text-muted-foreground mt-1">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {property.location.address}, {property.location.city}
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">
+                    {priceDisplay.primary}
+                    {pricingContext && (
+                      <span className="text-sm font-normal text-muted-foreground ml-1">
+                        {pricingContext}
+                      </span>
+                    )}
+                  </div>
+                  {priceDisplay.alternatives.length > 0 && (
+                    <div className="text-sm text-muted-foreground">
+                      {priceDisplay.alternatives[0].formatted}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Property Details */}
+              <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
+                {property.specifications.bedrooms && (
+                  <div className="flex items-center">
+                    <Bed className="h-4 w-4 mr-1" />
+                    {property.specifications.bedrooms} bed
+                  </div>
+                )}
+                {property.specifications.bathrooms && (
+                  <div className="flex items-center">
+                    <Bath className="h-4 w-4 mr-1" />
+                    {property.specifications.bathrooms} bath
+                  </div>
+                )}
+                <div className="flex items-center">
+                  <Square className="h-4 w-4 mr-1" />
+                  {property.specifications.size.toLocaleString()} {property.specifications.sizeUnit}
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                {property.description}
+              </p>
+
+              {/* Seller Info & Actions */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Listed by </span>
+                    <span className="font-medium">{property.seller.name}</span>
+                    {property.seller.isVerified && (
+                      <Verified className="inline w-3 h-3 ml-1 text-verified" />
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={handleContact}>
+                    <Phone className="h-4 w-4 mr-1" />
+                    Call
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleWhatsApp}>
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    WhatsApp
+                  </Button>
                 </div>
               </div>
             </div>
@@ -483,8 +566,8 @@ export function PropertyCard({
             </div>
 
             {/* Description */}
-            <div className="mb-3 flex-1 min-h-[2.5rem]">
-              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+            <div className="mb-1 flex-1 min-h-[1.5rem]">
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 leading-relaxed">
                 {property.description}
               </p>
             </div>
