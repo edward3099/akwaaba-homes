@@ -78,3 +78,30 @@ export async function createApiRouteSupabaseClient() {
     throw error;
   }
 }
+
+// Service role client for admin operations that bypass RLS
+export function createServiceRoleSupabaseClient() {
+  // Validate environment variables
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
+  }
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not defined');
+  }
+  
+  // Use service role key to bypass RLS for admin operations
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {
+          // No-op for service role client
+        },
+      },
+    }
+  );
+}

@@ -89,7 +89,7 @@ interface AdminDashboardProps {
 export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashboardProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [propertySubTab, setPropertySubTab] = useState('overview');
+  const [propertySubTab, setPropertySubTab] = useState('pending');
   const [agentsSubTab, setAgentsSubTab] = useState('overview');
   const [analyticsSubTab, setAnalyticsSubTab] = useState('overview');
   const [paymentsSubTab, setPaymentsSubTab] = useState('overview');
@@ -105,6 +105,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [pendingProperties, setPendingProperties] = useState<Property[]>([]);
+  const [approvedProperties, setApprovedProperties] = useState<Property[]>([]);
   const [premiumPricing, setPremiumPricing] = useState<PremiumPricing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,9 +130,14 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       const activityData = { activities: [] };
 
       // Fetch pending properties
-      const propertiesResponse = await fetch('/api/admin/properties?status=pending&limit=5');
-      if (!propertiesResponse.ok) throw new Error('Failed to fetch pending properties');
-      const propertiesData = await propertiesResponse.json();
+      const pendingResponse = await fetch('/api/admin/properties?status=pending&limit=10');
+      if (!pendingResponse.ok) throw new Error('Failed to fetch pending properties');
+      const pendingData = await pendingResponse.json();
+
+      // Fetch approved properties (status is 'active' for approved properties)
+      const approvedResponse = await fetch('/api/admin/properties?status=active&limit=10');
+      if (!approvedResponse.ok) throw new Error('Failed to fetch approved properties');
+      const approvedData = await approvedResponse.json();
 
       // Fetch premium pricing (mock data for now)
       const pricingData = { pricing: [] };
@@ -139,7 +145,8 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       setStats(statsData);
       setChartData(chartData.data || []);
       setRecentActivity(activityData.activities || []);
-      setPendingProperties(propertiesData.properties || []);
+      setPendingProperties(pendingData.properties || []);
+      setApprovedProperties(approvedData.properties || []);
       setPremiumPricing(pricingData.pricing || []);
 
     } catch (err) {
@@ -171,6 +178,58 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
     } catch (err) {
       console.error('Property action error:', err);
       setError(err instanceof Error ? err.message : 'Failed to update property');
+    }
+  };
+
+  // Handle bulk delete of all pending properties
+  const handleDeleteAllPending = async () => {
+    if (!confirm('Are you sure you want to delete ALL pending properties? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/properties/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'pending'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to delete pending properties');
+      
+      // Refresh data
+      await fetchDashboardData();
+      
+    } catch (err) {
+      console.error('Bulk delete error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete pending properties');
+    }
+  };
+
+  // Handle bulk delete of all approved properties
+  const handleDeleteAllApproved = async () => {
+    if (!confirm('Are you sure you want to delete ALL approved properties? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/properties/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'active' // Approved properties have status 'active'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to delete approved properties');
+      
+      // Refresh data
+      await fetchDashboardData();
+      
+    } catch (err) {
+      console.error('Bulk delete error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete approved properties');
     }
   };
 
@@ -455,79 +514,198 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Property Management</h2>
             </div>
             
+            {/* Property Sub-tabs */}
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setPropertySubTab('pending')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    propertySubTab === 'pending'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Pending Properties ({pendingProperties.length})
+                </button>
+                <button
+                  onClick={() => setPropertySubTab('approved')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    propertySubTab === 'approved'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Approved Properties ({approvedProperties.length})
+                </button>
+              </nav>
+            </div>
+
+            {/* Property Content */}
             <div className="bg-white rounded-lg shadow">
               <div className="px-2 sm:px-4 lg:px-6 py-4 border-b border-gray-200">
-                <h3 className="text-base sm:text-lg font-medium text-gray-900">Property Approval Queue</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900">
+                    {propertySubTab === 'pending' ? 'Property Approval Queue' : 'Approved Properties'}
+                  </h3>
+                  {propertySubTab === 'pending' && pendingProperties.length > 0 && (
+                    <button
+                      onClick={handleDeleteAllPending}
+                      className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 hover:border-red-300 transition-colors"
+                    >
+                      Delete All Pending
+                    </button>
+                  )}
+                  {propertySubTab === 'approved' && approvedProperties.length > 0 && (
+                    <button
+                      onClick={handleDeleteAllApproved}
+                      className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 hover:border-red-300 transition-colors"
+                    >
+                      Delete All Approved
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="p-2 sm:p-4 lg:p-6">
-                {pendingProperties.length > 0 ? (
-                  <div className="overflow-x-auto -mx-2 sm:mx-0">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Property
-                          </th>
-                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Owner
-                          </th>
-                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Price
-                          </th>
-                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {pendingProperties.map((property) => (
-                          <tr key={property.id}>
-                            <td className="px-2 sm:px-4 lg:px-6 py-4">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900 break-words">{property.title}</div>
-                                <div className="text-sm text-gray-500">
-                                  {new Date(property.created_at).toLocaleDateString()}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900 break-words">
-                              {property.owner_name}
-                            </td>
-                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900">
-                              ${safeFormatNumber(property.price)} {property.currency}
-                            </td>
-                            <td className="px-2 sm:px-4 lg:px-6 py-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                <ClockIcon className="h-4 w-4 mr-1" />
-                                Pending
-                              </span>
-                            </td>
-                            <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm font-medium">
-                              <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
-                                <button
-                                  onClick={() => handlePropertyAction(property.id, 'approve')}
-                                  className="text-green-600 hover:text-green-900 text-xs sm:text-sm"
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  onClick={() => handlePropertyAction(property.id, 'reject')}
-                                  className="text-red-600 hover:text-red-900 text-xs sm:text-sm"
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            </td>
+                {propertySubTab === 'pending' ? (
+                  pendingProperties.length > 0 ? (
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Property
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Owner
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {pendingProperties.map((property) => (
+                            <tr key={property.id}>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900 break-words">{property.title}</div>
+                                  <div className="text-sm text-gray-500">
+                                    {new Date(property.created_at).toLocaleDateString()}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900 break-words">
+                                {property.owner_name}
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900">
+                                ${safeFormatNumber(property.price)} {property.currency}
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                  <ClockIcon className="h-4 w-4 mr-1" />
+                                  Pending
+                                </span>
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm font-medium">
+                                <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
+                                  <button
+                                    onClick={() => handlePropertyAction(property.id, 'approve')}
+                                    className="text-green-600 hover:text-green-900 text-xs sm:text-sm"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handlePropertyAction(property.id, 'reject')}
+                                    className="text-red-600 hover:text-red-900 text-xs sm:text-sm"
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No pending properties for approval</p>
+                  )
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No pending properties for approval</p>
+                  approvedProperties.length > 0 ? (
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Property
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Owner
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-2 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {approvedProperties.map((property) => (
+                            <tr key={property.id}>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900 break-words">{property.title}</div>
+                                  <div className="text-sm text-gray-500">
+                                    {new Date(property.created_at).toLocaleDateString()}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900 break-words">
+                                {property.owner_name}
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm text-gray-900">
+                                ${safeFormatNumber(property.price)} {property.currency}
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                  Approved
+                                </span>
+                              </td>
+                              <td className="px-2 sm:px-4 lg:px-6 py-4 text-sm font-medium">
+                                <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
+                                  <button
+                                    onClick={() => handlePropertyAction(property.id, 'reject')}
+                                    className="text-red-600 hover:text-red-900 text-xs sm:text-sm"
+                                  >
+                                    Revoke
+                                  </button>
+                                  <button
+                                    onClick={() => console.log('View property:', property.id)}
+                                    className="text-blue-600 hover:text-blue-900 text-xs sm:text-sm"
+                                  >
+                                    View
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No approved properties found</p>
+                  )
                 )}
               </div>
             </div>

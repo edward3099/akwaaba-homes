@@ -21,7 +21,7 @@ interface PropertyFormData {
   description: string;
   price: number;
   status: 'for-sale' | 'for-rent' | 'short-let';
-  type: 'house' | 'apartment' | 'land' | 'commercial' | 'townhouse' | 'condo';
+  type: 'house' | 'apartment' | 'land' | 'office';
   tier: 'normal' | 'premium';
   
   // Location
@@ -77,22 +77,24 @@ const initialFormData: PropertyFormData = {
 };
 
 const cities = [
-  'Accra', 'Kumasi', 'Tamale', 'Sekondi-Takoradi', 'Ashaiman', 
-  'Cape Coast', 'Obuasi', 'Tema', 'Teshi', 'Ho'
+  'Accra', 'Kumasi', 'Tamale', 'Sekondi-Takoradi', 'Sunyani', 
+  'Cape Coast', 'Obuasi', 'Tema', 'Teshie', 'Ho', 'Koforidua',
+  'Goaso', 'Techiman', 'Nalerigu', 'Dambai', 'Damongo', 
+  'Bolgatanga', 'Wa', 'Sefwi Wiawso', 'Ashaiman', 'Madina',
+  'Kasoa', 'Tema New Town', 'Adenta', 'Dome', 'East Legon'
 ];
 
 const regions = [
   'Greater Accra', 'Ashanti', 'Northern', 'Western', 'Central', 
-  'Eastern', 'Volta', 'Upper East', 'Upper West', 'Bono', 'Ahafo'
+  'Eastern', 'Volta', 'Upper East', 'Upper West', 'Bono', 'Ahafo',
+  'Bono East', 'North East', 'Oti', 'Savannah', 'Western North'
 ];
 
 const propertyTypes = [
   { value: 'house', label: 'House', icon: '🏠' },
   { value: 'apartment', label: 'Apartment', icon: '🏢' },
   { value: 'land', label: 'Land', icon: '🌍' },
-  { value: 'commercial', label: 'Commercial', icon: '🏪' },
-  { value: 'townhouse', label: 'Townhouse', icon: '🏘️' },
-  { value: 'condo', label: 'Condo', icon: '🏬' }
+  { value: 'office', label: 'Office', icon: '🏢' }
 ];
 
 const commonFeatures = [
@@ -546,18 +548,8 @@ export default function PropertyListingForm() {
     const isResidentialProperty = formData.type && residentialTypes.includes(formData.type);
     console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Is residential property?', isResidentialProperty);
     
-    // Apply conditional validation based on property type
-    if (isResidentialProperty) {
-      console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Applying residential validation rules');
-      if (!formData.bedrooms || formData.bedrooms <= 0) {
-        validationErrors.push('Number of bedrooms must be greater than 0.');
-      }
-      if (!formData.bathrooms || formData.bathrooms <= 0) {
-        validationErrors.push('Number of bathrooms must be greater than 0.');
-      }
-    } else {
-      console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - ✅ SKIPPING bedrooms/bathrooms validation for non-residential property');
-    }
+    // Bedrooms and bathrooms are now optional for all property types
+    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - ✅ Bedrooms and bathrooms are optional for all property types');
     
     // Always require size and lot size (year built is now optional)
     if (!formData.size || formData.size <= 0) {
@@ -883,7 +875,7 @@ export default function PropertyListingForm() {
           </label>
           <select
             value={formData.type}
-            onChange={(e) => updateFormData('type', e.target.value as 'house' | 'apartment' | 'land' | 'commercial' | 'townhouse' | 'condo')}
+            onChange={(e) => updateFormData('type', e.target.value as 'house' | 'apartment' | 'land' | 'office')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
@@ -1092,7 +1084,7 @@ export default function PropertyListingForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bedrooms {formData.type && !['land', 'commercial'].includes(formData.type) && <span className="text-red-500">*</span>}
+            Bedrooms
           </label>
           <input
             type="number"
@@ -1106,7 +1098,7 @@ export default function PropertyListingForm() {
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bathrooms {formData.type && !['land', 'commercial'].includes(formData.type) && <span className="text-red-500">*</span>}
+            Bathrooms
           </label>
           <input
             type="number"

@@ -17,7 +17,8 @@ import {
   ArrowRight,
   Search,
   Filter,
-  Loader2
+  Loader2,
+  MessageCircle
 } from 'lucide-react';
 
 interface Agent {
@@ -309,8 +310,35 @@ export default function AgentsPageClient() {
                       <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   </Link>
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700 h-7 w-7 p-0">
-                    <Phone className="w-3 h-3" />
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700 h-7 w-7 p-0"
+                    onClick={() => {
+                      // Check if phone number exists
+                      if (!agent.phone || agent.phone.trim() === '') {
+                        alert('Phone number not available for this developer. Please contact them through other means.');
+                        return;
+                      }
+                      
+                      // Create WhatsApp message
+                      const message = `Hi ${agent.name}, I'm interested in your development services. Can you help me with my project?`;
+                      
+                      // Clean the phone number - remove all non-numeric characters
+                      let cleanPhone = agent.phone.replace(/[^0-9]/g, '');
+                      
+                      // Ensure it starts with country code (Ghana is +233)
+                      if (cleanPhone.startsWith('0')) {
+                        cleanPhone = '233' + cleanPhone.substring(1);
+                      } else if (!cleanPhone.startsWith('233')) {
+                        cleanPhone = '233' + cleanPhone;
+                      }
+                      
+                      // Open WhatsApp
+                      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                  >
+                    <MessageCircle className="w-3 h-3" />
                   </Button>
                 </div>
               </CardContent>

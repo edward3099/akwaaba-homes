@@ -82,7 +82,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
             </button>
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-            Developer Profile
+            Agent Profile
           </h1>
         </div>
       </div>
@@ -334,15 +334,68 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
               </div>
 
               <div className="mt-6 space-y-3">
-                <Button className="w-full" size="lg">
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => {
+                    // Check if phone number exists
+                    if (!agent.phone || agent.phone.trim() === '') {
+                      alert('Phone number not available for this agent. Please contact them through other means.');
+                      return;
+                    }
+                    // Open phone dialer
+                    window.open(`tel:${agent.phone}`, '_self');
+                  }}
+                >
                   <Phone className="w-4 h-4 mr-2" />
                   Call Now
                 </Button>
-                <Button variant="outline" className="w-full" size="lg">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => {
+                    // Check if phone number exists
+                    if (!agent.phone || agent.phone.trim() === '') {
+                      alert('Phone number not available for this agent. Please contact them through other means.');
+                      return;
+                    }
+                    
+                    // Create WhatsApp message
+                    const message = `Hi ${agent.name}, I'm interested in your properties. Can you help me find what I'm looking for?`;
+                    
+                    // Clean the phone number - remove all non-numeric characters
+                    let cleanPhone = agent.phone.replace(/[^0-9]/g, '');
+                    
+                    // Ensure it starts with country code (Ghana is +233)
+                    if (cleanPhone.startsWith('0')) {
+                      cleanPhone = '233' + cleanPhone.substring(1);
+                    } else if (!cleanPhone.startsWith('233')) {
+                      cleanPhone = '233' + cleanPhone;
+                    }
+                    
+                    // Open WhatsApp
+                    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                  }}
+                >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" className="w-full" size="lg">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => {
+                    // Check if email exists
+                    if (!agent.email || agent.email.trim() === '') {
+                      alert('Email not available for this agent. Please contact them through other means.');
+                      return;
+                    }
+                    // Open email client
+                    window.open(`mailto:${agent.email}?subject=Property Inquiry from AkwaabaHomes&body=Hi ${agent.name},%0D%0A%0D%0AI'm interested in your properties. Can you help me find what I'm looking for?%0D%0A%0D%0AThank you!`, '_blank');
+                  }}
+                >
                   <Mail className="w-4 h-4 mr-2" />
                   Send Email
                 </Button>
