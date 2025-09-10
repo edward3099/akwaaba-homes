@@ -214,7 +214,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
     .from('properties')
     .select('*')
     .eq('seller_id', id)
-    .in('approval_status', ['approved', 'pending'])
+    .eq('approval_status', 'approved')
     .order('created_at', { ascending: false });
 
   if (propertiesError) {
@@ -272,7 +272,7 @@ export default async function AgentPage({ params }: AgentPageProps) {
       sizeUnit: 'sqft' as const,
       yearBuilt: property.year_built
     },
-    images: property.images || ['/placeholder-property.svg'],
+    images: property.image_urls || ['/placeholder-property.svg'],
     features: property.features || [],
     amenities: property.amenities || [],
     seller: {

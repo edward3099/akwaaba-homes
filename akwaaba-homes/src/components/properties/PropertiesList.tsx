@@ -1,95 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { useProperties } from '@/lib/hooks/useApi';
+import { usePropertiesWithSellers } from '@/lib/hooks/usePropertiesWithSellers';
 import { PropertyCard } from './PropertyCard';
-import { DatabaseProperty } from '@/lib/types/database';
 import { Property } from '@/lib/types/index';
 
-const transformDatabaseProperty = (dbProperty: DatabaseProperty): Property => {
-  return {
-    id: dbProperty.id,
-    title: dbProperty.title || 'Untitled Property',
-    description: dbProperty.description || '',
-    price: dbProperty.price || 0,
-    currency: 'GHS', // Always GHS for Ghana
-    status: dbProperty.status === 'active' ? 'for-sale' : 
-            dbProperty.status === 'sold' ? 'sold' : 
-            dbProperty.status === 'rented' ? 'rented' : 'for-sale',
-    type: dbProperty.property_type === 'office' ? 'commercial' : dbProperty.property_type,
-    
-    // Location & Geo-tagging (mandatory)
-    location: {
-      address: dbProperty.address || '',
-      city: dbProperty.city || '',
-      region: dbProperty.region || '',
-      country: 'Ghana',
-      coordinates: {
-        lat: dbProperty.latitude || 5.6037, // Default to Accra coordinates
-        lng: dbProperty.longitude || -0.1870,
-      },
-      plusCode: undefined, // Will be generated later
-    },
-
-    // Property Details
-    specifications: {
-      bedrooms: dbProperty.bedrooms,
-      bathrooms: dbProperty.bathrooms,
-      size: dbProperty.square_feet || dbProperty.land_size || 0,
-      sizeUnit: 'sqft',
-      lotSize: dbProperty.land_size,
-      lotSizeUnit: 'sqft',
-      yearBuilt: dbProperty.year_built,
-      parkingSpaces: undefined,
-    },
-
-    // Media
-    images: dbProperty.image_urls || [], // Use the image_urls from database
-    videos: undefined,
-    virtualTour: undefined,
-    
-    // Features & Amenities
-    features: dbProperty.features || [],
-    amenities: dbProperty.amenities || [],
-    
-    // Seller Information (placeholder - will need to fetch from user table)
-    seller: {
-      id: dbProperty.seller_id,
-      name: 'Unknown Seller', // Will be fetched separately
-      type: 'individual', // Default
-      phone: '', // Will be fetched separately
-      email: undefined,
-      whatsapp: undefined,
-      isVerified: false, // Will be fetched separately
-      company: undefined,
-      licenseNumber: undefined,
-    },
-
-    // Trust & Verification
-    verification: {
-      isVerified: false, // Will be updated based on actual verification status
-      documentsUploaded: false, // Will be updated based on actual status
-      verificationDate: undefined,
-      adminNotes: undefined,
-    },
-
-    // Timestamps
-    createdAt: dbProperty.created_at || new Date().toISOString(),
-    updatedAt: dbProperty.updated_at || new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-    
-    // Visibility Tier
-    tier: dbProperty.is_featured ? 'premium' : 'normal',
-    
-    // Diaspora Features
-    diasporaFeatures: {
-      multiCurrencyDisplay: true,
-      inspectionScheduling: true,
-      virtualTourAvailable: false,
-      familyRepresentativeContact: undefined,
-    },
-  };
-};
 
 export default function PropertiesList() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -97,10 +12,10 @@ export default function PropertiesList() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
   
-  const { loading, error, data: properties, getProperties, clearError } = useProperties();
+  const { properties, loading, error, fetchPropertiesWithSellers } = usePropertiesWithSellers();
 
   useEffect(() => {
-    console.log('Calling getProperties with filters:', {
+    console.log('Calling fetchPropertiesWithSellers with filters:', {
       page: currentPage,
       limit: 12,
       propertyType: selectedPropertyType === 'all' ? undefined : selectedPropertyType,
@@ -108,7 +23,7 @@ export default function PropertiesList() {
       minPrice: priceRange[0],
       maxPrice: priceRange[1],
     });
-    getProperties({
+    fetchPropertiesWithSellers({
       page: currentPage,
       limit: 12,
       propertyType: selectedPropertyType === 'all' ? undefined : selectedPropertyType,
@@ -116,7 +31,7 @@ export default function PropertiesList() {
       minPrice: priceRange[0],
       maxPrice: priceRange[1],
     });
-  }, [currentPage, selectedPropertyType, selectedStatus, priceRange]);
+  }, [currentPage, selectedPropertyType, selectedStatus, priceRange, fetchPropertiesWithSellers]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -145,10 +60,8 @@ export default function PropertiesList() {
     );
   }
 
-  console.log('Raw properties data:', properties);
-  const transformedProperties = properties?.properties?.map(transformDatabaseProperty) || [];
-  console.log('Transformed properties:', transformedProperties);
-  const totalPages = properties?.pagination?.totalPages || 1;
+  console.log('Properties with sellers:', properties);
+  const totalPages = 1; // Simplified for now
 
   return (
     <div>
@@ -217,7 +130,7 @@ export default function PropertiesList() {
       </div>
 
       {/* Properties Grid */}
-      {transformedProperties.length === 0 ? (
+      {properties.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-gray-500 text-lg">No properties found</div>
           <p className="text-gray-400 mt-2">Try adjusting your filters</p>
@@ -225,7 +138,7 @@ export default function PropertiesList() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {transformedProperties.map((property) => (
+            {properties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>

@@ -11,15 +11,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin role - fixed to use correct field names
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('user_role, is_verified')
-      .eq('id', user.id)
-      .single();
+    // Check if user has admin role by checking user metadata
+    const userType = user.user_metadata?.user_type || user.app_metadata?.user_type;
+    console.log('Admin analytics API - User metadata check:', { userType, userMetadata: user.user_metadata, appMetadata: user.app_metadata });
 
-    if (profileError || profile?.user_role !== 'admin') {
-      console.error('Profile check failed:', { profileError, profile, userId: user.id });
+    if (userType !== 'admin') {
+      console.error('Admin role check failed:', { userType, userId: user.id });
       return NextResponse.json({ error: 'Forbidden - Admin role required' }, { status: 403 });
     }
 

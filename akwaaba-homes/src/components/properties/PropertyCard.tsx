@@ -52,15 +52,24 @@ export function PropertyCard({
     toast.success(isSaved ? 'Property removed from saved' : 'Property saved successfully');
   };
 
+  // Debug: Log the property data to see what we're getting
+  console.log('PropertyCard - Property data:', property);
+  console.log('PropertyCard - Property images:', property.images);
+  console.log('PropertyCard - Property images type:', typeof property.images);
+  
   // Ensure images array exists and has valid URLs
   const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
     ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '')
     : [];
   
+  console.log('PropertyCard - Valid images:', validImages);
+  
   // Use the first valid image or null if no images available
   const currentImage = validImages.length > 0 && validImages[currentImageIndex] 
     ? validImages[currentImageIndex] 
     : null;
+    
+  console.log('PropertyCard - Current image:', currentImage);
   
   // Ensure currentImageIndex doesn't exceed valid images length
   const safeImageIndex = Math.min(currentImageIndex, Math.max(0, validImages.length - 1));
@@ -179,6 +188,24 @@ export function PropertyCard({
                     style={{ objectPosition: 'center' }}
                     priority={currentImageIndex === 0}
                     unoptimized
+                    onError={(e) => {
+                      console.error('Image failed to load:', currentImage);
+                      const target = e.target as HTMLImageElement;
+                      if (target) {
+                        target.style.display = 'none';
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center';
+                        fallbackDiv.innerHTML = `
+                          <div class="text-center text-slate-600">
+                            <svg class="w-4 h-4 mx-auto mb-0.5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            <p class="text-[10px]">No image</p>
+                          </div>
+                        `;
+                        target.parentNode?.insertBefore(fallbackDiv, target);
+                      }
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
@@ -294,12 +321,25 @@ export function PropertyCard({
           <div className="hidden md:flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="relative md:w-1/3 md:max-w-80 h-64 md:h-48 flex-shrink-0">
-              <Image
-                src={currentImage || '/placeholder-property.jpg'}
-                alt={property.title}
-                fill
-                className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
-              />
+              {currentImage ? (
+                <Image
+                  src={currentImage}
+                  alt={property.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="property-image rounded-t-lg md:rounded-l-lg md:rounded-t-none object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                  <div className="text-center text-slate-600">
+                    <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <p className="text-sm">No image available</p>
+                  </div>
+                </div>
+              )}
               
               {/* Image Navigation */}
                 {validImages.length > 1 && (

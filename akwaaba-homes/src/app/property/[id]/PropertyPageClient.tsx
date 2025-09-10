@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ReturnToSearch } from '@/components/navigation/ReturnToSearch';
@@ -12,7 +13,6 @@ import {
   Square, 
   Phone, 
   MessageCircle, 
-  Calendar, 
   Shield, 
   Clock, 
   Eye, 
@@ -24,13 +24,11 @@ import {
   FileText,
   Map,
   Flag,
-  Share2,
   Mail,
   ChevronLeft
 } from 'lucide-react';
 import { Property, CurrencyCode } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
-import { InspectionScheduler } from '@/components/property/InspectionScheduler';
 import PropertyStickyBar from '@/components/property/PropertyStickyBar';
 
 interface PropertyPageClientProps {
@@ -39,8 +37,8 @@ interface PropertyPageClientProps {
 }
 
 export default function PropertyPageClient({ property }: PropertyPageClientProps) {
+  const router = useRouter();
   const [currency] = useState<CurrencyCode>('GHS');
-  const [showInspectionForm, setShowInspectionForm] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('details');
 
@@ -440,49 +438,6 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
               </div>
             </div>
 
-            {/* Social Sharing */}
-            <div className="bg-white rounded-lg p-4 sm:p-6 border text-center">
-              <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">Share this property</p>
-              <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs sm:text-sm"
-                  onClick={() => {
-                    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(`Check out this property: ${property.title}`)}`;
-                    window.open(shareUrl, '_blank', 'width=600,height=400');
-                  }}
-                >
-                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Facebook
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs sm:text-sm"
-                  onClick={() => {
-                    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out this property: ${property.title}`)}&url=${encodeURIComponent(window.location.href)}`;
-                    window.open(shareUrl, '_blank', 'width=600,height=400');
-                  }}
-                >
-                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Twitter
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs sm:text-sm"
-                  onClick={() => {
-                    const message = `Check out this property: ${property.title}\n\n${property.location.address}, ${property.location.city}\n\nView it here: ${window.location.href}`;
-                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-                    window.open(whatsappUrl, '_blank');
-                  }}
-                >
-                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  WhatsApp
-                </Button>
-              </div>
-            </div>
           </div>
 
           {/* Sidebar - Now properly responsive with better spacing */}
@@ -494,9 +449,8 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                 <div className="text-center">
                   <button 
                     onClick={() => {
-                      // Navigate to agent profile with a smooth transition
-                      const agentUrl = `/agent/${property.seller.id}`;
-                      window.location.href = agentUrl;
+                      // Navigate to agent profile with smooth client-side routing
+                      router.push(`/agent/${property.seller.id}`);
                     }}
                     className="group w-full transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg p-2 -m-2"
                   >
@@ -524,14 +478,6 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full text-sm sm:text-base" 
-                  size="sm"
-                  onClick={() => setShowInspectionForm(true)}
-                >
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Schedule Inspection
-                </Button>
               </div>
             </div>
 
@@ -560,13 +506,6 @@ export default function PropertyPageClient({ property }: PropertyPageClientProps
         </div>
       </div>
 
-      {/* Inspection Modal */}
-      {showInspectionForm && (
-        <InspectionScheduler
-          property={property}
-          onClose={() => setShowInspectionForm(false)}
-        />
-      )}
 
       {/* Sticky Bottom Bar */}
       <PropertyStickyBar property={property} />

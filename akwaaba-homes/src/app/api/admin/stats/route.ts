@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
@@ -62,17 +63,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if user is an admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('user_role')
-      .eq('id', user.id)
-      .single();
-    
-    console.log('Admin stats API - Profile check:', { profile, profileError, userId: user.id }); // Added logging
+    // Check if user is an admin by checking user metadata
+    const userType = user.user_metadata?.user_type || user.app_metadata?.user_type;
+    console.log('Admin stats API - User metadata check:', { userType, userMetadata: user.user_metadata, appMetadata: user.app_metadata }); // Added logging
 
-    if (profileError || (!profile || profile.user_role !== 'admin')) {
-      console.log('Admin stats API - Admin role check failed:', { profile, profileError }); // Added logging
+    if (userType !== 'admin') {
+      console.log('Admin stats API - Admin role check failed:', { userType }); // Added logging
       return NextResponse.json(
         { error: 'Access denied. Only admins can access admin stats.' },
         { status: 403 }

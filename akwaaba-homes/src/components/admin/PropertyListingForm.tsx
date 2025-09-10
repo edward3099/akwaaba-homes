@@ -108,12 +108,6 @@ const commonAmenities = [
 ];
 
 export default function PropertyListingForm() {
-  // 🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED
-  const context7Timestamp = Date.now();
-  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
-  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
-  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - COMPONENT LOADED 🎯');
-  console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - TIMESTAMP:', context7Timestamp, '🎯');
   
   // Force cache bust by checking version
   useEffect(() => {
@@ -139,8 +133,12 @@ export default function PropertyListingForm() {
   // File upload state
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [uploadedVideos, setUploadedVideos] = useState<File[]>([]);
+  const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [videoDragActive, setVideoDragActive] = useState(false);
   const [debugMode, setDebugMode] = useState(false); // Debug mode for troubleshooting
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null); // State to hold created property ID
   
@@ -152,17 +150,19 @@ export default function PropertyListingForm() {
     premiumListingsEnabled: true
   });
 
-  // File input ref
+  // File input refs
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const totalSteps = 6; // Added image upload step
 
-  // Cleanup image preview URLs on component unmount
+  // Cleanup image and video preview URLs on component unmount
   useEffect(() => {
     return () => {
       imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      videoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [imagePreviewUrls]);
+  }, []); // Empty dependency array - only run on unmount
 
   // Fetch payment settings
   useEffect(() => {
@@ -340,6 +340,51 @@ export default function PropertyListingForm() {
     }, 1000);
   }, [formData.images, updateFormData]);
 
+  // Handle video file selection
+  const handleVideoFiles = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setIsVideoUploading(true);
+
+    const newVideos: File[] = [];
+    const newPreviewUrls: string[] = [];
+
+    Array.from(files).forEach((file) => {
+      // Validate file type
+      if (!file.type.startsWith('video/')) {
+        toast.error(`File ${file.name} is not a video. Please select only video files.`);
+        return;
+      }
+
+      // Validate file size (50MB limit for videos)
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error(`File ${file.name} is too large. Maximum size is 50MB.`);
+        return;
+      }
+
+      newVideos.push(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      newPreviewUrls.push(previewUrl);
+    });
+
+    if (newVideos.length > 0) {
+      setUploadedVideos(prev => [...prev, ...newVideos]);
+      setVideoPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+      
+      // Update form data with video URLs
+      updateFormData('videos', [...formData.videos, ...newPreviewUrls]);
+      
+      toast.success(`Successfully uploaded ${newVideos.length} video(s)`);
+    }
+
+    // Clear loading state
+    setTimeout(() => {
+      setIsVideoUploading(false);
+    }, 1000);
+  }, [formData.videos, updateFormData]);
+
   // Handle file input change
   const handleFileInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     handleFiles(event.target.files);
@@ -377,6 +422,41 @@ export default function PropertyListingForm() {
     }
   }, [isUploading]);
 
+  // Video upload handlers
+  const handleVideoInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    handleVideoFiles(event.target.files);
+    // Reset the input value
+    if (event.target) {
+      event.target.value = '';
+    }
+  }, []);
+
+  const handleVideoDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setVideoDragActive(true);
+    } else if (e.type === "dragleave") {
+      setVideoDragActive(false);
+    }
+  }, []);
+
+  const handleVideoDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setVideoDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleVideoFiles(e.dataTransfer.files);
+    }
+  }, []);
+
+  const triggerVideoInput = useCallback(() => {
+    if (videoInputRef.current && !isVideoUploading) {
+      videoInputRef.current.click();
+    }
+  }, [isVideoUploading]);
+
   const removeImage = useCallback((index: number) => {
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
     setImagePreviewUrls(prev => {
@@ -391,6 +471,21 @@ export default function PropertyListingForm() {
     newImages.splice(index, 1);
     updateFormData('images', newImages);
   }, [formData.images, updateFormData]);
+
+  const removeVideo = useCallback((index: number) => {
+    setUploadedVideos(prev => prev.filter((_, i) => i !== index));
+    setVideoPreviewUrls(prev => {
+      const newUrls = prev.filter((_, i) => i !== index);
+      // Revoke the old URL to free memory
+      URL.revokeObjectURL(prev[index]);
+      return newUrls;
+    });
+    
+    // Update form data
+    const newVideos = [...formData.videos];
+    newVideos.splice(index, 1);
+    updateFormData('videos', newVideos);
+  }, [formData.videos, updateFormData]);
 
   // Handle image upload after property creation
   const handleImageUpload = async () => {
@@ -425,7 +520,7 @@ export default function PropertyListingForm() {
       console.log('✅ All images uploaded successfully:', uploadResult);
       
       // Extract image URLs from the response
-      const uploadedImageUrls = uploadResult.uploadedImages.map((img: any) => img.image_url);
+      const uploadedImageUrls = uploadResult.uploadedImages.map((img: any) => img.url);
 
       // Update property with image URLs
       const updateResponse = await fetch(`/api/properties/${createdPropertyId}`, {
@@ -445,6 +540,38 @@ export default function PropertyListingForm() {
 
       toast.success(`Successfully uploaded ${uploadedImages.length} images!`);
       
+      // Upload videos if any
+      if (uploadedVideos.length > 0) {
+        try {
+          const videoFormData = new FormData();
+          uploadedVideos.forEach((file) => {
+            videoFormData.append('videos', file);
+          });
+          
+          const videoUploadResponse = await fetch(`/api/properties/${createdPropertyId}/videos/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session?.access_token}`,
+            },
+            body: videoFormData,
+          });
+
+          if (!videoUploadResponse.ok) {
+            const errorData = await videoUploadResponse.json();
+            throw new Error(errorData.error || 'Failed to upload videos');
+          }
+
+          const videoUploadResult = await videoUploadResponse.json();
+          console.log('✅ All videos uploaded successfully:', videoUploadResult);
+          
+          toast.success(`Successfully uploaded ${uploadedVideos.length} videos!`);
+          
+        } catch (error) {
+          console.error('❌ Error uploading videos:', error);
+          toast.error(error instanceof Error ? error.message : 'Failed to upload videos');
+        }
+      }
+      
       // Reset form and redirect to dashboard
       setTimeout(() => {
         setShowSuccess(false);
@@ -452,6 +579,8 @@ export default function PropertyListingForm() {
         setFormData(initialFormData);
         setUploadedImages([]);
         setImagePreviewUrls([]);
+        setUploadedVideos([]);
+        setVideoPreviewUrls([]);
         setCurrentStep(1);
         
         // Redirect to agent dashboard
@@ -499,13 +628,6 @@ export default function PropertyListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT
-    const context7SubmitTimestamp = Date.now();
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - HANDLE SUBMIT 🎯');
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - SUBMIT TIMESTAMP:', context7SubmitTimestamp, '🎯');
-    
     // Comprehensive validation following Context7 best practices
     const validationErrors = [];
     
@@ -539,17 +661,11 @@ export default function PropertyListingForm() {
     if (!formData.status) {
       validationErrors.push('Listing type is required.');
     }
-    // 🎯 CONTEXT7 EXPERT VALIDATION FIX - CONDITIONAL VALIDATION LOGIC
-    // Based on Next.js and Conform best practices for conditional form validation
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Property type:', formData.type, 'Bedrooms:', formData.bedrooms, 'Bathrooms:', formData.bathrooms);
-    
     // Define residential property types that require bedrooms/bathrooms
     const residentialTypes = ['house', 'apartment', 'townhouse', 'condo'];
     const isResidentialProperty = formData.type && residentialTypes.includes(formData.type);
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - Is residential property?', isResidentialProperty);
     
     // Bedrooms and bathrooms are now optional for all property types
-    console.log('🎯 CONTEXT7 EXPERT VALIDATION FIX - ✅ Bedrooms and bathrooms are optional for all property types');
     
     // Always require size and lot size (year built is now optional)
     if (!formData.size || formData.size <= 0) {
@@ -671,6 +787,41 @@ export default function PropertyListingForm() {
           
         } catch (error) {
           console.error('❌ Error uploading images:', error);
+          // Don't throw here - property was created successfully
+          // Just log the error and continue
+        }
+      }
+      
+      // Step 3: Upload videos if any
+      if (uploadedVideos.length > 0) {
+        console.log('📤 Starting video upload for property:', createdProperty.id);
+        
+        try {
+          const videoFormData = new FormData();
+          uploadedVideos.forEach((file) => {
+            videoFormData.append('videos', file);
+          });
+          
+          const videoUploadResponse = await fetch(`/api/properties/${createdProperty.id}/videos/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: videoFormData,
+          });
+          
+          if (!videoUploadResponse.ok) {
+            const errorData = await videoUploadResponse.json();
+            console.error('❌ Error uploading videos:', errorData);
+            // Don't throw here - property was created successfully
+            // Just log the error and continue
+          } else {
+            const videoResult = await videoUploadResponse.json();
+            console.log('✅ All videos uploaded successfully:', videoResult);
+          }
+          
+        } catch (error) {
+          console.error('❌ Error uploading videos:', error);
           // Don't throw here - property was created successfully
           // Just log the error and continue
         }
@@ -1348,6 +1499,10 @@ export default function PropertyListingForm() {
                       src={url}
                       alt={`Property image ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      onError={(e) => {
+                        console.warn(`Failed to load image preview ${index + 1}:`, url);
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                     <button
                       type="button"
@@ -1371,6 +1526,133 @@ export default function PropertyListingForm() {
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                   <p className="text-sm text-yellow-800">
                     ⚠️ You need at least 3 images. Please upload {3 - imagePreviewUrls.length} more image(s).
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Video Upload Section */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Property Videos
+          </label>
+          
+          {/* Hidden video file input */}
+          <input
+            ref={videoInputRef}
+            type="file"
+            multiple
+            accept="video/*"
+            onChange={handleVideoInputChange}
+            className="hidden"
+            id="property-video-upload"
+          />
+          
+          {/* Video upload area */}
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              videoDragActive 
+                ? 'border-green-500 bg-green-50' 
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onDragEnter={handleVideoDrag}
+            onDragLeave={handleVideoDrag}
+            onDragOver={handleVideoDrag}
+            onDrop={handleVideoDrop}
+          >
+            <svg className={`mx-auto h-12 w-12 ${videoDragActive ? 'text-green-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <div className="mt-4">
+              <p className="text-sm text-gray-600">
+                Upload property videos (optional)
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                MP4, MOV, AVI up to 50MB each • Maximum 5 videos
+              </p>
+              <p className="text-xs text-green-600 mt-2">
+                🎥 Drag and drop videos here or click the button below
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={triggerVideoInput}
+              disabled={isVideoUploading}
+              className={`mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+                isVideoUploading 
+                  ? 'text-gray-400 bg-gray-100 cursor-not-allowed' 
+                  : 'text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+              }`}
+            >
+              {isVideoUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-700 mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Choose Videos
+                </>
+              )}
+            </button>
+            
+            {/* Upload progress indicator */}
+            {isVideoUploading && (
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Processing videos...</p>
+              </div>
+            )}
+          </div>
+
+          {/* Video previews */}
+          {videoPreviewUrls.length > 0 && (
+            <div className="mt-6">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Uploaded Videos ({videoPreviewUrls.length})
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {videoPreviewUrls.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <video
+                      src={url}
+                      className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                      controls
+                      preload="metadata"
+                      onError={(e) => {
+                        console.warn(`Failed to load video preview ${index + 1}:`, url);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeVideo(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Remove video"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                      Video {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Video count warning */}
+              {videoPreviewUrls.length > 5 && (
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800">
+                    ⚠️ You have uploaded {videoPreviewUrls.length} videos. Maximum recommended is 5 videos.
                   </p>
                 </div>
               )}
@@ -1479,6 +1761,10 @@ export default function PropertyListingForm() {
                       src={url}
                       alt={`Property image ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      onError={(e) => {
+                        console.warn(`Failed to load image preview ${index + 1}:`, url);
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                     <button
                       type="button"

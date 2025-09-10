@@ -52,31 +52,31 @@ export async function GET(request: NextRequest) {
     const addedToSite = searchParams.get('added_to_site') || searchParams.get('addedToSite');
     const propertyRef = searchParams.get('property_ref');
 
-    // Build query - start with basic properties and join with users table for seller info
+    // Build query - join with property_images to get images
     let query = supabase
       .from('properties')
       .select(`
         *,
         property_images (
-          *
-        ),
-        users!properties_seller_id_fkey (
           id,
-          full_name,
-          phone,
-          email,
-          user_type,
-          is_verified
+          image_url,
+          is_primary,
+          created_at
         )
       `)
       .eq('status', status)
+      .eq('approval_status', 'approved')
       .order('created_at', { ascending: false });
+    
+    // Debug: Log the query to see what we're getting
+    console.log('Properties API - Query built, executing...');
 
     // Build count query with same filters
     let countQuery = supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('status', status);
+      .eq('status', status)
+      .eq('approval_status', 'approved');
 
     // Apply filters to both queries
     if (propertyType) {
@@ -154,6 +154,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log('Properties fetch successful, found', properties?.length || 0, 'properties');
+    
+    // Fetch user data separately to avoid RLS issues with joins
+    const sellerIds = [...new Set(properties?.map(p => p.seller_id).filter(Boolean))];
+    console.log('Unique seller IDs:', sellerIds);
+    
+    let sellersData: any = {};
+    if (sellerIds.length > 0) {
+      const { data: sellers, error: sellersError } = await supabase
+        .from('users')
+        .select('id, full_name, email, phone, is_verified')
+        .in('id', sellerIds);
+      
+      if (sellersError) {
+        console.error('Error fetching sellers:', sellersError);
+      } else {
+        console.log('Fetched sellers:', sellers);
+        // Convert array to object for easy lookup
+        sellersData = sellers?.reduce((acc, seller) => {
+          acc[seller.id] = seller;
+          return acc;
+        }, {} as any) || {};
+      }
+    }
+
     // Transform the data to match frontend expectations
     const transformedProperties = properties?.map(property => ({
       id: property.id,
@@ -177,7 +202,7 @@ export async function GET(request: NextRequest) {
               property.listing_type === 'rent' ? 'for-rent' : 
               property.listing_type === 'lease' ? 'short-let' : 'for-sale',
       type: property.property_type || 'house',
-      // Transform property_images to images for frontend compatibility
+      // Extract images from the joined property_images table
       images: (property.property_images || [])
         .map((img: any) => img.image_url)
         .filter(url => 
@@ -212,17 +237,37 @@ export async function GET(request: NextRequest) {
         },
         plusCode: property.plus_code || undefined
       },
-      seller: {
-        id: property.seller_id || 'unknown',
-        name: property.users?.full_name || 'Unknown Seller',
-        type: (property.users?.user_type as 'individual' | 'agent' | 'developer') || 'individual',
-        phone: property.users?.phone || '',
-        email: property.users?.email || undefined,
-        whatsapp: property.users?.phone || undefined, // Use phone as WhatsApp
-        isVerified: property.users?.is_verified || false,
-        company: undefined, // Will be added later when we join with profiles table
-        licenseNumber: undefined // Not stored in users table
-      },
+      // Extract seller information from the separately fetched sellers data
+      seller: (() => {
+        const seller = sellersData[property.seller_id];
+        if (seller) {
+          return {
+            id: seller.id,
+            name: seller.full_name || 'Unknown Seller',
+            full_name: seller.full_name,
+            email: seller.email,
+            phone: seller.phone,
+            type: 'individual' as const,
+            whatsapp: seller.phone, // Use phone as WhatsApp
+            isVerified: seller.is_verified || false,
+            company: undefined,
+            licenseNumber: undefined
+          };
+        } else {
+          return {
+            id: property.seller_id || 'unknown',
+            name: 'Unknown Seller',
+            full_name: null,
+            email: null,
+            phone: null,
+            type: 'individual' as const,
+            whatsapp: undefined,
+            isVerified: false,
+            company: undefined,
+            licenseNumber: undefined
+          };
+        }
+      })(),
       verification: {
         isVerified: property.verification_status === 'verified',
         documentsUploaded: property.documents_uploaded || false,

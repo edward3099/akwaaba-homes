@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,6 +40,7 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { rates, error, isLoading } = useCurrencyRates();
   
   console.log('PropertyCard - rates:', rates, 'error:', error, 'isLoading:', isLoading);
@@ -61,7 +62,7 @@ export function PropertyCard({
   const createReturnURL = () => {
     const currentParams = searchParams.toString();
     const returnParams = currentParams ? `?return=${encodeURIComponent(`?${currentParams}`)}` : '';
-    return `/property/${property.id}${returnParams}`;
+    return `/properties/${property.id}${returnParams}`;
   };
 
   const handleContact = (e: React.MouseEvent) => {
@@ -497,9 +498,16 @@ export function PropertyCard({
             <div className="pt-2 border-t text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <span className="flex-shrink-0">Listed by</span>
-                <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent the property link from being triggered
+                    e.stopPropagation(); // Stop event bubbling
+                    router.push(`/agent/${property.seller.id}`);
+                  }}
+                  className="font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0 text-left hover:text-primary transition-colors cursor-pointer"
+                >
                   {property.seller.name}
-                </span>
+                </button>
                 {property.seller.isVerified && (
                   <Verified className="inline w-3 h-3 ml-1 text-verified flex-shrink-0" />
                 )}

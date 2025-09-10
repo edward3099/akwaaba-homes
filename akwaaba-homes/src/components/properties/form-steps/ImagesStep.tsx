@@ -66,7 +66,7 @@ export function ImagesStep() {
               path="properties"
               maxFiles={10}
               maxFileSize={5 * 1024 * 1024} // 5MB
-              acceptedFileTypes={['image/jpeg', 'image/png', 'image/webp']}
+              acceptedFileTypes={['image/jpeg', 'image/png', 'image/webp', 'image/avif']}
               onImagesUploaded={handleImagesUploaded}
               onImageRemoved={handleImageRemoved}
               className="min-h-[300px]"

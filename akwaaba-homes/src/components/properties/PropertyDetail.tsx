@@ -52,6 +52,7 @@ interface Property {
   features?: string[];
   amenities?: string[];
   image_urls?: string[];
+  videos?: string[];
   users?: {
     id: string;
     full_name: string;
@@ -273,6 +274,31 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
               )}
             </div>
 
+            {/* Video Section */}
+            {property.videos && property.videos.length > 0 && (
+              <div className="bg-white rounded-lg border overflow-hidden">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-semibold text-gray-900">Property Video</h3>
+                </div>
+                <div className="p-4">
+                  <div className="space-y-4">
+                    {property.videos.map((videoUrl, index) => (
+                      <div key={index} className="relative">
+                        <video
+                          controls
+                          className="w-full h-64 sm:h-80 md:h-96 rounded-lg object-cover"
+                          preload="metadata"
+                        >
+                          <source src={videoUrl} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Property Details Tabs */}
             <div className="bg-white rounded-lg border">
               <div className="border-b">
@@ -406,7 +432,15 @@ export default function PropertyDetail({ propertyId }: PropertyDetailProps) {
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{property.users?.full_name || 'Agent'}</p>
+                    <button 
+                      onClick={() => {
+                        // Navigate to agent profile
+                        window.location.href = `/agent/${property.users?.id}`;
+                      }}
+                      className="font-medium text-gray-900 hover:text-primary transition-colors cursor-pointer text-left"
+                    >
+                      {property.users?.full_name || 'Agent'}
+                    </button>
                     <p className="text-sm text-gray-500 capitalize">{property.users?.user_type || 'agent'}</p>
                   </div>
                 </div>

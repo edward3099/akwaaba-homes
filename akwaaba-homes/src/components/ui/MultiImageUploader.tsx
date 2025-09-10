@@ -34,7 +34,7 @@ export function MultiImageUploader({
   path = '',
   maxFiles = 10,
   maxFileSize = 5 * 1024 * 1024, // 5MB
-  acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp'],
+  acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
   onImagesUploaded,
   onImageRemoved,
   className

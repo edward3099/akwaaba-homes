@@ -23,16 +23,6 @@ export default function AboutPage() {
             All <b>estate agents and developers</b> on our platform are verified professionals with proven track records. Contact verified <b>estate agents</b> directly for viewings and property inquiries, knowing you're working with trusted professionals who have been vetted by our team.
           </p>
           
-          <p className="text-gray-700 mb-6 leading-relaxed">
-            Akwaaba Homes is part of Akwaaba Homes Limited which was founded in 2020.
-          </p>
-          
-          <p className="text-gray-700 leading-relaxed">
-            Akwaaba Homes Limited, Accra, Ghana<br />
-            Registered in Ghana with Company No. CS123456789<br />
-            VAT Registration number: 1234567890<br />
-            Data Protection number: DP1234567
-          </p>
         </div>
       </div>
     </div>

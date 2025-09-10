@@ -88,6 +88,7 @@ export async function GET(
           is_primary,
           alt_text
         ),
+        videos,
         inquiries (
           id,
           buyer_name,
@@ -99,6 +100,7 @@ export async function GET(
         )
       `)
       .eq('id', propertyId)
+      .eq('approval_status', 'approved')
       .single();
 
     if (error) {

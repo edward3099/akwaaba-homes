@@ -66,6 +66,22 @@ interface AgentPageClientProps {
 export default function AgentPageClient({ agent, properties }: AgentPageClientProps) {
   const [activeTab, setActiveTab] = useState<'about' | 'properties'>('properties');
   const [currency] = useState<'GHS'>('GHS');
+  const [currentPage, setCurrentPage] = useState(1);
+  const propertiesPerPage = 6;
+
+  // Calculate pagination
+  const totalPages = Math.ceil(properties.length / propertiesPerPage);
+  const startIndex = (currentPage - 1) * propertiesPerPage;
+  const endIndex = startIndex + propertiesPerPage;
+  const currentProperties = properties.slice(startIndex, endIndex);
+
+  // Reset to page 1 when switching tabs
+  const handleTabChange = (tab: 'about' | 'properties') => {
+    setActiveTab(tab);
+    if (tab === 'properties') {
+      setCurrentPage(1);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,13 +111,18 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
             {/* Agent Profile Header */}
             <div className="bg-white rounded-lg border overflow-hidden">
               <div className="relative h-32 sm:h-40">
-                <Image 
-                  src={agent.coverImage} 
-                  alt={`${agent.name} cover image`} 
-                  fill 
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
-                  className="object-cover"
-                />
+                {agent.coverImage ? (
+                  <Image 
+                    src={agent.coverImage} 
+                    alt={`${agent.name} cover image`} 
+                    fill 
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
+                    className="object-cover"
+                    unoptimized={agent.coverImage.includes('supabase.co')}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/40"></div>
                 
                 {/* Agent Info Overlay */}
@@ -109,13 +130,22 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                   <div className="flex items-end gap-4">
                     <div className="relative flex-shrink-0">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1.5 shadow-xl">
-                        <Image 
-                          src={agent.avatar} 
-                          alt={agent.name} 
-                          width={64} 
-                          height={64} 
-                          className="w-full h-full rounded-full object-cover"
-                        />
+                        {agent.avatar ? (
+                          <Image 
+                            src={agent.avatar} 
+                            alt={agent.name} 
+                            width={64} 
+                            height={64} 
+                            className="w-full h-full rounded-full object-cover"
+                            unoptimized={agent.avatar.includes('supabase.co')}
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                            <span className="text-primary font-semibold text-lg">
+                              {agent.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="absolute -bottom-1.5 -right-1.5 bg-primary text-white rounded-full p-1 shadow-lg">
                         <CheckCircle className="w-2 h-2" />
@@ -141,7 +171,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
             <div className="bg-white rounded-lg border">
               <div className="flex border-b">
                 <button
-                  onClick={() => setActiveTab('about')}
+                  onClick={() => handleTabChange('about')}
                   className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === 'about'
                       ? 'text-primary border-b-2 border-primary bg-primary/5'
@@ -151,7 +181,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                   About
                 </button>
                 <button
-                  onClick={() => setActiveTab('properties')}
+                  onClick={() => handleTabChange('properties')}
                   className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === 'properties'
                       ? 'text-primary border-b-2 border-primary bg-primary/5'
@@ -213,10 +243,10 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                      {properties.map((property) => {
+                      {currentProperties.map((property) => {
                         // Ensure images array exists and has valid URLs
                         const validImages = property.images && Array.isArray(property.images) && property.images.length > 0 
-                          ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '')
+                          ? property.images.filter(img => img && typeof img === 'string' && img.trim() !== '' && img !== null)
                           : [];
                         
                         // Use a fallback image if no valid images are available
@@ -229,7 +259,9 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                                 src={propertyImage} 
                                 alt={property.title} 
                                 fill 
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                                 className="object-cover"
+                                unoptimized={propertyImage.includes('supabase.co')}
                                 onError={(e) => {
                                   console.error('Image failed to load:', propertyImage);
                                   // Fallback to placeholder if image fails
@@ -272,7 +304,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                                 <span className="flex items-center gap-1"><Square className="w-3 h-3" />{property.specifications.size} {property.specifications.sizeUnit}</span>
                               </div>
                               <div className="text-sm font-bold text-primary mb-1">{formatDiasporaPrice(property.price, currency).primary}</div>
-                              <Link href={`/property/${property.id}`}>
+                              <Link href={`/properties/${property.id}`}>
                                 <Button variant="outline" size="sm" className="w-full h-6 text-xs">View Details<ArrowRight className="w-3 h-3 ml-1" /></Button>
                               </Link>
                             </div>
@@ -280,6 +312,48 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                         );
                       })}
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                        <div className="text-sm text-gray-600">
+                          Showing {startIndex + 1} to {Math.min(endIndex, properties.length)} of {properties.length} properties
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Previous
+                          </button>
+                          
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-1 text-sm border rounded-md ${
+                                  currentPage === page
+                                    ? 'bg-primary text-white border-primary'
+                                    : 'border-gray-300 hover:bg-gray-50'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            ))}
+                          </div>
+                          
+                          <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

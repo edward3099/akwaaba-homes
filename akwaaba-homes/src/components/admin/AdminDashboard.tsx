@@ -117,12 +117,16 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       setError(null);
 
       // Fetch stats
-      const statsResponse = await fetch('/api/admin/stats');
+      const statsResponse = await fetch('/api/admin/stats', {
+        credentials: 'include'
+      });
       if (!statsResponse.ok) throw new Error('Failed to fetch stats');
       const statsData = await statsResponse.json();
 
       // Fetch chart data (using analytics endpoint)
-      const chartResponse = await fetch('/api/admin/analytics?timeRange=30d');
+      const chartResponse = await fetch('/api/admin/analytics?timeRange=30d', {
+        credentials: 'include'
+      });
       if (!chartResponse.ok) throw new Error('Failed to fetch chart data');
       const chartData = await chartResponse.json();
 
@@ -130,12 +134,16 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       const activityData = { activities: [] };
 
       // Fetch pending properties
-      const pendingResponse = await fetch('/api/admin/properties?status=pending&limit=10');
+      const pendingResponse = await fetch('/api/admin/properties?status=pending&limit=10', {
+        credentials: 'include'
+      });
       if (!pendingResponse.ok) throw new Error('Failed to fetch pending properties');
       const pendingData = await pendingResponse.json();
 
       // Fetch approved properties (status is 'active' for approved properties)
-      const approvedResponse = await fetch('/api/admin/properties?status=active&limit=10');
+      const approvedResponse = await fetch('/api/admin/properties?status=active&limit=10', {
+        credentials: 'include'
+      });
       if (!approvedResponse.ok) throw new Error('Failed to fetch approved properties');
       const approvedData = await approvedResponse.json();
 
@@ -163,6 +171,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       const response = await fetch('/api/admin/properties/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           propertyId,
           action,
@@ -191,6 +200,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       const response = await fetch('/api/admin/properties/bulk-delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           status: 'pending'
         })

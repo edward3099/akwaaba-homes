@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createApiRouteSupabaseClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 // GET method to list pending verifications
 export async function GET(request: NextRequest) {
@@ -18,23 +19,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin role - query by id (not user_id)
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('user_role')
-      .eq('user_id', user.id)
-      .single();
+    // Check if user has admin role by checking user metadata
+    const userType = user.user_metadata?.user_type || user.app_metadata?.user_type;
+    console.log('Admin verifications API - User metadata check:', { userType, userMetadata: user.user_metadata, appMetadata: user.app_metadata });
 
-    console.log('Profile check result:', { profile, error: profileError });
-
-    if (profileError || profile?.user_role !== 'admin') {
-      console.log('Admin role check failed:', { profileError, userRole: profile?.user_role });
-      return NextResponse.json({ error: 'Forbidden - Admin role required' }, { status: 403 });
+    if (userType !== 'admin') {
+      console.log('Admin role check failed:', { userType, userId: user.id });
+      return NextResponse.json({ error: 'Admin role required' }, { status: 403 });
     }
+
+    // Create service role client to bypass RLS
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // Get pending agent verifications
     console.log('Fetching agent verifications...');
-    const { data: agentVerifications, error: agentError } = await supabase
+    const { data: agentVerifications, error: agentError } = await serviceSupabase
       .from('profiles')
       .select(`
         id,
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     // Get pending property verifications
     console.log('Fetching property verifications...');
-    const { data: propertyVerifications, error: propertyError } = await supabase
+    const { data: propertyVerifications, error: propertyError } = await serviceSupabase
       .from('properties')
       .select(`
         id,
@@ -138,15 +140,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user has admin role - query by id (not user_id)
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('user_role')
-      .eq('user_id', user.id)
-      .single();
+    // Check if user has admin role by checking user metadata
+    const userType = user.user_metadata?.user_type || user.app_metadata?.user_type;
+    console.log('Admin verifications POST - User metadata check:', { userType, userMetadata: user.user_metadata, appMetadata: user.app_metadata });
 
-    if (profileError || profile?.user_role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin role required' }, { status: 403 });
+    if (userType !== 'admin') {
+      console.log('Admin role check failed:', { userType, userId: user.id });
+      return NextResponse.json({ error: 'Admin role required' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -163,6 +163,12 @@ export async function POST(request: NextRequest) {
     let result;
     let error;
 
+    // Create service role client to bypass RLS
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     if (verificationType === 'agent') {
       // Handle agent verification
       const newStatus = action === 'approve' ? 'verified' : 'rejected';
@@ -170,7 +176,7 @@ export async function POST(request: NextRequest) {
       console.log('POST - Updating agent profile:', { verificationId, newStatus, adminId: user.id });
       
       // First check if the agent is already in the target status
-      const { data: existingProfile, error: checkError } = await supabase
+      const { data: existingProfile, error: checkError } = await serviceSupabase
         .from('profiles')
         .select('verification_status')
         .eq('user_id', verificationId)
@@ -190,7 +196,7 @@ export async function POST(request: NextRequest) {
         });
       }
       
-      const { data, error: updateError } = await supabase
+      const { data, error: updateError } = await serviceSupabase
         .from('profiles')
         .update({
           verification_status: newStatus,
@@ -209,7 +215,7 @@ export async function POST(request: NextRequest) {
       // Handle property verification
       const newStatus = action === 'approve' ? 'active' : 'rejected';
       
-      const { data, error: updateError } = await supabase
+      const { data, error: updateError } = await serviceSupabase
         .from('properties')
         .update({
           status: newStatus,
