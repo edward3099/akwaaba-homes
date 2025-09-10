@@ -296,7 +296,7 @@ export default function AgentsPageClient() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
-                  <Link href={`/agent/${agent.id}`} className="flex-1">
+                  <Link href={`/agent/${agent.id}?return=${encodeURIComponent('/agents')}`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full h-7 text-xs">
                       View Profile
                       <ArrowRight className="w-3 h-3 ml-1" />

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { Property } from '@/lib/types/index';
 import { formatDiasporaPrice } from '@/lib/utils/currency';
+import { ReturnToSearch } from '@/components/navigation/ReturnToSearch';
 
 interface Agent {
   id: string;
@@ -89,13 +90,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center gap-1 hover:text-primary transition-colors text-xs sm:text-sm"
-            >
-              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-              Back to property
-            </button>
+            <ReturnToSearch />
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
             Agent Profile
@@ -304,7 +299,7 @@ export default function AgentPageClient({ agent, properties }: AgentPageClientPr
                                 <span className="flex items-center gap-1"><Square className="w-3 h-3" />{property.specifications.size} {property.specifications.sizeUnit}</span>
                               </div>
                               <div className="text-sm font-bold text-primary mb-1">{formatDiasporaPrice(property.price, currency).primary}</div>
-                              <Link href={`/properties/${property.id}`}>
+                              <Link href={`/properties/${property.id}?return=${encodeURIComponent(`/agent/${agent.id}`)}`}>
                                 <Button variant="outline" size="sm" className="w-full h-6 text-xs">View Details<ArrowRight className="w-3 h-3 ml-1" /></Button>
                               </Link>
                             </div>
