@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth/authContext';
 import MobileMoneyPayment from '@/components/payments/MobileMoneyPayment';
+import { UploadingAnimation } from '@/components/ui/UploadingAnimation';
 
 interface PropertyFormData {
   // Basic Information
@@ -141,6 +142,11 @@ export default function PropertyListingForm() {
   const [videoDragActive, setVideoDragActive] = useState(false);
   const [debugMode, setDebugMode] = useState(false); // Debug mode for troubleshooting
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null); // State to hold created property ID
+  
+  // Progress tracking states
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStage, setUploadStage] = useState<'idle' | 'creating' | 'images' | 'videos' | 'complete'>('idle');
+  const [uploadMessage, setUploadMessage] = useState('');
   
   // Payment-related state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -687,6 +693,9 @@ export default function PropertyListingForm() {
     }
     
     setIsSubmitting(true);
+    setUploadStage('creating');
+    setUploadProgress(5);
+    setUploadMessage('Creating property...');
     
     try {
       // Check authentication before making API call
@@ -737,8 +746,15 @@ export default function PropertyListingForm() {
       const createdProperty = await createResponse.json();
       console.log('✅ Property created successfully:', createdProperty);
       
+      // Update progress after property creation
+      setUploadProgress(25);
+      setUploadMessage('Property created successfully!');
+      
       // Step 2: Upload images to the newly created property
       if (uploadedImages.length > 0) {
+        setUploadStage('images');
+        setUploadProgress(30);
+        setUploadMessage(`Uploading ${uploadedImages.length} images...`);
         console.log('📤 Starting image upload for property:', createdProperty.id);
         
         try {
@@ -763,6 +779,10 @@ export default function PropertyListingForm() {
           
           const uploadResult = await uploadResponse.json();
           console.log('✅ All images uploaded successfully:', uploadResult);
+          
+          // Update progress after image upload
+          setUploadProgress(60);
+          setUploadMessage('Images uploaded! Updating property...');
           
           // Extract image URLs from the response
           const uploadedImageUrls = uploadResult.uploadedImages.map((img: any) => img.image_url);
@@ -794,6 +814,9 @@ export default function PropertyListingForm() {
       
       // Step 3: Upload videos if any
       if (uploadedVideos.length > 0) {
+        setUploadStage('videos');
+        setUploadProgress(70);
+        setUploadMessage(`Uploading ${uploadedVideos.length} videos...`);
         console.log('📤 Starting video upload for property:', createdProperty.id);
         
         try {
@@ -826,6 +849,11 @@ export default function PropertyListingForm() {
           // Just log the error and continue
         }
       }
+      
+      // Final progress update
+      setUploadStage('complete');
+      setUploadProgress(100);
+      setUploadMessage('Property listed successfully!');
       
       // Show success message
       toast.success('Property created successfully! It is now pending admin approval.');
@@ -1841,6 +1869,18 @@ export default function PropertyListingForm() {
       </div>
 
       {renderStepIndicator()}
+
+      {/* Uploading Animation - Prominent Display */}
+      {(isUploading || isSubmitting) && (
+        <div className="mb-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+          <UploadingAnimation 
+            isUploading={isUploading || isSubmitting}
+            progress={uploadProgress}
+            status={uploadStage === 'complete' ? 'success' : 'uploading'}
+            message={uploadMessage}
+          />
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {renderStepContent()}
