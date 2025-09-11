@@ -134,14 +134,14 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
       const activityData = { activities: [] };
 
       // Fetch pending properties
-      const pendingResponse = await fetch('/api/admin/properties?status=pending&limit=10', {
+      const pendingResponse = await fetch('/api/admin/properties?approval_status=pending&limit=50', {
         credentials: 'include'
       });
       if (!pendingResponse.ok) throw new Error('Failed to fetch pending properties');
       const pendingData = await pendingResponse.json();
 
-      // Fetch approved properties (status is 'active' for approved properties)
-      const approvedResponse = await fetch('/api/admin/properties?status=active&limit=10', {
+      // Fetch approved properties
+      const approvedResponse = await fetch('/api/admin/properties?approval_status=approved&limit=50', {
         credentials: 'include'
       });
       if (!approvedResponse.ok) throw new Error('Failed to fetch approved properties');
@@ -701,7 +701,7 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
                                     Revoke
                                   </button>
                                   <button
-                                    onClick={() => console.log('View property:', property.id)}
+                                    onClick={() => window.location.href = `/properties/${property.id}`}
                                     className="text-blue-600 hover:text-blue-900 text-xs sm:text-sm"
                                   >
                                     View

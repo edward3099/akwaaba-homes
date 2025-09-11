@@ -162,28 +162,12 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      properties: {
-        total: totalProperties || 0,
-        active: activeProperties || 0,
-        pending: pendingApprovals || 0,
-        featured: featuredProperties || 0
-      },
-      users: {
-        total: totalUsers || 0,
-        agents: totalAgents || 0,
-        sellers: totalSellers || 0,
-        buyers: totalBuyers || 0
-      },
-      revenue: {
-        total: 0, // TODO: Implement revenue tracking
-        monthly: 0,
-        premium: 0
-      },
-      activity: {
-        views: 0, // TODO: Implement view tracking
-        inquiries: totalInquiries || 0,
-        approvals: 0 // TODO: Implement approval tracking
-      },
+      totalUsers: totalUsers || 0,
+      totalAgents: totalAgents || 0,
+      totalProperties: totalProperties || 0,
+      pendingVerifications: pendingVerifications || 0,
+      pendingApprovals: pendingApprovals || 0,
+      totalInquiries: totalInquiries || 0,
       systemHealth
     });
 

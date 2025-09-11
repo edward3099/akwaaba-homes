@@ -6,15 +6,15 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceRoleSupabaseClient();
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'pending';
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const approvalStatus = searchParams.get('approval_status') || 'pending';
+    const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Get properties based on status
+    // Get properties based on approval status
     const { data: properties, error: propertiesError } = await supabase
       .from('properties')
-      .select('id, title, status, created_at')
-      .eq('status', status)
+      .select('id, title, status, approval_status, created_at')
+      .eq('approval_status', approvalStatus)
       .order('created_at', { ascending: false })
       .limit(limit);
 
