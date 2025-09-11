@@ -134,10 +134,7 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
       previousUrlFiltersRef.current = urlFiltersString;
       filtersRef.current = urlFilters;
       
-      // Use a microtask to defer the state update to avoid render phase updates
-      Promise.resolve().then(() => {
-        setFilters(urlFilters);
-      });
+      setFilters(urlFilters);
     }
   }, [searchParams, isInitialized]);
 
@@ -147,7 +144,11 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     
     // Add filters to URL params
     if (newFilters.location) params.set('q', newFilters.location);
-    if (newFilters.type && newFilters.type.length > 0) params.set('type', newFilters.type[0]);
+    if (newFilters.type && newFilters.type.length > 0) {
+      // Ensure we handle type correctly whether it's an array or string
+      const typeValue = Array.isArray(newFilters.type) ? newFilters.type[0] : newFilters.type;
+      params.set('type', typeValue);
+    }
     if (newFilters.status) params.set('status', newFilters.status);
     
     if (newFilters.priceRange) {
@@ -164,7 +165,6 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     
     // Set default values for required params
     if (!params.has('status')) params.set('status', 'for-sale');
-    if (!params.has('type')) params.set('type', '0');
     if (!params.has('minprice')) params.set('minprice', '0');
     if (!params.has('maxprice')) params.set('maxprice', '0');
     if (!params.has('bedrooms')) params.set('bedrooms', '0');
@@ -173,11 +173,14 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
     
     const newURL = `${pathname}?${params.toString()}`;
     
-    if (replace) {
-      router.replace(newURL);
-    } else {
-      router.push(newURL);
-    }
+    // Use setTimeout to defer router updates and avoid state updates during render
+    setTimeout(() => {
+      if (replace) {
+        router.replace(newURL);
+      } else {
+        router.push(newURL);
+      }
+    }, 0);
   }, [pathname, router]);
 
   // Update filters and URL
@@ -214,7 +217,6 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   const updateFilter = useCallback((key: keyof SearchFilters | string, value: any) => {
     setFilters(prevFilters => {
       const newFilters = { ...prevFilters, [key]: value };
-      updateURL(newFilters, false);
       
       // Save to localStorage if enabled
       if (persistToLocalStorage) {
@@ -225,6 +227,11 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
         }
       }
       
+      // Update URL after state update (deferred)
+      setTimeout(() => {
+        updateURL(newFilters, false);
+      }, 0);
+      
       return newFilters;
     });
   }, [updateURL, persistToLocalStorage, localStorageKey]);
@@ -232,7 +239,7 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   // Get current URL filters
   const getCurrentURLFilters = useCallback(() => {
     return parseSearchParams(searchParams);
-  }, [searchParams, parseSearchParams]);
+  }, [searchParams]);
 
   return {
     filters,

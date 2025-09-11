@@ -12,15 +12,67 @@ export type ListingType = z.infer<typeof ListingTypeSchema>
 export const PropertyStatusSchema = z.enum(['active', 'pending', 'sold', 'rented', 'inactive'])
 export type PropertyStatus = z.infer<typeof PropertyStatusSchema>
 
+// Placeholder validation function
+const validateNoPlaceholders = (value: string, fieldName: string) => {
+  const placeholderPatterns = [
+    /^a{3,}$/i, // aaa, aaaa, aaaaa, etc.
+    /^c{3,}$/i, // ccc, cccc, ccccc, etc.
+    /^q{3,}$/i, // qqq, qqqq, qqqqq, etc.
+    /^w{3,}$/i, // www, wwww, wwwww, etc.
+    /^s{3,}$/i, // sss, ssss, sssss, etc.
+    /^g{3,}$/i, // ggg, gggg, ggggg, etc.
+    /^f{3,}$/i, // fff, ffff, fffff, etc.
+    /^d{3,}$/i, // ddd, dddd, ddddd, etc.
+    /^h{3,}$/i, // hhh, hhhh, hhhhh, etc.
+    /^t{3,}$/i, // ttt, tttt, ttttt, etc.
+    /^e{3,}$/i, // eee, eeee, eeeee, etc.
+    /^r{3,}$/i, // rrr, rrrr, rrrrr, etc.
+    /^y{3,}$/i, // yyy, yyyy, yyyyy, etc.
+    /^u{3,}$/i, // uuu, uuuu, uuuuu, etc.
+    /^i{3,}$/i, // iii, iiii, iiiii, etc.
+    /^o{3,}$/i, // ooo, oooo, ooooo, etc.
+    /^p{3,}$/i, // ppp, pppp, ppppp, etc.
+    /test/i,    // test, Test, TEST, etc.
+    /placeholder/i, // placeholder, Placeholder, etc.
+    /^.{1,2}$/  // Too short (1-2 characters)
+  ];
+
+  for (const pattern of placeholderPatterns) {
+    if (pattern.test(value)) {
+      return `${fieldName} contains placeholder data. Please provide a real ${fieldName}.`;
+    }
+  }
+  return null;
+};
+
+// Custom validation schemas with placeholder checks
+const TitleSchema = z.string()
+  .min(3, 'Title must be at least 3 characters')
+  .refine((val) => !validateNoPlaceholders(val, 'title'), (val) => ({
+    message: validateNoPlaceholders(val, 'title') || 'Invalid title'
+  }));
+
+const DescriptionSchema = z.string()
+  .min(10, 'Description must be at least 10 characters')
+  .refine((val) => !validateNoPlaceholders(val, 'description'), (val) => ({
+    message: validateNoPlaceholders(val, 'description') || 'Invalid description'
+  }));
+
+const AddressSchema = z.string()
+  .min(5, 'Address must be at least 5 characters')
+  .refine((val) => !validateNoPlaceholders(val, 'address'), (val) => ({
+    message: validateNoPlaceholders(val, 'address') || 'Invalid address'
+  }));
+
 // Base Property Schema
 export const PropertySchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters'),
-  description: z.string().min(20, 'Description must be at least 20 characters'),
+  title: TitleSchema,
+  description: DescriptionSchema,
   property_type: PropertyTypeSchema,
   listing_type: ListingTypeSchema,
-  price: z.number().min(0, 'Price must be positive'),
+  price: z.number().min(1000, 'Price must be at least ₵1,000').max(100000000, 'Price cannot exceed ₵100,000,000'),
   currency: z.string().default('GHS'),
-  address: z.string().min(10, 'Address must be at least 10 characters'),
+  address: AddressSchema,
   city: z.string().min(2, 'City must be at least 2 characters'),
   region: z.string().min(2, 'Region must be at least 2 characters'),
   postal_code: z.string().optional(),
@@ -42,6 +94,20 @@ export const PropertySchema = z.object({
     alt_text: z.string().optional(),
     order_index: z.number().min(0)
   })).min(1, 'At least one image is required')
+}).refine((data) => {
+  // Validate bedrooms and bathrooms for houses and apartments
+  if ((data.property_type === 'house' || data.property_type === 'apartment')) {
+    if (data.bedrooms === 0 || !data.bedrooms) {
+      return false;
+    }
+    if (data.bathrooms === 0 || !data.bathrooms) {
+      return false;
+    }
+  }
+  return true;
+}, {
+  message: 'Houses and apartments must have at least 1 bedroom and 1 bathroom',
+  path: ['bedrooms'] // This will show the error on the bedrooms field
 })
 
 // Multi-step form schemas

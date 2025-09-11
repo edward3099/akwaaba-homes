@@ -4,10 +4,11 @@ import { cookies } from 'next/headers';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    console.log('🎬 Video upload API called for property:', params.id);
+    const { id } = await params;
+    console.log('🎬 Video upload API called for property:', id);
     
     const supabase = await createApiRouteSupabaseClient();
     
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     console.log('✅ User authenticated:', user.id);
-    const propertyId = params.id;
+    const propertyId = id;
     
     // Verify the property exists and belongs to the user
     console.log('🔍 Checking property ownership for:', propertyId);

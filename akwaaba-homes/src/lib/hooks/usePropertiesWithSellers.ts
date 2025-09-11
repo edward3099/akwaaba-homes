@@ -68,7 +68,6 @@ const transformDatabasePropertyWithSeller = (dbProperty: DatabaseProperty, selle
     seller: seller ? {
       id: seller.id,
       name: seller.full_name || 'Unknown Seller',
-      full_name: seller.full_name,
       email: seller.email,
       phone: seller.phone,
       type: 'individual',
@@ -78,9 +77,8 @@ const transformDatabasePropertyWithSeller = (dbProperty: DatabaseProperty, selle
     } : {
       id: dbProperty.seller_id,
       name: 'Unknown Seller',
-      full_name: null,
-      email: null,
-      phone: null,
+      email: undefined,
+      phone: '',
       type: 'individual',
       isVerified: false,
       company: undefined,

@@ -153,45 +153,60 @@ export function FeaturedProperties() {
   // Sync local state with search state hook when it's initialized
   useEffect(() => {
     if (isInitialized && filters) {
-      // Map search state filters to local state
-      if (filters.type) {
-        // Map property type to tid format
-        const typeToTidMap: { [key: string]: string } = {
-          'apartment': '1',
-          'house': '2',
-          'office': '3',
-          'land': '5'
-        };
-        // Handle both single type and array of types
-        const propertyType = Array.isArray(filters.type) ? filters.type[0] : filters.type;
-        setSelectedType(typeToTidMap[propertyType] || '0');
-      }
-      if ((filters as any).bedrooms) {
-        setSelectedBedrooms((filters as any).bedrooms.toString());
-      }
-      if (filters.priceRange) {
-        if (filters.priceRange.min) {
-          setSelectedMinPrice(filters.priceRange.min.toString());
+      console.log('🔍 DEBUG FeaturedProperties: Syncing selectedType with filters.type:', filters.type);
+      // Use functional state updates to avoid setState during render
+      setSelectedType(prev => {
+        if (filters.type) {
+          // Map property type to tid format
+          const typeToTidMap: { [key: string]: string } = {
+            'apartment': '1',
+            'house': '2',
+            'office': '3',
+            'land': '5'
+          };
+          // Handle both single type and array of types
+          const propertyType = Array.isArray(filters.type) ? filters.type[0] : filters.type;
+          const newType = typeToTidMap[propertyType] || '0';
+          console.log('🔍 DEBUG FeaturedProperties: Setting selectedType from', prev, 'to', newType);
+          return newType !== prev ? newType : prev;
+        } else {
+          // No property type filter means "All Types" should be selected
+          console.log('🔍 DEBUG FeaturedProperties: No filters.type, setting selectedType to 0');
+          return prev !== '0' ? '0' : prev;
         }
-        if (filters.priceRange.max) {
-          setSelectedMaxPrice(filters.priceRange.max.toString());
-        }
-      }
-      if (filters.location) {
-        setSearchRegion(filters.location);
-        
-      }
-      if ((filters as any).keywords) {
-        setSearchKeywords((filters as any).keywords);
-        
-      }
-      if ((filters as any).addedToSite) {
-        setAddedToSite((filters as any).addedToSite);
-      }
+      });
       
-
+      setSelectedBedrooms(prev => {
+        const newBedrooms = (filters as any).bedrooms ? (filters as any).bedrooms.toString() : '0';
+        return newBedrooms !== prev ? newBedrooms : prev;
+      });
+      
+      setSelectedMinPrice(prev => {
+        const newMinPrice = filters.priceRange?.min ? filters.priceRange.min.toString() : '0';
+        return newMinPrice !== prev ? newMinPrice : prev;
+      });
+      
+      setSelectedMaxPrice(prev => {
+        const newMaxPrice = filters.priceRange?.max ? filters.priceRange.max.toString() : '0';
+        return newMaxPrice !== prev ? newMaxPrice : prev;
+      });
+      
+      setSearchRegion(prev => {
+        const newRegion = filters.location || '';
+        return newRegion !== prev ? newRegion : prev;
+      });
+      
+      setSearchKeywords(prev => {
+        const newKeywords = (filters as any).keywords || '';
+        return newKeywords !== prev ? newKeywords : prev;
+      });
+      
+      setAddedToSite(prev => {
+        const newAddedToSite = (filters as any).addedToSite || '0';
+        return newAddedToSite !== prev ? newAddedToSite : prev;
+      });
     }
-  }, [isInitialized, filters.status]);
+  }, [isInitialized, filters.type, filters.bedrooms, filters.priceRange, filters.location, filters.keywords, filters.addedToSite]);
 
   // Slideshow effect - change image every 30 seconds
   useEffect(() => {
@@ -221,7 +236,14 @@ export function FeaturedProperties() {
       '3': 'office',
       '5': 'land'
     };
-    updateFilter('type', tidToTypeMap[value] || value);
+    
+    if (value === '0') {
+      // "All Types" selected - clear the type filter
+      updateFilter('type', undefined);
+    } else {
+      // Specific type selected - set the filter
+      updateFilter('type', tidToTypeMap[value] || value);
+    }
   };
 
   const handleBedroomsChange = (value: string) => {
@@ -308,18 +330,40 @@ export function FeaturedProperties() {
           }
 
           // Apply property type filter (tid)
-          if (filters.type && Array.isArray(filters.type) && filters.type.length > 0) {
-            const propertyType = filters.type[0];
-            // Convert property type to tid value
-            const typeToTidMap: { [key: string]: string } = {
-              'apartment': '1',
-              'house': '2',
-              'office': '3',
-              'land': '5'
-            };
-            const tid = typeToTidMap[propertyType];
-            if (tid) {
-              apiFilters.tid = tid;
+          if (filters.type) {
+            let propertyType: string;
+            
+            // Handle both array and string formats
+            if (Array.isArray(filters.type) && filters.type.length > 0) {
+              propertyType = filters.type[0];
+            } else if (typeof filters.type === 'string') {
+              propertyType = filters.type;
+            } else {
+              propertyType = '';
+            }
+            
+            console.log('🔍 DEBUG FeaturedProperties: propertyType:', propertyType);
+            
+            if (propertyType) {
+              // Check if it's already a tid (numeric string) or a property type name
+              if (/^\d+$/.test(propertyType)) {
+                // It's already a tid, use it directly
+                apiFilters.tid = propertyType;
+                console.log('🔍 DEBUG FeaturedProperties: Using tid directly:', propertyType);
+              } else {
+                // Convert property type name to tid value
+                const typeToTidMap: { [key: string]: string } = {
+                  'apartment': '1',
+                  'house': '2',
+                  'office': '3',
+                  'land': '5'
+                };
+                const tid = typeToTidMap[propertyType];
+                if (tid) {
+                  apiFilters.tid = tid;
+                  console.log('🔍 DEBUG FeaturedProperties: Mapped propertyType to tid:', propertyType, '->', tid);
+                }
+              }
             }
           }
 
@@ -354,7 +398,8 @@ export function FeaturedProperties() {
           }
 
           // Debug: Log API filters before making the call
-          
+          console.log('🔍 DEBUG FeaturedProperties: API filters:', apiFilters);
+          console.log('🔍 DEBUG FeaturedProperties: filters.type:', filters.type);
           
           // Make the API call
           const response = await fetch('/api/properties?' + new URLSearchParams(apiFilters));
@@ -381,11 +426,14 @@ export function FeaturedProperties() {
           // Validate current page after receiving API response
           if (calculatedPages > 0 && currentPage > calculatedPages) {
             // Current page is invalid, redirect to page 1
-            setCurrentPage(1);
-            // Update URL to page 1
-            const newSearchParams = new URLSearchParams(window.location.search);
-            newSearchParams.set('page', '1');
-            router.replace(`${window.location.pathname}?${newSearchParams.toString()}`);
+            // Use setTimeout to avoid setState during render
+            setTimeout(() => {
+              setCurrentPage(1);
+              // Update URL to page 1
+              const newSearchParams = new URLSearchParams(window.location.search);
+              newSearchParams.set('page', '1');
+              router.replace(`${window.location.pathname}?${newSearchParams.toString()}`);
+            }, 0);
           }
           
           setLoading(false);
@@ -407,7 +455,7 @@ export function FeaturedProperties() {
         ignore = true;
       };
     }
-  }, [isInitialized, filters, currentPage]);
+  }, [isInitialized, filters.status, filters.type, filters.bedrooms, filters.priceRange, filters.location, currentPage]);
 
   // Use properties directly from API (already transformed)
   const currentPageProperties = properties || [];
@@ -472,35 +520,46 @@ export function FeaturedProperties() {
     const urlLocation = searchParams.get('q') || '';
     const urlPage = searchParams.get('page') || '1';
 
-    // Only update state if URL parameters have actually changed
-    // This prevents unnecessary re-renders and state resets
-    // Note: selectedPropertyType is derived from filters.status, not a state variable
-    if (urlType !== selectedType) setSelectedType(urlType);
-    if (urlBedrooms !== selectedBedrooms) setSelectedBedrooms(urlBedrooms);
-    if (urlMinPrice !== selectedMinPrice) setSelectedMinPrice(urlMinPrice);
-    if (urlMaxPrice !== selectedMaxPrice) setSelectedMaxPrice(urlMaxPrice);
-    if (urlKeywords !== searchKeywords) setSearchKeywords(urlKeywords);
-    if (urlLocation !== searchRegion) setSearchRegion(urlLocation);
+    // Map URL type parameter to internal numeric format
+    const typeToTidMap: { [key: string]: string } = {
+      'apartment': '1',
+      'house': '2',
+      'office': '3',
+      'land': '5'
+    };
     
+    // Convert URL type to internal format, fallback to urlType if it's already numeric
+    const mappedType = typeToTidMap[urlType] || urlType;
+
+    // Use functional state updates to avoid circular dependencies
+    setSelectedType(prev => mappedType !== prev ? mappedType : prev);
+    setSelectedBedrooms(prev => urlBedrooms !== prev ? urlBedrooms : prev);
+    setSelectedMinPrice(prev => urlMinPrice !== prev ? urlMinPrice : prev);
+    setSelectedMaxPrice(prev => urlMaxPrice !== prev ? urlMaxPrice : prev);
+    setSearchKeywords(prev => urlKeywords !== prev ? urlKeywords : prev);
+    setSearchRegion(prev => urlLocation !== prev ? urlLocation : prev);
+    
+    // Handle page validation separately to avoid circular dependency
+    const requestedPage = parseInt(urlPage);
+    setCurrentPage(prev => {
+      if (requestedPage !== prev) {
+        // If totalPages is known and requested page is invalid, redirect to page 1
+        if (totalPages > 0 && requestedPage > totalPages) {
+          // Update URL to page 1
+          const newSearchParams = new URLSearchParams(searchParams.toString());
+          newSearchParams.set('page', '1');
+          router.replace(`${window.location.pathname}?${newSearchParams.toString()}`);
+          return 1;
+        } else {
+          return requestedPage;
+        }
+      }
+      return prev;
+    });
     
     // Note: We don't need to manually update filters here as the search state hook 
     // handles URL parameter parsing automatically
-    
-    // Validate page number and ensure it's within valid range
-    const requestedPage = parseInt(urlPage);
-    if (requestedPage !== currentPage) {
-      // If totalPages is known and requested page is invalid, redirect to page 1
-      if (totalPages > 0 && requestedPage > totalPages) {
-        // Update URL to page 1
-        const newSearchParams = new URLSearchParams(searchParams.toString());
-        newSearchParams.set('page', '1');
-        router.replace(`${window.location.pathname}?${newSearchParams.toString()}`);
-        setCurrentPage(1);
-      } else {
-        setCurrentPage(requestedPage);
-      }
-    }
-  }, [searchParams, totalPages, currentPage, router]);
+  }, [searchParams, totalPages, router]); // Removed state variables from dependencies
 
   // Show loading state
   if (loading) {
@@ -836,6 +895,7 @@ export function FeaturedProperties() {
                   <div className="form-group">
                     <label className="block text-xs font-medium text-foreground mb-1">Type</label>
                     <div className="flex flex-wrap gap-1">
+                      {console.log('🔍 DEBUG FeaturedProperties: Rendering buttons with selectedType:', selectedType)}
                       <button
                         onClick={() => handleTypeChange('0')}
                         className={`px-2 py-1 text-xs rounded-md border transition-all ${

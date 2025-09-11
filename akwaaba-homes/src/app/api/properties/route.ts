@@ -422,6 +422,137 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate against placeholder data patterns
+    const validateNoPlaceholders = (value: string, fieldName: string) => {
+      const placeholderPatterns = [
+        /^a{3,}$/i, // aaa, aaaa, aaaaa, etc.
+        /^c{3,}$/i, // ccc, cccc, ccccc, etc.
+        /^q{3,}$/i, // qqq, qqqq, qqqqq, etc.
+        /^w{3,}$/i, // www, wwww, wwwww, etc.
+        /^s{3,}$/i, // sss, ssss, sssss, etc.
+        /^g{3,}$/i, // ggg, gggg, ggggg, etc.
+        /^f{3,}$/i, // fff, ffff, fffff, etc.
+        /^d{3,}$/i, // ddd, dddd, ddddd, etc.
+        /^h{3,}$/i, // hhh, hhhh, hhhhh, etc.
+        /^t{3,}$/i, // ttt, tttt, ttttt, etc.
+        /^e{3,}$/i, // eee, eeee, eeeee, etc.
+        /^r{3,}$/i, // rrr, rrrr, rrrrr, etc.
+        /^y{3,}$/i, // yyy, yyyy, yyyyy, etc.
+        /^u{3,}$/i, // uuu, uuuu, uuuuu, etc.
+        /^i{3,}$/i, // iii, iiii, iiiii, etc.
+        /^o{3,}$/i, // ooo, oooo, ooooo, etc.
+        /^p{3,}$/i, // ppp, pppp, ppppp, etc.
+        /test/i,    // test, Test, TEST, etc.
+        /placeholder/i, // placeholder, Placeholder, etc.
+        /^.{1,2}$/  // Too short (1-2 characters)
+      ];
+
+      for (const pattern of placeholderPatterns) {
+        if (pattern.test(value)) {
+          return `${fieldName} contains placeholder data. Please provide a real ${fieldName}.`;
+        }
+      }
+      return null;
+    };
+
+    // Validate title
+    const titleError = validateNoPlaceholders(body.title, 'title');
+    if (titleError) {
+      return NextResponse.json({ error: titleError }, { status: 400 });
+    }
+
+    // Validate description
+    const descriptionError = validateNoPlaceholders(body.description, 'description');
+    if (descriptionError) {
+      return NextResponse.json({ error: descriptionError }, { status: 400 });
+    }
+
+    // Validate address
+    const addressError = validateNoPlaceholders(body.address, 'address');
+    if (addressError) {
+      return NextResponse.json({ error: addressError }, { status: 400 });
+    }
+
+    // Validate minimum length requirements
+    if (body.title.length < 3) {
+      return NextResponse.json(
+        { error: 'Title must be at least 3 characters long' },
+        { status: 400 }
+      );
+    }
+
+    if (body.description.length < 10) {
+      return NextResponse.json(
+        { error: 'Description must be at least 10 characters long' },
+        { status: 400 }
+      );
+    }
+
+    if (body.address.length < 5) {
+      return NextResponse.json(
+        { error: 'Address must be at least 5 characters long' },
+        { status: 400 }
+      );
+    }
+
+    // Validate price is realistic
+    const price = parseFloat(body.price);
+    if (price < 1000) {
+      return NextResponse.json(
+        { error: 'Price must be at least ₵1,000' },
+        { status: 400 }
+      );
+    }
+
+    if (price > 100000000) {
+      return NextResponse.json(
+        { error: 'Price cannot exceed ₵100,000,000' },
+        { status: 400 }
+      );
+    }
+
+    // Map form data to database fields - define functions first
+    const mapStatusToListingType = (status: string) => {
+      switch (status) {
+        case 'for-sale': return 'sale';
+        case 'for-rent': return 'rent';
+        case 'short-let': return 'lease';
+        default: return 'sale';
+      }
+    };
+
+    const mapTypeToPropertyType = (type: string) => {
+      switch (type) {
+        case 'house': return 'house';
+        case 'apartment': return 'apartment';
+        case 'land': return 'land';
+        case 'commercial': return 'commercial';
+        case 'office': return 'office';
+        case 'townhouse': return 'house'; // Map townhouse to house
+        case 'condo': return 'apartment'; // Map condo to apartment
+        default: return 'house';
+      }
+    };
+
+    // Validate property details for houses and apartments
+    const propertyType = mapTypeToPropertyType(body.property_type || body.type || 'house');
+    const bedrooms = parseInt(body.bedrooms) || 0;
+    const bathrooms = parseInt(body.bathrooms) || 0;
+
+    if ((propertyType === 'house' || propertyType === 'apartment') && bedrooms === 0) {
+      return NextResponse.json(
+        { error: 'Houses and apartments must have at least 1 bedroom' },
+        { status: 400 }
+      );
+    }
+
+    if ((propertyType === 'house' || propertyType === 'apartment') && bathrooms === 0) {
+      return NextResponse.json(
+        { error: 'Houses and apartments must have at least 1 bathroom' },
+        { status: 400 }
+      );
+    }
+
     // Validate images - handle both 'images' and 'image_urls' field names
     const imageUrls = body.image_urls || body.images;
     
@@ -452,27 +583,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Map form data to database fields
-    const mapStatusToListingType = (status: string) => {
-      switch (status) {
-        case 'for-sale': return 'sale';
-        case 'for-rent': return 'rent';
-        case 'short-let': return 'lease';
-        default: return 'sale';
-      }
-    };
-
-    const mapTypeToPropertyType = (type: string) => {
-      switch (type) {
-        case 'house': return 'house';
-        case 'apartment': return 'apartment';
-        case 'land': return 'land';
-        case 'commercial': return 'commercial';
-        case 'townhouse': return 'house'; // Map townhouse to house
-        case 'condo': return 'apartment'; // Map condo to apartment
-        default: return 'house';
-      }
-    };
+    // Map form data to database fields (functions already defined above)
 
     // Prepare property data
     const propertyData = {

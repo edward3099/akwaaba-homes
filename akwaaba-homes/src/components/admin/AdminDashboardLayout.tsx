@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Activity
+  Activity,
+  Trash2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/authContext';
@@ -121,6 +122,12 @@ export default function AdminDashboardLayout({ children, currentTab }: AdminDash
       label: 'Monitoring',
       icon: Activity,
       href: '/admin/monitoring'
+    },
+    {
+      id: 'cleanup',
+      label: 'Data Cleanup',
+      icon: Trash2,
+      href: '/admin/cleanup'
     },
     {
       id: 'settings',

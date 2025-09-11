@@ -51,7 +51,14 @@ export default function PropertiesList() {
       <div className="text-center py-20">
         <div className="text-red-600 text-lg mb-4">Error loading properties</div>
         <button
-          onClick={clearError}
+          onClick={() => fetchPropertiesWithSellers({
+            page: currentPage,
+            limit: 12,
+            propertyType: selectedPropertyType === 'all' ? undefined : selectedPropertyType,
+            status: selectedStatus === 'all' ? undefined : selectedStatus,
+            minPrice: priceRange[0],
+            maxPrice: priceRange[1],
+          })}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Try Again
