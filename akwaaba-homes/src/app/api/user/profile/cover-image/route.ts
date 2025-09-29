@@ -74,7 +74,8 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('Cover image upload error:', uploadError);
       return NextResponse.json({ 
-        error: 'Failed to upload cover image' 
+        error: 'Failed to upload cover image',
+        details: uploadError.message 
       }, { status: 500 });
     }
 
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      publicUrl,
+      cover_image_url: publicUrl,
       message: 'Cover image uploaded successfully'
     });
 

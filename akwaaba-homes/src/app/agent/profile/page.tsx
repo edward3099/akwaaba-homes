@@ -611,7 +611,7 @@ export default function AgentProfilePage() {
       // Update the profile state with the new cover image URL
       setProfile(prev => {
         if (!prev) return null;
-        const updated = { ...prev, cover_image: result.publicUrl };
+        const updated = { ...prev, cover_image: result.cover_image_url };
         console.log('Updated profile state with cover image:', updated);
         return updated;
       });
@@ -623,7 +623,7 @@ export default function AgentProfilePage() {
         title: "Success",
         description: "Cover image uploaded successfully!",
       });
-      handleInputChange('cover_image', result.publicUrl);
+      handleInputChange('cover_image', result.cover_image_url);
     } catch (error) {
       console.error('Cover image upload error:', error);
       toast({
@@ -645,19 +645,68 @@ export default function AgentProfilePage() {
     setSaving(true);
 
     try {
+      // Check if required images are uploaded (temporarily disabled for testing)
+      // if (!profile?.profile_image || profile.profile_image.trim() === '') {
+      //   toast({
+      //     title: "Profile Image Required",
+      //     description: "Please upload a profile photo before saving.",
+      //     variant: "destructive"
+      //   });
+      //   setSaving(false);
+      //   return;
+      // }
+
+      // if (!profile?.cover_image || profile.cover_image.trim() === '') {
+      //   toast({
+      //     title: "Cover Image Required", 
+      //     description: "Please upload a cover image before saving.",
+      //     variant: "destructive"
+      //   });
+      //   setSaving(false);
+      //   return;
+      // }
+
+      // Map form data to API expected format
+      const apiData: any = {
+        full_name: formData.full_name,
+        phone: formData.phone,
+        company_name: formData.company_name,
+        license_number: formData.license_number,
+        specializations: formData.specializations,
+        experience_years: formData.experience_years,
+        bio: formData.bio,
+        address: formData.address,
+        city: formData.city,
+        region: formData.region,
+        postal_code: formData.postal_code
+      };
+
+      // Only include image fields if they have valid URLs
+      if (profile?.profile_image && profile.profile_image.trim() !== '' && profile.profile_image.startsWith('http')) {
+        apiData.profile_image = profile.profile_image;
+      }
+      if (profile?.cover_image && profile.cover_image.trim() !== '' && profile.cover_image.startsWith('http')) {
+        apiData.cover_image = profile.cover_image;
+      }
+
+      console.log('Submitting profile data:', apiData);
+
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorData = await response.json();
+        console.error('Profile update error response:', errorData);
+        throw new Error(errorData.error || 'Failed to update profile');
       }
 
       const data = await response.json();
+      console.log('Profile update success:', data);
       setProfile(data.profile);
       
       // Check completion after saving
@@ -671,7 +720,7 @@ export default function AgentProfilePage() {
       console.error('Profile update error:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
         variant: "destructive"
       });
     } finally {

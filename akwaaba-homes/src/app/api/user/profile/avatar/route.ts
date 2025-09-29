@@ -21,130 +21,97 @@ export async function POST(request: NextRequest) {
             } catch {
               // The `setAll` method was called from a Server Component.
               // This can be ignored if you have middleware refreshing
+              // user sessions.
             }
           },
         },
       }
     );
-
-    // Get current user session
+    
+    // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-
+    
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Parse the form data
+    // Get the form data
     const formData = await request.formData();
-    const file = formData.get('avatar') as File;
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+    const avatarFile = formData.get('avatar') as File;
+    
+    if (!avatarFile) {
+      return NextResponse.json({ error: 'No avatar file provided' }, { status: 400 });
     }
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.' },
-        { status: 400 }
-      );
+    if (!allowedTypes.includes(avatarFile.type)) {
+      return NextResponse.json({ 
+        error: 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.' 
+      }, { status: 400 });
     }
 
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File size too large. Maximum size is 5MB.' },
-        { status: 400 }
-      );
+    if (avatarFile.size > maxSize) {
+      return NextResponse.json({ 
+        error: 'File too large. Maximum size is 5MB.' 
+      }, { status: 400 });
     }
 
     // Generate unique filename with user ID as folder
-    const fileExt = file.name.split('.').pop();
+    const fileExt = avatarFile.name.split('.').pop();
     const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
-    // Upload file to Supabase Storage
+    // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(fileName, file, {
+      .upload(fileName, avatarFile, {
         cacheControl: '3600',
-        upsert: false
+        upsert: true
       });
 
     if (uploadError) {
-      console.error('File upload error:', uploadError);
-      return NextResponse.json(
-        { error: 'Failed to upload file', details: uploadError.message },
-        { status: 500 }
-      );
+      console.error('Avatar upload error:', uploadError);
+      return NextResponse.json({ 
+        error: 'Failed to upload avatar',
+        details: uploadError.message 
+      }, { status: 500 });
     }
 
-    // Get the public URL of the uploaded file
+    // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('avatars')
       .getPublicUrl(fileName);
 
-    // Update the user's profile with the new avatar URL
+    console.log('Avatar uploaded successfully:', { fileName, publicUrl });
+
+    // Update user profile with avatar URL
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({
-        profile_image: publicUrl,
+      .update({ 
+        avatar_url: publicUrl,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', user.id);
 
     if (updateError) {
       console.error('Profile update error:', updateError);
-      // If profile update fails, we should delete the uploaded file
-      await supabase.storage
-        .from('avatars')
-        .remove([fileName]);
-      
-      return NextResponse.json(
-        { error: 'Failed to update profile with new avatar', details: updateError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ 
+        error: 'Failed to update profile with avatar' 
+      }, { status: 500 });
     }
 
     return NextResponse.json({
-      message: 'Avatar uploaded successfully',
-      avatarUrl: publicUrl
-    }, { status: 200 });
+      success: true,
+      avatar_url: publicUrl,
+      message: 'Avatar uploaded successfully'
+    });
 
   } catch (error) {
     console.error('Avatar upload error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
-}
-
-// Handle unsupported methods
-export async function GET() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
-}
-
-export async function PUT() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
-}
-
-export async function DELETE() {
-  return NextResponse.json(
-    { error: 'Method not allowed' },
-    { status: 405 }
-  );
 }

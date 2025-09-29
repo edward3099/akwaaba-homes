@@ -81,8 +81,12 @@ export async function GET(request: NextRequest) {
         specializations: profile.specializations,
         experience_years: profile.experience_years,
         bio: profile.bio,
-        profile_image: profile.profile_image,
+        profile_image: profile.avatar_url, // Map avatar_url to profile_image
         cover_image: profile.cover_image,
+        address: profile.address,
+        city: profile.city,
+        region: profile.region,
+        postal_code: profile.postal_code,
         user_role: profile.user_role,
         verification_status: profile.verification_status,
         created_at: profile.created_at,
@@ -229,6 +233,12 @@ export async function PUT(request: NextRequest) {
         updated_at: new Date().toISOString()
       };
 
+      // Map profile_image to avatar_url for database compatibility
+      if (updateData.profile_image) {
+        updateData.avatar_url = updateData.profile_image;
+        delete updateData.profile_image;
+      }
+
       // Remove undefined values
       Object.keys(updateData).forEach(key => 
         updateData[key] === undefined && delete updateData[key]
@@ -284,9 +294,15 @@ export async function PUT(request: NextRequest) {
         phone: profileData.phone,
         company_name: profileData.company_name,
         license_number: profileData.license_number,
+        specializations: profileData.specializations,
         experience_years: profileData.experience_years,
         bio: profileData.bio,
-        avatar_url: profileData.avatar_url,
+        profile_image: profileData.avatar_url, // Map avatar_url back to profile_image
+        cover_image: profileData.cover_image,
+        address: profileData.address,
+        city: profileData.city,
+        region: profileData.region,
+        postal_code: profileData.postal_code,
         user_role: profileData.user_role,
         verification_status: profileData.verification_status,
         is_verified: profileData.is_verified,
