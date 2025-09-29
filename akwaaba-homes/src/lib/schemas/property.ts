@@ -48,21 +48,21 @@ const validateNoPlaceholders = (value: string, fieldName: string) => {
 // Custom validation schemas with placeholder checks
 const TitleSchema = z.string()
   .min(3, 'Title must be at least 3 characters')
-  .refine((val) => !validateNoPlaceholders(val, 'title'), (val) => ({
-    message: validateNoPlaceholders(val, 'title') || 'Invalid title'
-  }));
+  .refine((val) => !validateNoPlaceholders(val, 'title'), {
+    message: 'Title contains placeholder text'
+  });
 
 const DescriptionSchema = z.string()
   .min(10, 'Description must be at least 10 characters')
-  .refine((val) => !validateNoPlaceholders(val, 'description'), (val) => ({
-    message: validateNoPlaceholders(val, 'description') || 'Invalid description'
-  }));
+  .refine((val) => !validateNoPlaceholders(val, 'description'), {
+    message: 'Description contains placeholder text'
+  });
 
 const AddressSchema = z.string()
   .min(5, 'Address must be at least 5 characters')
-  .refine((val) => !validateNoPlaceholders(val, 'address'), (val) => ({
-    message: validateNoPlaceholders(val, 'address') || 'Invalid address'
-  }));
+  .refine((val) => !validateNoPlaceholders(val, 'address'), {
+    message: 'Address contains placeholder text'
+  });
 
 // Base Property Schema
 export const PropertySchema = z.object({

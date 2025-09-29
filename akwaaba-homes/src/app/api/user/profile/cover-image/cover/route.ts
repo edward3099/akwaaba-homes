@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: 'Cover image uploaded successfully',
-      coverUrl: publicUrl
+      cover_image_url: publicUrl
     }, { status: 200 });
 
   } catch (error) {

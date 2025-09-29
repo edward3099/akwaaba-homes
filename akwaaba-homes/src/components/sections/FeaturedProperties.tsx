@@ -206,7 +206,7 @@ export function FeaturedProperties() {
         return newAddedToSite !== prev ? newAddedToSite : prev;
       });
     }
-  }, [isInitialized, filters.type, filters.bedrooms, filters.priceRange, filters.location, filters.keywords, filters.addedToSite]);
+  }, [isInitialized, filters.type, filters.bedrooms, filters.priceRange, filters.location, (filters as any).keywords, (filters as any).addedToSite]);
 
   // Slideshow effect - change image every 30 seconds
   useEffect(() => {
@@ -895,7 +895,6 @@ export function FeaturedProperties() {
                   <div className="form-group">
                     <label className="block text-xs font-medium text-foreground mb-1">Type</label>
                     <div className="flex flex-wrap gap-1">
-                      {console.log('🔍 DEBUG FeaturedProperties: Rendering buttons with selectedType:', selectedType)}
                       <button
                         onClick={() => handleTypeChange('0')}
                         className={`px-2 py-1 text-xs rounded-md border transition-all ${
