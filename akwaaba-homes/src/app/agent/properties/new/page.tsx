@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { 
   ArrowLeft, 
@@ -43,7 +43,6 @@ interface PropertyFormData {
 }
 
 export default function AddNewPropertyPage() {
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PropertyFormData>({
     title: '',
@@ -109,11 +108,7 @@ export default function AddNewPropertyPage() {
     e.preventDefault();
     
     if (!formData.title || !formData.price || !formData.property_type) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -155,11 +150,7 @@ export default function AddNewPropertyPage() {
           return;
         }
         if (response.status === 403) {
-          toast({
-            title: "Access Denied",
-            description: "You don't have permission to create properties",
-            variant: "destructive"
-          });
+          toast.error("You don't have permission to create properties");
           return;
         }
         throw new Error('Failed to create property');
@@ -167,21 +158,14 @@ export default function AddNewPropertyPage() {
 
       const result = await response.json();
       
-      toast({
-        title: "Success",
-        description: "Property created successfully!",
-      });
+      toast.success("Property created successfully!");
 
       // Redirect to properties list
       window.location.href = '/agent/properties';
       
     } catch (error) {
       console.error('Create property error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create property. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to create property. Please try again.");
     } finally {
       setLoading(false);
     }
