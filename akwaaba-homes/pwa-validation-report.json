@@ -1,0 +1,237 @@
+{
+  "timestamp": "2025-10-01T19:50:57.561Z",
+  "score": 100,
+  "totalChecks": 38,
+  "passedChecks": 38,
+  "failedChecks": 0,
+  "details": [
+    {
+      "name": "Manifest exists",
+      "passed": true,
+      "message": "manifest.json found",
+      "critical": false
+    },
+    {
+      "name": "Manifest name",
+      "passed": true,
+      "message": "App name defined",
+      "critical": true
+    },
+    {
+      "name": "Manifest short_name",
+      "passed": true,
+      "message": "Short name defined",
+      "critical": true
+    },
+    {
+      "name": "Manifest start_url",
+      "passed": true,
+      "message": "Start URL defined",
+      "critical": true
+    },
+    {
+      "name": "Manifest display",
+      "passed": true,
+      "message": "Display mode set to standalone",
+      "critical": true
+    },
+    {
+      "name": "Manifest theme_color",
+      "passed": true,
+      "message": "Theme color defined",
+      "critical": true
+    },
+    {
+      "name": "Manifest background_color",
+      "passed": true,
+      "message": "Background color defined",
+      "critical": true
+    },
+    {
+      "name": "Manifest icons",
+      "passed": true,
+      "message": "Found 8 icons",
+      "critical": true
+    },
+    {
+      "name": "Required icon sizes",
+      "passed": true,
+      "message": "Has 192x192 and 512x512 icons: true",
+      "critical": true
+    },
+    {
+      "name": "Service worker exists",
+      "passed": true,
+      "message": "sw.js found",
+      "critical": true
+    },
+    {
+      "name": "Service worker has install event",
+      "passed": true,
+      "message": "Install event handler found",
+      "critical": false
+    },
+    {
+      "name": "Service worker has activate event",
+      "passed": true,
+      "message": "Activate event handler found",
+      "critical": false
+    },
+    {
+      "name": "Service worker has fetch event",
+      "passed": true,
+      "message": "Fetch event handler found",
+      "critical": false
+    },
+    {
+      "name": "Service worker has cache strategy",
+      "passed": true,
+      "message": "Caching strategy implemented",
+      "critical": false
+    },
+    {
+      "name": "Offline page exists",
+      "passed": true,
+      "message": "offline.html found",
+      "critical": true
+    },
+    {
+      "name": "Icons directory exists",
+      "passed": true,
+      "message": "Icons directory found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-72x72.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-96x96.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-128x128.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-144x144.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-152x152.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-192x192.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-384x384.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Icon icon-512x512.png",
+      "passed": true,
+      "message": "Found",
+      "critical": true
+    },
+    {
+      "name": "Manifest link",
+      "passed": true,
+      "message": "Manifest link found",
+      "critical": true
+    },
+    {
+      "name": "Theme color meta",
+      "passed": true,
+      "message": "Theme color meta tag found",
+      "critical": true
+    },
+    {
+      "name": "Apple touch icon",
+      "passed": true,
+      "message": "Apple touch icon link found",
+      "critical": true
+    },
+    {
+      "name": "Viewport meta",
+      "passed": true,
+      "message": "Viewport meta tag found",
+      "critical": true
+    },
+    {
+      "name": "Mobile web app capable",
+      "passed": true,
+      "message": "Mobile web app capable meta found",
+      "critical": true
+    },
+    {
+      "name": "Component ServiceWorkerRegistration.tsx",
+      "passed": true,
+      "message": "Found",
+      "critical": false
+    },
+    {
+      "name": "Component PWAInstallPrompt.tsx",
+      "passed": true,
+      "message": "Found",
+      "critical": false
+    },
+    {
+      "name": "Component SplashScreen.tsx",
+      "passed": true,
+      "message": "Found",
+      "critical": false
+    },
+    {
+      "name": "Component PushNotifications.tsx",
+      "passed": true,
+      "message": "Found",
+      "critical": false
+    },
+    {
+      "name": "TWA config exists",
+      "passed": true,
+      "message": "twa-config.json found",
+      "critical": false
+    },
+    {
+      "name": "TWA package ID",
+      "passed": true,
+      "message": "Package ID defined",
+      "critical": false
+    },
+    {
+      "name": "TWA host",
+      "passed": true,
+      "message": "Host defined",
+      "critical": false
+    },
+    {
+      "name": "TWA theme color",
+      "passed": true,
+      "message": "Theme color defined",
+      "critical": false
+    },
+    {
+      "name": "Browser config exists",
+      "passed": true,
+      "message": "browserconfig.xml found",
+      "critical": false
+    }
+  ]
+}

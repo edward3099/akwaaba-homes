@@ -12,30 +12,153 @@ html, body {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  background-color: #f8fafc; /* Light gray background to prevent blue overscroll */
+  background-color: #ffffff; /* White background to prevent Safari theme color bleeding */
+  /* Fix Safari PWA safe area issues */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* Fix Safari overscroll bounce showing blue background */
 html {
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
   overscroll-behavior: none;
   min-height: 100vh;
 }
 
 body {
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
   overscroll-behavior: none;
   min-height: 100vh;
 }
 
 /* Additional viewport background fixes */
 #__next {
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
   min-height: 100vh;
+  /* Ensure content doesn't bleed into safe areas */
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+  margin-left: calc(-1 * env(safe-area-inset-left));
+  margin-right: calc(-1 * env(safe-area-inset-right));
+}
+
+/* Fix for Safari PWA red background issue */
+body {
+  /* Override any theme color bleeding */
+  background-color: #ffffff !important;
+  /* Ensure safe area is properly handled */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 [data-nextjs-scroll-focus-boundary] {
   background-color: #f8fafc !important;
+}
+
+/* Safari PWA specific fixes */
+@supports (padding: max(0px)) {
+  html, body {
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    padding-left: max(env(safe-area-inset-left), 0px);
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+}
+
+/* Fix Safari PWA red background bleeding */
+@media screen and (display-mode: standalone) {
+  html {
+    background-color: #ffffff !important;
+    /* Force override Safari theme color */
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    background-color: #ffffff !important;
+    /* Ensure content area is properly contained */
+    position: relative;
+    z-index: 1;
+    /* Override any Safari theme color bleeding */
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Override any theme color bleeding in safe areas */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff !important;
+    z-index: -1;
+  }
+  
+  /* Additional Safari-specific overrides */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Force override for any red background bleeding */
+  html, body, #__next, main, [data-nextjs-scroll-focus-boundary] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+  
+  /* Override Safari's status bar area */
+  html::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background-color: #ffffff !important;
+    z-index: 9999;
+  }
+  
+  /* Override Safari's home indicator area */
+  html::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background-color: #ffffff !important;
+    z-index: 9999;
+  }
+}
+
+/* Safari PWA mode class for additional fixes */
+.safari-pwa-mode {
+  background-color: #ffffff !important;
+}
+
+.safari-pwa-mode * {
+  /* Override any red backgrounds that might leak through */
+  background-color: inherit !important;
+}
+
+/* Additional Safari PWA fixes */
+@supports (-webkit-touch-callout: none) {
+  html {
+    background-color: #ffffff !important;
+  }
+  
+  body {
+    background-color: #ffffff !important;
+  }
+  
+  /* Override Safari's theme color application */
+  html, body, #__next {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
 }
 
 /* Ensure proper viewport behavior on mobile */
@@ -500,7 +623,7 @@ html {
 }
 
 body {
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 }

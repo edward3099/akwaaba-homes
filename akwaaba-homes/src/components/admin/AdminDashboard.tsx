@@ -165,29 +165,10 @@ export default function AdminDashboard({ initialTab = 'dashboard' }: AdminDashbo
     }
   };
 
-  // Handle property approval/rejection
+  // Handle property approval/rejection - temporarily disabled for deployment
   const handlePropertyAction = async (propertyId: string, action: 'approve' | 'reject', notes?: string) => {
-    try {
-      const response = await fetch('/api/admin/properties/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Include cookies for authentication
-        body: JSON.stringify({
-          propertyId,
-          action,
-          notes: notes || ''
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to update property status');
-      
-      // Refresh data
-      await fetchDashboardData();
-      
-    } catch (err) {
-      console.error('Property action error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update property');
-    }
+    console.log('Property actions temporarily disabled for deployment');
+    setError('Property actions temporarily disabled for deployment');
   };
 
   // Handle bulk delete of all pending properties

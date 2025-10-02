@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ 
-        avatar_url: publicUrl,
+        profile_image: publicUrl,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', user.id);

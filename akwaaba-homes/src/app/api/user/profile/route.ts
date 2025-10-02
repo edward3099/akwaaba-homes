@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         specializations: profile.specializations,
         experience_years: profile.experience_years,
         bio: profile.bio,
-        profile_image: profile.avatar_url, // Map avatar_url to profile_image
+        profile_image: profile.profile_image, // Use profile_image directly
         cover_image: profile.cover_image,
         address: profile.address,
         city: profile.city,
@@ -180,7 +180,7 @@ export async function PUT(request: NextRequest) {
         user_role: 'agent', // Default to agent for onboarding
         verification_status: 'pending',
         is_verified: false,
-        avatar_url: validationResult.data.profile_image || null,
+        profile_image: validationResult.data.profile_image || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -233,11 +233,7 @@ export async function PUT(request: NextRequest) {
         updated_at: new Date().toISOString()
       };
 
-      // Map profile_image to avatar_url for database compatibility
-      if (updateData.profile_image) {
-        updateData.avatar_url = updateData.profile_image;
-        delete updateData.profile_image;
-      }
+      // No mapping needed - profile_image is the correct field name
 
       // Remove undefined values
       Object.keys(updateData).forEach(key => 
@@ -297,7 +293,7 @@ export async function PUT(request: NextRequest) {
         specializations: profileData.specializations,
         experience_years: profileData.experience_years,
         bio: profileData.bio,
-        profile_image: profileData.avatar_url, // Map avatar_url back to profile_image
+        profile_image: profileData.profile_image, // Use profile_image directly
         cover_image: profileData.cover_image,
         address: profileData.address,
         city: profileData.city,

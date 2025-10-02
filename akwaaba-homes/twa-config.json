@@ -1,0 +1,75 @@
+{
+  "packageId": "com.akwaabahomes.app",
+  "host": "akwaabahomes.com",
+  "name": "AkwaabaHomes",
+  "launcherName": "AkwaabaHomes",
+  "display": "standalone",
+  "themeColor": "#C21807",
+  "navigationColor": "#C21807",
+  "backgroundColor": "#00A86B",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://akwaabahomes.com/icons/icon-512x512.png",
+  "maskableIconUrl": "https://akwaabahomes.com/icons/icon-512x512.png",
+  "monochromeIconUrl": "https://akwaabahomes.com/icons/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 19,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Search Properties",
+      "shortName": "Search",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "https://akwaabahomes.com/icons/search-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Featured Properties",
+      "shortName": "Featured",
+      "url": "/?featured=true",
+      "icons": [
+        {
+          "src": "https://akwaabahomes.com/icons/featured-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Diaspora Services",
+      "shortName": "Diaspora",
+      "url": "/#diaspora",
+      "icons": [
+        {
+          "src": "https://akwaabahomes.com/icons/diaspora-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "webManifestUrl": "https://akwaabahomes.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "playBilling": false,
+    "locationDelegation": true
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "appVersion": "1.0.0"
+}
+
+
+
+

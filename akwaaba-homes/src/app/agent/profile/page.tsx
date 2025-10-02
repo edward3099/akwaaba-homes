@@ -332,7 +332,7 @@ export default function AgentProfilePage() {
     
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('cover_image', file);
       
       const response = await fetch('/api/user/profile/cover-image', {
         method: 'POST',
@@ -1135,23 +1135,25 @@ export default function AgentProfilePage() {
                 ))}
               </div>
               
-              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+              <div className="space-y-2">
                 <Input
                   value={newSpecialization}
                   onChange={(e) => setNewSpecialization(e.target.value)}
                   placeholder="Add a specialization"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
-                  className="min-h-[44px]"
+                  className="min-h-[44px] w-full text-base"
                 />
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={addSpecialization}
-                  disabled={!newSpecialization.trim()}
-                  className="w-full sm:w-auto min-h-[44px]"
-                >
-                  Add
-                </Button>
+                <div className="flex justify-end">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={addSpecialization}
+                    disabled={!newSpecialization.trim()}
+                    className="min-h-[44px] px-6"
+                  >
+                    Add Specialization
+                  </Button>
+                </div>
               </div>
               
               <p className="text-xs sm:text-sm text-slate-500">
