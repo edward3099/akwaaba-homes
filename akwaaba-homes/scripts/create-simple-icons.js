@@ -197,3 +197,6 @@ console.log('Note: These are basic colored squares. For production, use proper i
 
 
 
+
+
+
